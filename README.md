@@ -29,6 +29,26 @@ class Item
 end
 ```
 
+# Usage
+
+```
+item.move_to 2 # just change position
+item.move_to! 2 # and save
+item.move_to = 2 # assignable method
+
+# symbol position
+item.move_to :top
+item.move_to :bottom
+item.move_to :higher
+item.move_to :lower
+
+# generated methods
+item.move_to_top
+item.move_to_bottom
+item.move_higher
+item.move_lower
+```
+
 # Contributing
 
 Fork && Patch && Spec && Push && Pull request.
