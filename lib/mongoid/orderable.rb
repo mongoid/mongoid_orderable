@@ -13,7 +13,7 @@ module Mongoid::Orderable
       }
 
       configuration.update options if options.is_a?(Hash)
-      field configuration[:column], type: Integer
+      field configuration[:column], :type => Integer
       index configuration[:column]
 
       configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
@@ -121,7 +121,7 @@ module Mongoid::Orderable
         self.class.find(_id).remove_from_list
         self.orderable_position = nil
       end
-        
+
       return if !target_position && in_list?
 
       target_position = target_position_to_position target_position
