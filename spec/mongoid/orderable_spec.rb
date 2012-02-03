@@ -36,6 +36,12 @@ describe Mongoid::Orderable do
     embedded_in :embeds_orderable
   end
 
+  class CustomizedOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    orderable :column => :pos
+  end
 
   describe SimpleOrderable do
     before :each do
@@ -249,6 +255,16 @@ describe Mongoid::Orderable do
       positions.should == [[1, 2], [1, 2, 3]]
     end
 
+  end
+
+  describe CustomizedOrderable do
+    it 'does not have default position field' do
+      CustomizedOrderable.fields.should_not have_key('position')
+    end
+
+    it 'should have custom pos field' do
+      CustomizedOrderable.fields.should have_key('pos')
+    end
   end
 
 end
