@@ -1,22 +1,19 @@
 module Mongoid::Orderable
   extend ActiveSupport::Concern
 
-  included do
-    orderable
-  end
-
   module ClassMethods
     def orderable options = {}
       configuration = {
         :column => :position,
+        :index => true,
         :scope => nil
       }
 
-      configuration.update options if options.is_a?(Hash)
-      field configuration[:column], :type => Integer
-      index configuration[:column]
-
+      configuration.merge! options if options.is_a?(Hash)
       configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
+
+      field configuration[:column], :type => Integer
+      index configuration[:column] if configuration[:index]
 
       case configuration[:scope]
       when Symbol then

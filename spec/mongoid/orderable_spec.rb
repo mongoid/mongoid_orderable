@@ -4,6 +4,8 @@ describe Mongoid::Orderable do
   class SimpleOrderable
     include Mongoid::Document
     include Mongoid::Orderable
+
+    orderable
   end
 
   class ScopedGroup
@@ -21,8 +23,6 @@ describe Mongoid::Orderable do
     orderable :scope => :group
   end
 
-
-
   class EmbedsOrderable
     include Mongoid::Document
 
@@ -34,6 +34,8 @@ describe Mongoid::Orderable do
     include Mongoid::Orderable
 
     embedded_in :embeds_orderable
+
+    orderable
   end
 
   class CustomizedOrderable
@@ -41,6 +43,13 @@ describe Mongoid::Orderable do
     include Mongoid::Orderable
 
     orderable :column => :pos
+  end
+
+  class NoIndexOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    orderable :index => false
   end
 
   describe SimpleOrderable do
@@ -58,6 +67,10 @@ describe Mongoid::Orderable do
     it 'should have proper position column' do
       SimpleOrderable.fields.key?('position').should be_true
       SimpleOrderable.fields['position'].options[:type].should == Integer
+    end
+
+    it 'should have index on position column' do
+      SimpleOrderable.index_options[:position].should_not be_nil
     end
 
     it 'should set proper position while creation' do
@@ -264,6 +277,12 @@ describe Mongoid::Orderable do
 
     it 'should have custom pos field' do
       CustomizedOrderable.fields.should have_key('pos')
+    end
+  end
+
+  describe NoIndexOrderable do
+    it 'should not have index on position column' do
+      NoIndexOrderable.index_options[:position].should be_nil
     end
   end
 

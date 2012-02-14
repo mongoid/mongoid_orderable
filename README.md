@@ -14,8 +14,7 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 gem 'mongoid_orderable'
 ```
 
-Gem has the same api as others. Just include Mongoid::Orderable into your model.
-Also you can initialize orderable manually and specify `:scope` or `:column` options:
+Gem has the same api as others. Just include Mongoid::Orderable into your model and call `orderable` method.
 
 ```
 class Item
@@ -24,8 +23,10 @@ class Item
 
   # belongs_to :group
 
+  # orderable
   # orderable :scope => :group, :column => :pos
   # orderable :scope => lambda { |document| where(:group_id => document.group_id) }
+  # orderable :index => false # this one if you want specify indexes manually
 end
 ```
 
