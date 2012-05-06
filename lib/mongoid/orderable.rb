@@ -113,7 +113,7 @@ private
 
   def apply_position target_position
     if persisted? && !embedded? && orderable_scope_changed?
-      self.class.find(_id).remove_from_list
+      self.class.unscoped.find(_id).remove_from_list
       self.orderable_position = nil
     end
 
