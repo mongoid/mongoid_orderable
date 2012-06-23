@@ -13,15 +13,22 @@ module Mongoid::Orderable
       configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
 
       field configuration[:column], :type => Integer
-      index configuration[:column] if configuration[:index]
+      if configuration[:index]
+        if MongoidOrderable.mongoid2?
+          index configuration[:column]
+        else
+          index(configuration[:column] => 1)
+        end
+      end
 
       case configuration[:scope]
       when Symbol then
-        scope :orderable_scope, lambda { |document| where(configuration[:scope] => document.send(configuration[:scope])) }
+        scope :orderable_scope, lambda { |document|
+          where(configuration[:scope] => document.send(configuration[:scope])) }
       when Proc then
         scope :orderable_scope, configuration[:scope]
       else
-        scope :orderable_scope, lambda { |document| where }
+        scope :orderable_scope, lambda { |document| where({}) }
       end
 
       define_method :orderable_column do
@@ -86,7 +93,7 @@ module Mongoid::Orderable
   end
 
   def remove_from_list
-    orderable_scoped.where(orderable_column.gt => orderable_position).inc(orderable_column => -1)
+    orderable_scoped.where(orderable_column.gt => orderable_position).inc(orderable_column, -1)
   end
 
 private
@@ -122,10 +129,10 @@ private
     target_position = target_position_to_position target_position
 
     unless in_list?
-      orderable_scoped.where(orderable_column.gte => target_position).inc(orderable_column => 1)
+      orderable_scoped.where(orderable_column.gte => target_position).inc(orderable_column, 1)
     else
-      orderable_scoped.where(orderable_column.gte => target_position, orderable_column.lt => orderable_position).inc(orderable_column => 1) if target_position < orderable_position
-      orderable_scoped.where(orderable_column.gt => orderable_position, orderable_column.lte => target_position).inc(orderable_column => -1) if target_position > orderable_position
+      orderable_scoped.where(orderable_column.gte => target_position, orderable_column.lt => orderable_position).inc(orderable_column, 1) if target_position < orderable_position
+      orderable_scoped.where(orderable_column.gt => orderable_position, orderable_column.lte => target_position).inc(orderable_column, -1) if target_position > orderable_position
     end
 
     self.orderable_position = target_position
@@ -148,7 +155,7 @@ private
 
   def bottom_orderable_position
     @bottom_orderable_position = begin
-      max = orderable_scoped.max(orderable_column).to_i
+      max = orderable_scoped.distinct(orderable_column).map(&:to_i).max.to_i
       in_list? ? max : max.next
     end
   end

@@ -2,11 +2,9 @@ module MongoidOrderable #:nodoc:
   module Mongoid #:nodoc:
     module Contexts #:nodoc:
       module Enumerable #:nodoc:
-        def inc attributes = {}
+        def inc attribute, value
           iterate do |doc|
-            attributes.each do |attribute, value|
-              doc.inc(attribute, value)
-            end
+            doc.inc(attribute, value)
           end
         end
       end

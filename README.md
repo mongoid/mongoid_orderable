@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/pyromaniac/mongoid_orderable.png)](http://travis-ci.org/pyromaniac/mongoid_orderable)
+
 # What?
 
 Mongoid::Orderable is a ordered list implementation for your mongoid models.
@@ -7,6 +9,7 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 * It uses native mongo batch increment feature
 * It supports assignable api
 * It proper assingns position while moving document between scopes
+* It supports both mongoid 2 and 3
 
 # How?
 

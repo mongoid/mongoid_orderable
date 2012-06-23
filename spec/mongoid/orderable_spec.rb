@@ -61,7 +61,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      SimpleOrderable.order_by(:position, :asc).map(&:position)
+      SimpleOrderable.all.map(&:position).sort
     end
 
     it 'should have proper position column' do
@@ -70,7 +70,11 @@ describe Mongoid::Orderable do
     end
 
     it 'should have index on position column' do
-      SimpleOrderable.index_options[:position].should_not be_nil
+      if MongoidOrderable.mongoid2?
+        SimpleOrderable.index_options[:position].should_not be_nil
+      else
+        SimpleOrderable.index_options[{:position => 1}].should_not be_nil
+      end
     end
 
     it 'should set proper position while creation' do
@@ -261,7 +265,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      EmbedsOrderable.order_by(:position).all.map { |eo| eo.embedded_orderables.order_by(:position).map(&:position) }
+      EmbedsOrderable.order_by(:position => 1).all.map { |eo| eo.embedded_orderables.map(&:position).sort }
     end
 
     it 'should set proper position while creation' do

@@ -1,13 +1,19 @@
 require 'bundler'
 Bundler.require
 
-DATABASE_ID = Process.pid
+DATABASE_NAME = "mongoid_#{Process.pid}"
 
-Mongoid.configure do |config|
-  database = Mongo::Connection.new.db("mongoid_#{DATABASE_ID}")
-  database.add_user("mongoid", "test")
-  config.master = database
-  config.logger = nil
+if MongoidOrderable.mongoid2?
+  Mongoid.configure do |config|
+    # database = Mongo::Connection.new.db DATABASE_NAME
+    # database.add_user "mongoid", "test"
+    config.master = Mongo::Connection.new.db DATABASE_NAME
+    config.logger = nil
+  end
+else
+  Mongoid.configure do |config|
+    config.connect_to DATABASE_NAME
+  end
 end
 
 RSpec.configure do |config|
@@ -22,6 +28,10 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    Mongoid.master.connection.drop_database("mongoid_#{DATABASE_ID}")
+    if MongoidOrderable.mongoid2?
+      Mongoid.master.connection.drop_database DATABASE_NAME
+    else
+      Mongoid.default_session.drop
+    end
   end
 end

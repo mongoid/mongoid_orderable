@@ -2,10 +2,10 @@ module MongoidOrderable #:nodoc:
   module Mongoid #:nodoc:
     module Contexts #:nodoc:
       module Mongo #:nodoc:
-        def inc attributes = {}
+        def inc attribute, value
           klass.collection.update(
             selector,
-            { "$inc" => attributes },
+            { "$inc" => {attribute => value} },
             :multi => true,
             :safe => ::Mongoid.persist_in_safe_mode
           )
