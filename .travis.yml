@@ -9,3 +9,5 @@ rvm:
 env:
   - MONGOID_VERSION=2
   - MONGOID_VERSION='~> 3.0.0.rc'
+
+services: mongodb
