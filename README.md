@@ -30,6 +30,7 @@ class Item
   # orderable :scope => :group, :column => :pos
   # orderable :scope => lambda { |document| where(:group_id => document.group_id) }
   # orderable :index => false # this one if you want specify indexes manually
+  # orderable :base => 0 # count position from zero as the top-most value (1 is the default value)
 end
 ```
 

@@ -8,11 +8,11 @@ rvm:
 
 env:
   - MONGOID_VERSION=2
-  - MONGOID_VERSION='~> 3.0.0.rc'
+  - MONGOID_VERSION='~> 3.0.0'
 
 matrix:
   exclude:
     - rvm: 1.9.2
-      env: MONGOID_VERSION='~> 3.0.0.rc'
+      env: MONGOID_VERSION='~> 3.0.0'
 
 services: mongodb
