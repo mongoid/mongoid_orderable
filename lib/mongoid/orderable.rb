@@ -6,7 +6,8 @@ module Mongoid::Orderable
       configuration = {
         :column => :position,
         :index => true,
-        :scope => nil
+        :scope => nil,
+        :base => 1
       }
 
       configuration.merge! options if options.is_a?(Hash)
@@ -33,6 +34,10 @@ module Mongoid::Orderable
 
       define_method :orderable_column do
         configuration[:column]
+      end
+
+      define_method :orderable_base do
+        configuration[:base]
       end
 
       before_save :add_to_list
@@ -77,7 +82,7 @@ module Mongoid::Orderable
   end
 
   def first?
-    in_list? && orderable_position == 1
+    in_list? && orderable_position == orderable_base
   end
 
   def last?
@@ -142,20 +147,22 @@ private
     target_position = :bottom unless target_position
 
     target_position = case target_position.to_sym
-      when :top then 1
+      when :top then orderable_base
       when :bottom then bottom_orderable_position
       when :higher then orderable_position.pred
       when :lower then orderable_position.next
     end unless target_position.is_a? Numeric
 
-    target_position = 1 if target_position < 1
+    target_position = orderable_base if target_position < orderable_base
     target_position = bottom_orderable_position if target_position > bottom_orderable_position
     target_position
   end
 
   def bottom_orderable_position
     @bottom_orderable_position = begin
-      max = orderable_scoped.distinct(orderable_column).map(&:to_i).max.to_i
+      positions_list = orderable_scoped.distinct(orderable_column)
+      return orderable_base if positions_list.empty?
+      max = positions_list.map(&:to_i).max.to_i
       in_list? ? max : max.next
     end
   end

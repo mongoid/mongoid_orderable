@@ -52,6 +52,13 @@ describe Mongoid::Orderable do
     orderable :index => false
   end
 
+  class ZeroBasedOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    orderable :base => 0
+  end
+
   describe SimpleOrderable do
     before :each do
       SimpleOrderable.delete_all
@@ -75,6 +82,10 @@ describe Mongoid::Orderable do
       else
         SimpleOrderable.index_options[{:position => 1}].should_not be_nil
       end
+    end
+
+    it 'should have a orderable base of 1' do
+      SimpleOrderable.create!.orderable_base.should == 1
     end
 
     it 'should set proper position while creation' do
@@ -105,16 +116,19 @@ describe Mongoid::Orderable do
       it 'top' do
         newbie = SimpleOrderable.create! :move_to => :top
         positions.should == [1, 2, 3, 4, 5, 6]
+        newbie.position.should == 1
       end
 
       it 'bottom' do
         newbie = SimpleOrderable.create! :move_to => :bottom
         positions.should == [1, 2, 3, 4, 5, 6]
+        newbie.position.should == 6
       end
 
       it 'middle' do
         newbie = SimpleOrderable.create! :move_to => 4
         positions.should == [1, 2, 3, 4, 5, 6]
+        newbie.position.should == 4
       end
 
     end
@@ -217,16 +231,19 @@ describe Mongoid::Orderable do
       it 'top' do
         newbie = ScopedOrderable.create! :move_to => :top, :group_id => 1
         positions.should == [1, 2, 3, 1, 2, 3]
+        newbie.position.should == 1
       end
 
       it 'bottom' do
         newbie = ScopedOrderable.create! :move_to => :bottom, :group_id => 2
         positions.should == [1, 2, 1, 2, 3, 4]
+        newbie.position.should == 4
       end
 
       it 'middle' do
         newbie = ScopedOrderable.create! :move_to => 2, :group_id => 2
         positions.should == [1, 2, 1, 2, 3, 4]
+        newbie.position.should == 2
       end
 
     end
@@ -288,6 +305,123 @@ describe Mongoid::Orderable do
     it 'should not have index on position column' do
       NoIndexOrderable.index_options[:position].should be_nil
     end
+  end
+
+
+  describe ZeroBasedOrderable do
+    before :each do
+      ZeroBasedOrderable.delete_all
+      5.times do
+        ZeroBasedOrderable.create!
+      end
+    end
+
+    def positions
+      ZeroBasedOrderable.all.map(&:position).sort
+    end
+
+    it 'should have a orderable base of 0' do
+      ZeroBasedOrderable.create!.orderable_base.should == 0
+    end
+
+    it 'should set proper position while creation' do
+      positions.should == [0, 1, 2, 3, 4]
+    end
+
+    describe 'removement' do
+
+      it 'top' do
+        ZeroBasedOrderable.where(:position => 0).destroy
+        positions.should == [0, 1, 2, 3]
+      end
+
+      it 'bottom' do
+        ZeroBasedOrderable.where(:position => 4).destroy
+        positions.should == [0, 1, 2, 3]
+      end
+
+      it 'middle' do
+        ZeroBasedOrderable.where(:position => 2).destroy
+        positions.should == [0, 1, 2, 3]
+      end
+
+    end
+
+    describe 'inserting' do
+
+      it 'top' do
+        newbie = ZeroBasedOrderable.create! :move_to => :top
+        positions.should == [0, 1, 2, 3, 4, 5]
+        newbie.position.should == 0
+      end
+
+      it 'bottom' do
+        newbie = ZeroBasedOrderable.create! :move_to => :bottom
+        positions.should == [0, 1, 2, 3, 4, 5]
+        newbie.position.should == 5
+      end
+
+      it 'middle' do
+        newbie = ZeroBasedOrderable.create! :move_to => 3
+        positions.should == [0, 1, 2, 3, 4, 5]
+        newbie.position.should == 3
+      end
+
+    end
+
+    describe 'movement' do
+
+      it 'higher from top' do
+        record = ZeroBasedOrderable.where(:position => 0).first
+        record.update_attributes :move_to => :higher
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 0
+      end
+
+      it 'higher from bottom' do
+        record = ZeroBasedOrderable.where(:position => 4).first
+        record.update_attributes :move_to => :higher
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 3
+      end
+
+      it 'higher from middle' do
+        record = ZeroBasedOrderable.where(:position => 3).first
+        record.update_attributes :move_to => :higher
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 2
+      end
+
+      it 'lower from top' do
+        record = ZeroBasedOrderable.where(:position => 0).first
+        record.update_attributes :move_to => :lower
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 1
+      end
+
+      it 'lower from bottom' do
+        record = ZeroBasedOrderable.where(:position => 4).first
+        record.update_attributes :move_to => :lower
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 4
+      end
+
+      it 'lower from middle' do
+        record = ZeroBasedOrderable.where(:position => 2).first
+        record.update_attributes :move_to => :lower
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 3
+      end
+
+      it "does nothing if position not change" do
+        record = ZeroBasedOrderable.where(:position => 3).first
+        record.save
+        positions.should == [0, 1, 2, 3, 4]
+        record.reload.position.should == 3
+      end
+
+    end
+
   end
 
 end
