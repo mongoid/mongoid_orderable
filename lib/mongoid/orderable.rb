@@ -40,6 +40,11 @@ module Mongoid::Orderable
         configuration[:base]
       end
 
+      self_class = self
+      define_method :orderable_inherited_class do
+        self_class if configuration[:inherited]
+      end
+
       before_save :add_to_list
       after_destroy :remove_from_list
     end
@@ -115,7 +120,7 @@ private
     if embedded?
       send(metadata.inverse).send(metadata.name).orderable_scope(self)
     else
-      self.class.orderable_scope(self)
+      (orderable_inherited_class || self.class).orderable_scope(self)
     end
   end
 
