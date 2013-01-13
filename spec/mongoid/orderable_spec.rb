@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Mongoid::Orderable do
+
   class SimpleOrderable
     include Mongoid::Document
     include Mongoid::Orderable
@@ -57,6 +58,19 @@ describe Mongoid::Orderable do
     include Mongoid::Orderable
 
     orderable :base => 0
+  end
+
+  class Fruit
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    orderable inherited: true
+  end
+
+  class Apple < Fruit
+  end
+
+  class Orange < Fruit
   end
 
   describe SimpleOrderable do
@@ -424,4 +438,13 @@ describe Mongoid::Orderable do
 
   end
 
+  describe Fruit do
+    it 'should set proper position' do
+      fruit1 = Apple.create
+      fruit2 = Orange.create
+      fruit1.position.should == 1
+      fruit2.position.should == 2
+    end
+
+  end
 end
