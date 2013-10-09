@@ -13,7 +13,8 @@ module Mongoid::Orderable
       configuration.merge! options if options.is_a?(Hash)
       configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
 
-      field configuration[:column], :type => Integer
+      field_opts = { :type => Integer }.merge(configuration.slice(:as))
+      field configuration[:column], field_opts
       if configuration[:index]
         if MongoidOrderable.mongoid2?
           index configuration[:column]

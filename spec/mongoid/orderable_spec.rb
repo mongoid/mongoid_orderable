@@ -43,7 +43,7 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    orderable :column => :pos
+    orderable :column => :pos, :as => :my_position
   end
 
   class NoIndexOrderable
@@ -312,6 +312,10 @@ describe Mongoid::Orderable do
 
     it 'should have custom pos field' do
       CustomizedOrderable.fields.should have_key('pos')
+    end
+
+    it 'should have an alias my_position which points to pos field' do
+      CustomizedOrderable.database_field_name('my_position').should eq('pos')
     end
   end
 
