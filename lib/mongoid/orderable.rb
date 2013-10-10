@@ -13,7 +13,7 @@ module Mongoid::Orderable
       configuration.merge! options if options.is_a?(Hash)
       configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
 
-      field configuration[:column], :type => Integer
+      field configuration[:column], orderable_field_opts(configuration)
       if configuration[:index]
         if MongoidOrderable.mongoid2?
           index configuration[:column]
@@ -47,6 +47,14 @@ module Mongoid::Orderable
 
       before_save :add_to_list
       after_destroy :remove_from_list
+    end
+
+    private
+
+    def orderable_field_opts(configuration)
+      field_opts = { :type => Integer }
+      field_opts.merge!(configuration.slice(:as))
+      field_opts
     end
   end
 
