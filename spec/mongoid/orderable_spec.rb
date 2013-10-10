@@ -314,8 +314,10 @@ describe Mongoid::Orderable do
       CustomizedOrderable.fields.should have_key('pos')
     end
 
-    it 'should have an alias my_position which points to pos field' do
-      CustomizedOrderable.database_field_name('my_position').should eq('pos')
+    it 'should have an alias my_position which points to pos field on Mongoid 3+' do
+      if CustomizedOrderable.respond_to?(:database_field_name)
+        CustomizedOrderable.database_field_name('my_position').should eq('pos')
+      end
     end
   end
 
