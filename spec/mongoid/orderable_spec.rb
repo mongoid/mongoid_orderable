@@ -74,6 +74,7 @@ describe Mongoid::Orderable do
   end
 
   describe SimpleOrderable do
+
     before :each do
       SimpleOrderable.delete_all
       5.times do
@@ -122,7 +123,6 @@ describe Mongoid::Orderable do
         SimpleOrderable.where(:position => 3).destroy
         positions.should == [1, 2, 3, 4]
       end
-
     end
 
     describe 'inserting' do
@@ -144,7 +144,6 @@ describe Mongoid::Orderable do
         positions.should == [1, 2, 3, 4, 5, 6]
         newbie.position.should == 4
       end
-
     end
 
     describe 'movement' do
@@ -191,18 +190,17 @@ describe Mongoid::Orderable do
         record.reload.position.should == 4
       end
 
-      it "does nothing if position not change" do
+      it 'does nothing if position not change' do
         record = SimpleOrderable.where(:position => 3).first
         record.save
         positions.should == [1, 2, 3, 4, 5]
         record.reload.position.should == 3
       end
-
     end
-
   end
 
   describe ScopedOrderable do
+
     before :each do
       ScopedOrderable.delete_all
       2.times do
@@ -237,7 +235,6 @@ describe Mongoid::Orderable do
         ScopedOrderable.where(:position => 2, :group_id => 2).destroy
         positions.should == [1, 2, 1, 2]
       end
-
     end
 
     describe 'inserting' do
@@ -259,30 +256,28 @@ describe Mongoid::Orderable do
         positions.should == [1, 2, 1, 2, 3, 4]
         newbie.position.should == 2
       end
-
     end
 
-    describe "scope movement" do
+    describe 'scope movement' do
 
-      it "without point on position" do
+      it 'without point on position' do
         record = ScopedOrderable.where(:group_id => 2, :position => 2).first
         record.update_attributes :group_id => 1
         positions.should == [1, 2, 3, 1, 2]
         record.reload.position.should == 3
       end
 
-      it "with point on position" do
+      it 'with point on position' do
         record = ScopedOrderable.where(:group_id => 2, :position => 2).first
         record.update_attributes :group_id => 1, :move_to => :top
         positions.should == [1, 2, 3, 1, 2]
         record.reload.position.should == 1
       end
-
     end
-
   end
 
   describe EmbeddedOrderable do
+
     before :each do
       EmbedsOrderable.delete_all
       eo = EmbedsOrderable.create!
@@ -302,10 +297,10 @@ describe Mongoid::Orderable do
     it 'should set proper position while creation' do
       positions.should == [[1, 2], [1, 2, 3]]
     end
-
   end
 
   describe CustomizedOrderable do
+
     it 'does not have default position field' do
       CustomizedOrderable.fields.should_not have_key('position')
     end
@@ -322,13 +317,14 @@ describe Mongoid::Orderable do
   end
 
   describe NoIndexOrderable do
+
     it 'should not have index on position column' do
       NoIndexOrderable.index_options[:position].should be_nil
     end
   end
 
-
   describe ZeroBasedOrderable do
+
     before :each do
       ZeroBasedOrderable.delete_all
       5.times do
@@ -364,7 +360,6 @@ describe Mongoid::Orderable do
         ZeroBasedOrderable.where(:position => 2).destroy
         positions.should == [0, 1, 2, 3]
       end
-
     end
 
     describe 'inserting' do
@@ -386,7 +381,6 @@ describe Mongoid::Orderable do
         positions.should == [0, 1, 2, 3, 4, 5]
         newbie.position.should == 3
       end
-
     end
 
     describe 'movement' do
@@ -433,24 +427,22 @@ describe Mongoid::Orderable do
         record.reload.position.should == 3
       end
 
-      it "does nothing if position not change" do
+      it 'does nothing if position not change' do
         record = ZeroBasedOrderable.where(:position => 3).first
         record.save
         positions.should == [0, 1, 2, 3, 4]
         record.reload.position.should == 3
       end
-
     end
-
   end
 
   describe Fruit do
+
     it 'should set proper position' do
       fruit1 = Apple.create
       fruit2 = Orange.create
       fruit1.position.should == 1
       fruit2.position.should == 2
     end
-
   end
 end
