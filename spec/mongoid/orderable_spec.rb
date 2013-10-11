@@ -260,18 +260,62 @@ describe Mongoid::Orderable do
 
     describe 'scope movement' do
 
-      it 'without point on position' do
-        record = ScopedOrderable.where(:group_id => 2, :position => 2).first
-        record.update_attributes :group_id => 1
-        positions.should == [1, 2, 3, 1, 2]
-        record.reload.position.should == 3
+      let(:record){ ScopedOrderable.where(:group_id => 2, :position => 2).first }
+
+      it 'to a new scope group' do
+        record.update_attributes :group_id => 3
+        positions.should == [1, 2, 1, 2, 1]
+        record.position.should == 1
       end
 
-      it 'with point on position' do
-        record = ScopedOrderable.where(:group_id => 2, :position => 2).first
-        record.update_attributes :group_id => 1, :move_to => :top
-        positions.should == [1, 2, 3, 1, 2]
-        record.reload.position.should == 1
+      context 'when moving to an existing scope group' do
+
+        it 'without a position' do
+          record.update_attributes :group_id => 1
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 3
+        end
+
+        it 'with symbol position' do
+          record.update_attributes :group_id => 1, :move_to => :top
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 1
+        end
+
+        it 'with point position' do
+          record.update_attributes :group_id => 1, :move_to => 2
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 2
+        end
+      end
+    end
+
+    if defined?(Mongoid::IdentityMap)
+
+      context 'when identity map is enabled' do
+
+        let(:record){ ScopedOrderable.where(:group_id => 2, :position => 2).first }
+
+        before do
+          Mongoid.identity_map_enabled = true
+          Mongoid::IdentityMap[ScopedOrderable.collection_name] = { record.id => record }
+        end
+
+        after do
+          Mongoid.identity_map_enabled = false
+        end
+
+        it 'to a new scope group' do
+          record.update_attributes :group_id => 3
+          positions.should == [1, 2, 1, 2, 1]
+          record.position.should == 1
+        end
+
+        it 'to an existing scope group' do
+          record.update_attributes :group_id => 1, :move_to => 2
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 2
+        end
       end
     end
   end
