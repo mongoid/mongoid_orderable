@@ -133,6 +133,16 @@ private
   end
 
   def orderable_scope_changed?
+    if Mongoid.respond_to?(:unit_of_work)
+      Mongoid.unit_of_work do
+        orderable_scope_changed_query
+      end
+    else
+      orderable_scope_changed_query
+    end
+  end
+
+  def orderable_scope_changed_query
     !orderable_scoped.where(:_id => _id).exists?
   end
 
