@@ -9,7 +9,7 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 * It uses native mongo batch increment feature
 * It supports assignable api
 * It proper assingns position while moving document between scopes
-* It supports both mongoid 2 and 3
+* It supports mongoid 2, 3 and 4
 
 # How?
 
