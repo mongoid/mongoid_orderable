@@ -1,6 +1,16 @@
 module MongoidOrderable
   def self.mongoid2?
-    Mongoid.const_defined? :Contexts
+    ::Mongoid.const_defined? :Contexts
+  end
+  def self.mongoid3?
+    ::Mongoid.const_defined? :Observer
+  end
+  def self.inc instance, attribute, value
+    if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
+      instance.inc attribute, value
+    else
+      instance.inc(attribute => value)
+    end
   end
 end
 

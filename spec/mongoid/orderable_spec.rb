@@ -19,6 +19,7 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
+    field :group_id
     belongs_to :scoped_group
 
     orderable :scope => :group
@@ -64,7 +65,7 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    orderable inherited: true
+    orderable :inherited => true
   end
 
   class Apple < Fruit
@@ -94,8 +95,10 @@ describe Mongoid::Orderable do
     it 'should have index on position column' do
       if MongoidOrderable.mongoid2?
         SimpleOrderable.index_options[:position].should_not be_nil
-      else
+      elsif MongoidOrderable.mongoid3?
         SimpleOrderable.index_options[{:position => 1}].should_not be_nil
+      else
+        SimpleOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }.should_not be_nil
       end
     end
 
@@ -338,8 +341,15 @@ describe Mongoid::Orderable do
       EmbedsOrderable.order_by(:position => 1).all.map { |eo| eo.embedded_orderables.map(&:position).sort }
     end
 
-    it 'should set proper position while creation' do
+    it 'sets proper position while creation' do
       positions.should == [[1, 2], [1, 2, 3]]
+    end
+
+    it 'moves an item returned by a query to position' do
+      embedded_orderable_1 = EmbedsOrderable.first.embedded_orderables.where(:position => 1).first
+      embedded_orderable_2 = EmbedsOrderable.first.embedded_orderables.where(:position => 2).first
+      embedded_orderable_1.move_to! 2
+      embedded_orderable_2.reload.position.should == 1
     end
   end
 
@@ -363,7 +373,11 @@ describe Mongoid::Orderable do
   describe NoIndexOrderable do
 
     it 'should not have index on position column' do
-      NoIndexOrderable.index_options[:position].should be_nil
+      if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
+        NoIndexOrderable.index_options[:position].should be_nil
+      else
+        NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }.should be_nil
+      end
     end
   end
 
