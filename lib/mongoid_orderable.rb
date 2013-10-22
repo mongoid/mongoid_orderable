@@ -5,6 +5,7 @@ module MongoidOrderable
   def self.mongoid3?
     ::Mongoid.const_defined? :Observer
   end
+
   def self.inc instance, attribute, value
     if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
       instance.inc attribute, value
