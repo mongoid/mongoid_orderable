@@ -200,6 +200,21 @@ describe Mongoid::Orderable do
         record.reload.position.should == 3
       end
     end
+
+    describe 'utiity methods' do
+
+      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+        record_1 = SimpleOrderable.where(:position => 1).first
+        record_2 = SimpleOrderable.where(:position => 2).first
+        record_3 = SimpleOrderable.where(:position => 3).first
+        record_4 = SimpleOrderable.where(:position => 4).first
+        record_5 = SimpleOrderable.where(:position => 5).first
+        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
+        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+      end
+    end
   end
 
   describe ScopedOrderable do
@@ -319,6 +334,21 @@ describe Mongoid::Orderable do
           positions.should == [1, 2, 3, 1, 2]
           record.reload.position.should == 2
         end
+      end
+    end
+
+    describe 'utiity methods' do
+
+      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+        record_1 = SimpleOrderable.where(:position => 1).first
+        record_2 = SimpleOrderable.where(:position => 2).first
+        record_3 = SimpleOrderable.where(:position => 3).first
+        record_4 = SimpleOrderable.where(:position => 4).first
+        record_5 = SimpleOrderable.where(:position => 5).first
+        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
+        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
       end
     end
   end
@@ -490,6 +520,21 @@ describe Mongoid::Orderable do
         record.save
         positions.should == [0, 1, 2, 3, 4]
         record.reload.position.should == 3
+      end
+    end
+
+    describe 'utiity methods' do
+
+      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+        record_1 = SimpleOrderable.where(:position => 1).first
+        record_2 = SimpleOrderable.where(:position => 2).first
+        record_3 = SimpleOrderable.where(:position => 3).first
+        record_4 = SimpleOrderable.where(:position => 4).first
+        record_5 = SimpleOrderable.where(:position => 5).first
+        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
+        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
       end
     end
   end

@@ -52,6 +52,9 @@ item.move_to_top
 item.move_to_bottom
 item.move_higher
 item.move_lower
+
+item.lower_items # return a collection of items lower on the list
+item.higher_items # return a collection of items higher on the list
 ```
 
 # Contributing
