@@ -58,6 +58,20 @@ module Mongoid::Orderable
     end
   end
 
+  ##
+  # Returns items below the current document.
+  # Items with a position greater than this document's position.
+  def lower_items
+    orderable_scoped.where(orderable_column.gt => self.position)
+  end
+  
+  ##
+  # Returns items above the current document.
+  # Items with a position lower than this document's position.
+  def higher_items
+    orderable_scoped.where(orderable_column.lt => self.position)
+  end
+
   def move_to! target_position
     @move_to = target_position
     save
