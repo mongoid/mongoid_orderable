@@ -349,6 +349,11 @@ describe Mongoid::Orderable do
         expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
         expect(record_3.higher_items.to_a).to eq([record_1, record_2])
         expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+        # next_item & previous_item testing
+        expect(record_1.next_item).to eq(record_2)
+        expect(record_2.previous_item).to eq(record_1)
+        expect(record_1.previous_item).to eq(nil)
+        expect(record_5.next_item).to eq(nil)
       end
     end
   end
@@ -535,6 +540,11 @@ describe Mongoid::Orderable do
         expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
         expect(record_3.higher_items.to_a).to eq([record_1, record_2])
         expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+        # next_item & previous_item testing
+        expect(record_1.next_item).to eq(record_2)
+        expect(record_2.previous_item).to eq(record_1)
+        expect(record_1.previous_item).to eq(nil)
+        expect(record_5.next_item).to eq(nil)
       end
     end
   end

@@ -72,6 +72,26 @@ module Mongoid::Orderable
     orderable_scoped.where(orderable_column.lt => self.position)
   end
 
+  # returns the previous item in the list
+  def previous_item
+    if higher_items.present?
+      previous_position = self.position - 1
+      orderable_scoped.find_by(position: previous_position)
+    else
+      nil
+    end
+  end
+
+  # returns the next item in the list
+  def next_item
+    if lower_items.present?
+      next_position = self.position + 1
+      orderable_scoped.find_by(position: next_position)
+    else
+      nil
+    end
+  end
+
   def move_to! target_position
     @move_to = target_position
     save
