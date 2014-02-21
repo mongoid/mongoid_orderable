@@ -76,10 +76,10 @@ module Mongoid::Orderable
   def previous_item
     if higher_items.present?
       previous_position = self.position - 1
-      if MongoidOrderable.mongoid2?
-        orderable_scoped.where(position: previous_position).first
-      else
+      begin
         orderable_scoped.find_by(position: previous_position)
+      rescue
+        orderable_scoped.where(position: previous_position).first
       end
     else
       nil
@@ -90,10 +90,10 @@ module Mongoid::Orderable
   def next_item
     if lower_items.present?
       next_position = self.position + 1
-      if MongoidOrderable.mongoid2?
-        orderable_scoped.where(position: next_position).first
-      else
+      begin
         orderable_scoped.find_by(position: next_position)
+      rescue
+        orderable_scoped.where(position: next_position).first
       end
     else
       nil
