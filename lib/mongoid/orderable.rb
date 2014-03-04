@@ -64,7 +64,7 @@ module Mongoid::Orderable
   def lower_items
     orderable_scoped.where(orderable_column.gt => self.position)
   end
-  
+
   ##
   # Returns items above the current document.
   # Items with a position lower than this document's position.
@@ -140,7 +140,7 @@ private
 
   def orderable_scoped
     if embedded?
-      send(metadata.inverse).send(metadata.name).orderable_scope(self)
+      send(MongoidOrderable.metadata(self).inverse).send(MongoidOrderable.metadata(self).name).orderable_scope(self)
     else
       (orderable_inherited_class || self.class).orderable_scope(self)
     end
