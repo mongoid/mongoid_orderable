@@ -13,6 +13,14 @@ module MongoidOrderable
       instance.inc(attribute => value)
     end
   end
+
+  def self.metadata instance
+    if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
+      instance.metadata
+    else
+      instance.relation_metadata
+    end
+  end
 end
 
 require 'mongoid'
