@@ -55,6 +55,9 @@ item.move_lower
 
 item.lower_items # return a collection of items lower on the list
 item.higher_items # return a collection of items higher on the list
+
+item.next_item # returns the next item in the list
+item.previous_item # requrns the previous item in the list
 ```
 
 # Contributing
