@@ -69,32 +69,34 @@ module Mongoid::Orderable
   end
 
   ##
-  # Returns items below the current document.
-  # Items with a position greater than this document's position.
-  def lower_items
-    orderable_scoped.where(orderable_column.gt => self.position)
-  end
-
-  ##
   # Returns items above the current document.
   # Items with a position lower than this document's position.
-  def higher_items
+  def previous_items
     orderable_scoped.where(orderable_column.lt => self.position)
+  end
+  alias_method :prev_items, :previous_items
+
+  ##
+  # Returns items below the current document.
+  # Items with a position greater than this document's position.
+  def next_items
+    orderable_scoped.where(orderable_column.gt => self.position)
   end
 
   # returns the previous item in the list
   def previous_item
-    if higher_items.present?
+    if previous_items.present?
       previous_position = self.position - 1
       orderable_scoped.where(:position => previous_position).first
     else
       nil
     end
   end
+  alias_method :prev_item, :previous_item
 
   # returns the next item in the list
   def next_item
-    if lower_items.present?
+    if next_items.present?
       next_position = self.position + 1
       orderable_scoped.where(:position => next_position).first
     else

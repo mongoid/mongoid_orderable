@@ -29,7 +29,7 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    field :some_scope, type: Integer
+    field :some_scope, :type => Integer
 
     orderable :scope => 'some_scope'
   end
@@ -222,16 +222,16 @@ describe Mongoid::Orderable do
 
     describe 'utiity methods' do
 
-      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+      it "should return a collection of items lower/higher on the list for next_items/previous_items" do
         record_1 = SimpleOrderable.where(:position => 1).first
         record_2 = SimpleOrderable.where(:position => 2).first
         record_3 = SimpleOrderable.where(:position => 3).first
         record_4 = SimpleOrderable.where(:position => 4).first
         record_5 = SimpleOrderable.where(:position => 5).first
-        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
-        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
-        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
-        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+        expect(record_1.next_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.previous_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.previous_items.to_a).to eq([record_1, record_2])
+        expect(record_3.next_items.to_a).to eq([record_4, record_5])
       end
     end
   end
@@ -358,16 +358,16 @@ describe Mongoid::Orderable do
 
     describe 'utiity methods' do
 
-      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+      it "should return a collection of items lower/higher on the list for next_items/previous_items" do
         record_1 = SimpleOrderable.where(:position => 1).first
         record_2 = SimpleOrderable.where(:position => 2).first
         record_3 = SimpleOrderable.where(:position => 3).first
         record_4 = SimpleOrderable.where(:position => 4).first
         record_5 = SimpleOrderable.where(:position => 5).first
-        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
-        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
-        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
-        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+        expect(record_1.next_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.previous_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.previous_items.to_a).to eq([record_1, record_2])
+        expect(record_3.next_items.to_a).to eq([record_4, record_5])
         # next_item & previous_item testing
         expect(record_1.next_item).to eq(record_2)
         expect(record_2.previous_item).to eq(record_1)
@@ -561,16 +561,16 @@ describe Mongoid::Orderable do
 
     describe 'utiity methods' do
 
-      it "should return a collection of items lower/higher on the list for lower_items/higher_items" do
+      it "should return a collection of items lower/higher on the list for next_items/previous_items" do
         record_1 = SimpleOrderable.where(:position => 1).first
         record_2 = SimpleOrderable.where(:position => 2).first
         record_3 = SimpleOrderable.where(:position => 3).first
         record_4 = SimpleOrderable.where(:position => 4).first
         record_5 = SimpleOrderable.where(:position => 5).first
-        expect(record_1.lower_items.to_a).to eq([record_2, record_3, record_4, record_5])
-        expect(record_5.higher_items.to_a).to eq([record_1, record_2, record_3, record_4])
-        expect(record_3.higher_items.to_a).to eq([record_1, record_2])
-        expect(record_3.lower_items.to_a).to eq([record_4, record_5])
+        expect(record_1.next_items.to_a).to eq([record_2, record_3, record_4, record_5])
+        expect(record_5.previous_items.to_a).to eq([record_1, record_2, record_3, record_4])
+        expect(record_3.previous_items.to_a).to eq([record_1, record_2])
+        expect(record_3.next_items.to_a).to eq([record_4, record_5])
         # next_item & previous_item testing
         expect(record_1.next_item).to eq(record_2)
         expect(record_2.previous_item).to eq(record_1)

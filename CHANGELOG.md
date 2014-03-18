@@ -4,7 +4,7 @@
 
   * Resolving scope foreign key form passed relation name (@dsci)
   * Fix: relation metadata quering (@pjkelly)
-  * `lower_items` and `higher_items` methods (@mrjlynch)
+  * `previous_items` and `next_items` methods (@mrjlynch)
 
 # 4.0.0
 
