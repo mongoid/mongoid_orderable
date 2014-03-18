@@ -25,6 +25,15 @@ describe Mongoid::Orderable do
     orderable :scope => :group
   end
 
+  class StringScopedOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    field :different_scope, type: Integer
+
+    orderable :scope => 'different_scope'
+  end
+
   class EmbedsOrderable
     include Mongoid::Document
 
@@ -368,6 +377,20 @@ describe Mongoid::Orderable do
     end
   end
 
+  describe StringScopedOrderable do
+
+    it 'uses the foreign key of the relationship as scope' do
+      expect do
+        orderable1 = StringScopedOrderable.create(:different_scope => 1)
+        orderable2 = StringScopedOrderable.create(:different_scope => 1)
+        orderable3 = StringScopedOrderable.create(:different_scope => 2)
+      end.to_not raise_error
+      expect(orderable1.position).to eq 1
+      expect(orderable2.position).to eq 2
+      expect(orderable3.position).to eq 1
+    end
+  end
+
   describe EmbeddedOrderable do
 
     before :each do
@@ -572,7 +595,6 @@ describe Mongoid::Orderable do
   describe ForeignKeyDiffersOrderable do
 
     it 'uses the foreign key of the relationship as scope' do
-      orderable1, orderable2, orderable3 = nil
       parent_scope1 = ForeignKeyDiffersOrderable.create
       parent_scope2 = ForeignKeyDiffersOrderable.create
       expect do

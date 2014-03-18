@@ -1,9 +1,9 @@
 rvm:
   - 1.8.7
-  - 1.9.2
   - 1.9.3
-  - ruby-head
-  #- rbx-19mode
+  - 2.0.0
+  - 2.1.1
+  - rbx
 
 env:
   - MONGOID_VERSION=2
@@ -15,10 +15,6 @@ matrix:
     - rvm: 1.8.7
       env: MONGOID_VERSION=3
     - rvm: 1.8.7
-      env: MONGOID_VERSION=4
-    - rvm: 1.9.2
-      env: MONGOID_VERSION=3
-    - rvm: 1.9.2
       env: MONGOID_VERSION=4
 
 services: mongodb

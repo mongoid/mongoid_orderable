@@ -19,6 +19,8 @@ module Mongoid::Orderable
         else
           configuration[:scope] = "#{configuration[:scope]}_id".to_sym
         end
+      elsif configuration[:scope].is_a?(String)
+        configuration[:scope] = configuration[:scope].to_sym
       end
 
       field configuration[:column], orderable_field_opts(configuration)
