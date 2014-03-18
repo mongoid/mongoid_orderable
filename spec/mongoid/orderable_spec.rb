@@ -74,6 +74,16 @@ describe Mongoid::Orderable do
   class Orange < Fruit
   end
 
+  class ForeignKeyDiffersOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    belongs_to  :different_scope, :class_name => "ForeignKeyDiffersOrderable",
+                :foreign_key => "different_orderable_id"
+
+    orderable :scope => :different_scope
+  end
+
   describe SimpleOrderable do
 
     before :each do
@@ -556,6 +566,23 @@ describe Mongoid::Orderable do
       fruit2 = Orange.create
       fruit1.position.should == 1
       fruit2.position.should == 2
+    end
+  end
+
+  describe ForeignKeyDiffersOrderable do
+
+    it 'uses the foreign key of the relationship as scope' do
+      orderable1, orderable2, orderable3 = nil
+      parent_scope1 = ForeignKeyDiffersOrderable.create
+      parent_scope2 = ForeignKeyDiffersOrderable.create
+      expect do
+        orderable1 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope1)
+        orderable2 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope1)
+        orderable3 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope2)
+      end.to_not raise_error
+      expect(orderable1.position).to eq 1
+      expect(orderable2.position).to eq 2
+      expect(orderable3.position).to eq 1
     end
   end
 end

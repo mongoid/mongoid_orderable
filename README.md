@@ -25,9 +25,13 @@ class Item
   include Mongoid::Orderable
 
   # belongs_to :group
+  # belongs_to :drawer, :class_name => "Office::Drawer",
+  #            :foreign_key => "legacy_drawer_key_id"
 
   # orderable
   # orderable :scope => :group, :column => :pos
+  # be lazy with different foreign keys
+  # orderable :scope => drawer, :column => :pos
   # orderable :scope => lambda { |document| where(:group_id => document.group_id) }
   # orderable :index => false # this one if you want specify indexes manually
   # orderable :base => 0 # count position from zero as the top-most value (1 is the default value)
