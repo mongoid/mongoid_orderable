@@ -11,7 +11,15 @@ module Mongoid::Orderable
       }
 
       configuration.merge! options if options.is_a?(Hash)
-      configuration[:scope] = "#{configuration[:scope]}_id".to_sym if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
+
+      if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
+        scope_relation = self.relations[configuration[:scope].to_s]
+        if scope_relation
+          configuration[:scope] = scope_relation.key.to_sym
+        else
+          configuration[:scope] = "#{configuration[:scope]}_id".to_sym
+        end
+      end
 
       field configuration[:column], orderable_field_opts(configuration)
       if configuration[:index]
