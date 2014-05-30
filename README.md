@@ -18,6 +18,7 @@ gem 'mongoid_orderable'
 ```
 
 Gem has the same api as others. Just include Mongoid::Orderable into your model and call `orderable` method.
+Embedded objects are automatically scoped by their parent.
 
 ```
 class Item
