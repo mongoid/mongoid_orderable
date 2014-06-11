@@ -35,3 +35,8 @@ else
 end
 
 require 'mongoid/orderable'
+
+require 'mongoid/orderable/configurable'
+require 'mongoid/orderable/listable'
+require 'mongoid/orderable/movable'
+
