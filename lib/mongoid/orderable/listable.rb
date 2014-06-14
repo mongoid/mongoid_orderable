@@ -19,23 +19,13 @@ module Mongoid
 
       # returns the previous item in the list
       def previous_item
-        if previous_items.present?
-          previous_position = self.position - 1
-          orderable_scoped.where(:position => previous_position).first
-        else
-          nil
-        end
+        orderable_scoped.where(:position => self.position - 1).first
       end
       alias_method :prev_item, :previous_item
 
       # returns the next item in the list
       def next_item
-        if next_items.present?
-          next_position = self.position + 1
-          orderable_scoped.where(:position => next_position).first
-        else
-          nil
-        end
+        orderable_scoped.where(:position => self.position + 1).first
       end
 
       def first?
