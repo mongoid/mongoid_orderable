@@ -2,46 +2,68 @@ module Mongoid
   module Orderable
     module Configurable
 
-      private
+      attr_reader :configuration
 
-        def orderable_position
-          send orderable_column
-        end
+      def default_configuration
+        { :column => :position,
+          :index => true,
+          :scope => nil,
+          :base => 1 }
+      end
 
-        def orderable_position= value
-          send "#{orderable_column}=", value
-        end
+      def setup_orderable_class(options = {})
+        @configuration = default_configuration;
 
-        def orderable_scoped
-          if embedded?
-            send(MongoidOrderable.metadata(self).inverse).send(MongoidOrderable.metadata(self).name).orderable_scope(self)
+        configuration.merge!(options) if options.is_a?(Hash)
+
+        configure_orderable_scope
+
+        define_orderable_scope
+
+        generate_orderable_class_helpers
+      end
+
+      def configure_orderable_scope
+        if configuration[:scope].is_a?(Symbol) && configuration[:scope].to_s !~ /_id$/
+          scope_relation = self.relations[configuration[:scope].to_s]
+          if scope_relation
+            configuration[:scope] = scope_relation.key.to_sym
           else
-            (orderable_inherited_class || self.class).orderable_scope(self)
+            configuration[:scope] = "#{configuration[:scope]}_id".to_sym
           end
+        elsif configuration[:scope].is_a?(String)
+          configuration[:scope] = configuration[:scope].to_sym
+        end
+      end
+
+      def define_orderable_scope
+        case configuration[:scope]
+        when Symbol then
+          scope :orderable_scope, lambda { |document|
+            where(configuration[:scope] => document.send(configuration[:scope])) }
+        when Proc then
+          scope :orderable_scope, configuration[:scope]
+        else
+          scope :orderable_scope, lambda { |document| where({}) }
+        end
+      end
+
+      def generate_orderable_class_helpers
+        self_class = self
+
+        define_method :orderable_column do
+          self_class.configuration[:column]
         end
 
-        def orderable_scope_changed?
-          if Mongoid.respond_to?(:unit_of_work)
-            Mongoid.unit_of_work do
-              orderable_scope_changed_query
-            end
-          else
-            orderable_scope_changed_query
-          end
+        define_method :orderable_base do
+          self_class.configuration[:base]
         end
 
-        def orderable_scope_changed_query
-          !orderable_scoped.where(:_id => _id).exists?
+        define_method :orderable_inherited_class do
+          self_class if self_class.configuration[:inherited]
         end
+      end
 
-        def bottom_orderable_position
-          @bottom_orderable_position = begin
-            positions_list = orderable_scoped.distinct(orderable_column)
-            return orderable_base if positions_list.empty?
-            max = positions_list.map(&:to_i).max.to_i
-            in_list? ? max : max.next
-          end
-        end
     end
   end
 end
