@@ -40,14 +40,6 @@ module Mongoid
         !orderable_position.nil?
       end
 
-      def add_to_list
-        apply_position @move_to
-      end
-
-      def remove_from_list
-        MongoidOrderable.inc orderable_scoped.where(orderable_column.gt => orderable_position), orderable_column, -1
-      end
-
     end
   end
 end

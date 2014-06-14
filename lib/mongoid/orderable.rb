@@ -2,6 +2,7 @@ module Mongoid::Orderable
   extend ActiveSupport::Concern
 
   included do
+    include Mongoid::Orderable::Callbacks
     include Mongoid::Orderable::Configurable
     include Mongoid::Orderable::Movable
     include Mongoid::Orderable::Listable
@@ -62,8 +63,7 @@ module Mongoid::Orderable
         self_class if configuration[:inherited]
       end
 
-      before_save :add_to_list
-      after_destroy :remove_from_list
+      add_orderable_callbacks
     end
 
     private
