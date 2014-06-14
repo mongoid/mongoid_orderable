@@ -21,20 +21,20 @@ module Mongoid::Orderable
     private
 
     def add_mongoid_field_and_index
-      field configuration[:column], orderable_field_opts
+      field orderable_config[:column], orderable_field_opts
 
-      if configuration[:index]
+      if orderable_config[:index]
         if MongoidOrderable.mongoid2?
-          index configuration[:column]
+          index orderable_config[:column]
         else
-          index(configuration[:column] => 1)
+          index(orderable_config[:column] => 1)
         end
       end
     end
 
     def orderable_field_opts
       field_opts = { :type => Integer }
-      field_opts.merge!(configuration.slice(:as))
+      field_opts.merge!(orderable_config.slice(:as))
       field_opts
     end
 
