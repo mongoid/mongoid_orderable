@@ -36,8 +36,9 @@ end
 
 require 'mongoid/orderable'
 require 'mongoid/orderable/configurable'
+require 'mongoid/orderable/configuration'
 require 'mongoid/orderable/helpers'
 require 'mongoid/orderable/callbacks'
 require 'mongoid/orderable/listable'
 require 'mongoid/orderable/movable'
-
+require 'mongoid/orderable/orderable_class'

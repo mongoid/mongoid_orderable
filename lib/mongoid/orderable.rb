@@ -10,33 +10,24 @@ module Mongoid::Orderable
   end
 
   module ClassMethods
-    def orderable options = {}
-      setup_orderable_class(options)
+    attr_accessor :orderable_configurations
 
-      add_mongoid_field_and_index
+    def orderable options = {}
+      configuration = Mongoid::Orderable::Configuration.build(self, options)
+
+      Mongoid::Orderable::OrderableClass.setup(self, configuration)
+
+      define_orderable_scope
+
+      generate_orderable_class_helpers
 
       add_orderable_callbacks
     end
 
-    private
-
-    def add_mongoid_field_and_index
-      field orderable_config[:column], orderable_field_opts
-
-      if orderable_config[:index]
-        if MongoidOrderable.mongoid2?
-          index orderable_config[:column]
-        else
-          index(orderable_config[:column] => 1)
-        end
-      end
+    def orderable_config(column = nil)
+      column ? orderable_configurations[column] : orderable_configurations.first.last
     end
 
-    def orderable_field_opts
-      field_opts = { :type => Integer }
-      field_opts.merge!(orderable_config.slice(:as))
-      field_opts
-    end
 
   end
 end
