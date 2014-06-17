@@ -7,6 +7,10 @@ module Mongoid::Orderable
     include Mongoid::Orderable::Callbacks
     include Mongoid::Orderable::Movable
     include Mongoid::Orderable::Listable
+
+    def orderable_keys
+      orderable_inherited_class.orderable_configurations.keys
+    end
   end
 
   module ClassMethods
@@ -17,17 +21,14 @@ module Mongoid::Orderable
 
       Mongoid::Orderable::OrderableClass.setup(self, configuration)
 
-      define_orderable_scope
+      define_orderable_scope(configuration[:column], configuration[:scope])
+
+      define_position_helpers(configuration[:column])
 
       generate_orderable_class_helpers
 
       add_orderable_callbacks
     end
-
-    def orderable_config(column = nil)
-      column ? orderable_configurations[column] : orderable_configurations.first.last
-    end
-
 
   end
 end

@@ -2,21 +2,19 @@ module Mongoid
   module Orderable
     module Helpers
 
+      def default_orderable_column
+        self.orderable_keys.first
+      end
+
       private
 
-        def orderable_position
-          send orderable_column
-        end
+        def orderable_scoped(column = nil)
+          column ||= default_orderable_column
 
-        def orderable_position= value
-          send "#{orderable_column}=", value
-        end
-
-        def orderable_scoped
           if embedded?
-            send(MongoidOrderable.metadata(self).inverse).send(MongoidOrderable.metadata(self).name).orderable_scope(self)
+            send(MongoidOrderable.metadata(self).inverse).send(MongoidOrderable.metadata(self).name).send("orderable_#{column}_scope", self)
           else
-            (orderable_inherited_class || self.class).orderable_scope(self)
+            self.orderable_inherited_class.send("orderable_#{column}_scope", self)
           end
         end
 
@@ -34,12 +32,13 @@ module Mongoid
           !orderable_scoped.where(:_id => _id).exists?
         end
 
-        def bottom_orderable_position
+        def bottom_orderable_position(column = nil)
+          column ||= default_orderable_column
           @bottom_orderable_position = begin
-            positions_list = orderable_scoped.distinct(orderable_column)
-            return orderable_base if positions_list.empty?
+            positions_list = orderable_scoped(column).distinct(column)
+            return orderable_base(column) if positions_list.empty?
             max = positions_list.map(&:to_i).max.to_i
-            in_list? ? max : max.next
+            in_list?(column) ? max : max.next
           end
         end
     end
