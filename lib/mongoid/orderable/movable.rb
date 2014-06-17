@@ -13,7 +13,7 @@ module Mongoid
       end
       alias_method :insert_at, :move_to
 
-      def move_to= column=nil, target_position
+      def move_to=(column=nil, target_position)
         move_column_to column, target_position
       end
       alias_method :insert_at=, :move_to=

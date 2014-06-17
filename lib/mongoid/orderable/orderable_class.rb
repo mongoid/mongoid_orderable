@@ -1,6 +1,7 @@
 module Mongoid
   module Orderable
     class OrderableClass
+      include Mongoid::Orderable::Generator
 
       attr_reader :klass, :configuration
 
@@ -13,6 +14,8 @@ module Mongoid
         add_db_field
         add_db_index if configuration[:index]
         save_configuration
+        generate_all_helpers
+        add_callbacks
       end
 
       def self.setup(klass, configuration={})
@@ -22,22 +25,21 @@ module Mongoid
       protected
 
       def add_db_field
-        klass.field configuration[:column], configuration[:field_opts]
+        klass.field column, configuration[:field_opts]
       end
 
       def add_db_index
-        if MongoidOrderable.mongoid2?
-          klass.index configuration[:column]
-        else
-          klass.index(configuration[:column] => 1)
-        end
+        klass.index(MongoidOrderable.mongoid2? ? column : column => 1)
       end
 
       def save_configuration
         klass.orderable_configurations ||= {}
-        klass.orderable_configurations[configuration[:column]] = configuration
+        klass.orderable_configurations[column] = configuration
       end
 
+      def add_callbacks
+        klass.add_orderable_callbacks
+      end
     end
   end
 end

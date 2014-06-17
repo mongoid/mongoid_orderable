@@ -7,7 +7,7 @@ module Mongoid
       # Items with a position lower than this document's position.
       def previous_items(column=nil)
         column = column || default_orderable_column
-        orderable_scoped(column).where(column.lt => public_send(column)).desc(column)
+        orderable_scoped(column).where(column.lt => public_send(column))
       end
       alias_method :prev_items, :previous_items
 
@@ -16,7 +16,7 @@ module Mongoid
       # Items with a position greater than this document's position.
       def next_items(column=nil)
         column = column || default_orderable_column
-        orderable_scoped(column).where(column.gt => public_send(column)).asc(column)
+        orderable_scoped(column).where(column.gt => public_send(column))
       end
 
       # returns the previous item in the list

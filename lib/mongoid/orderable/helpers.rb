@@ -2,6 +2,10 @@ module Mongoid
   module Orderable
     module Helpers
 
+      def orderable_keys
+        Array orderable_inherited_class.orderable_configurations.try(:keys)
+      end
+
       def default_orderable_column
         self.orderable_keys.first
       end
