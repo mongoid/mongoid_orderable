@@ -7,8 +7,8 @@ module Mongoid
       include Mongoid::Orderable::Generator::Listable
       include Mongoid::Orderable::Generator::Helpers
 
-      def column
-        configuration[:column]
+      def column_name
+        configuration[:field_opts][:as] || configuration[:column]
       end
 
       def order_scope
@@ -16,10 +16,10 @@ module Mongoid
       end
 
       def generate_all_helpers
-        generate_scope_helpers(column, order_scope)
-        generate_position_helpers(column)
-        generate_movable_helpers(column)
-        generate_listable_helpers(column)
+        generate_scope_helpers(column_name, order_scope)
+        generate_position_helpers(column_name)
+        generate_movable_helpers(column_name)
+        generate_listable_helpers(column_name)
         generate_orderable_helpers
       end
 

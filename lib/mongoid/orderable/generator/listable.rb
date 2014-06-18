@@ -3,35 +3,35 @@ module Mongoid
     module Generator
       module Listable
 
-        def generate_listable_helpers(column)
-          generate_list_helpers(column)
-          generate_aliased_helpers(column)
+        def generate_listable_helpers(column_name)
+          generate_list_helpers(column_name)
+          generate_aliased_helpers(column_name)
         end
 
         protected
 
-        def generate_list_helpers(column)
-          generate_method("next_#{column}_item") do
-            next_item(column)
+        def generate_list_helpers(column_name)
+          generate_method("next_#{column_name}_item") do
+            next_item(column_name)
           end
 
-          generate_method("next_#{column}_items") do
-            next_items(column)
+          generate_method("next_#{column_name}_items") do
+            next_items(column_name)
           end
 
-          generate_method("previous_#{column}_item") do
-            previous_item(column)
+          generate_method("previous_#{column_name}_item") do
+            previous_item(column_name)
           end
 
-          generate_method("previous_#{column}_items") do
-            previous_items(column)
+          generate_method("previous_#{column_name}_items") do
+            previous_items(column_name)
           end
         end
 
-        def generate_aliased_helpers(column)
+        def generate_aliased_helpers(column_name)
           klass.class_eval do
-            alias_method "prev_#{column}_items", "previous_#{column}_items"
-            alias_method "prev_#{column}_item",  "previous_#{column}_item"
+            alias_method "prev_#{column_name}_items", "previous_#{column_name}_items"
+            alias_method "prev_#{column_name}_item",  "previous_#{column_name}_item"
           end
         end
 

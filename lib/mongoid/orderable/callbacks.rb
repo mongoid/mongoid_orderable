@@ -15,7 +15,8 @@ module Mongoid
 
         def remove_from_list
           self.orderable_keys.each do |column|
-            MongoidOrderable.inc orderable_scoped(column).where(column.gt => orderable_position(column)), column, -1
+            col, pos = orderable_column(column), orderable_position(column)
+            MongoidOrderable.inc orderable_scoped(column).where(col.gt => pos), col, -1
           end
         end
 
@@ -28,12 +29,13 @@ module Mongoid
           return if !target_position && in_list?(column)
 
           target_position = target_position_to_position column, target_position
+          scope, col, pos = orderable_scoped(column), orderable_column(column), orderable_position(column)
 
           unless in_list?(column)
-            MongoidOrderable.inc orderable_scoped(column).where(column.gte => target_position), column, 1
+            MongoidOrderable.inc scope.where(col.gte => target_position), col, 1
           else
-            MongoidOrderable.inc(orderable_scoped(column).where(column.gte => target_position, column.lt => orderable_position(column)), column, 1) if target_position < orderable_position(column)
-            MongoidOrderable.inc(orderable_scoped(column).where(column.gt => orderable_position(column), column.lte => target_position), column, -1) if target_position > orderable_position(column)
+            MongoidOrderable.inc(scope.where(col.gte => target_position, col.lt => pos), col, 1) if target_position < pos
+            MongoidOrderable.inc(scope.where(col.gt => pos, col.lte => target_position), col, -1) if target_position > pos
           end
 
           self.public_send("orderable_#{column}_position=", target_position)

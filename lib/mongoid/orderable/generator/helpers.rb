@@ -11,6 +11,11 @@ module Mongoid
             self_class.orderable_configurations[column][:base]
           end
 
+          generate_method(:orderable_column) do |column = nil|
+            column ||= default_orderable_column
+            self_class.orderable_configurations[column][:column]
+          end
+
           generate_method(:orderable_inherited_class) do
             self_class.orderable_configurations.any?{ |col, conf| conf[:inherited] } ? self_class : self.class
           end

@@ -929,7 +929,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have a orderable base of 0' do
-        MultipleColumnsOrderable.first.orderable_base(:pos).should == 0
+        MultipleColumnsOrderable.first.orderable_base(:position).should == 0
       end
 
       it 'should set proper position while creation' do
@@ -960,21 +960,21 @@ describe Mongoid::Orderable do
         before { @serial_no = newbie.serial_no }
 
         it 'top' do
-          newbie.move_pos_to! :top
+          newbie.move_position_to! :top
           positions.should == [0, 1, 2, 3, 4, 5]
           newbie.position.should == 0
           newbie.serial_no.should == @serial_no
         end
 
         it 'bottom' do
-          newbie.move_pos_to! :bottom
+          newbie.move_position_to! :bottom
           positions.should == [0, 1, 2, 3, 4, 5]
           newbie.position.should == 5
           newbie.serial_no.should == @serial_no
         end
 
         it 'middle' do
-          newbie.move_pos_to! 4
+          newbie.move_position_to! 4
           positions.should == [0, 1, 2, 3, 4, 5]
           newbie.position.should == 4
           newbie.serial_no.should == @serial_no
@@ -985,7 +985,7 @@ describe Mongoid::Orderable do
         it 'higher from top' do
           record = MultipleColumnsOrderable.where(position: 0).first
           position = record.serial_no
-          record.move_pos_higher!
+          record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 0
           record.serial_no.should == position
@@ -994,7 +994,7 @@ describe Mongoid::Orderable do
         it 'higher from bottom' do
           record = MultipleColumnsOrderable.where(position: 4).first
           position = record.serial_no
-          record.move_pos_higher!
+          record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 3
           record.serial_no.should == position
@@ -1003,7 +1003,7 @@ describe Mongoid::Orderable do
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(position: 3).first
           position = record.serial_no
-          record.move_pos_higher!
+          record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 2
           record.serial_no.should == position
@@ -1012,7 +1012,7 @@ describe Mongoid::Orderable do
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(position: 0).first
           position = record.serial_no
-          record.move_pos_lower!
+          record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 1
           record.serial_no.should == position
@@ -1021,7 +1021,7 @@ describe Mongoid::Orderable do
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(position: 4).first
           position = record.serial_no
-          record.move_pos_lower!
+          record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 4
           record.serial_no.should == position
@@ -1030,7 +1030,7 @@ describe Mongoid::Orderable do
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(position: 3).first
           position = record.serial_no
-          record.move_pos_lower!
+          record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
           record.position.should == 4
           record.serial_no.should == position
@@ -1048,21 +1048,21 @@ describe Mongoid::Orderable do
         end
 
         it "should return the lower/higher item on the list for next_item/previous_item" do
-          expect(@record_1.next_pos_item).to eq(@record_2)
-          expect(@record_3.next_pos_item).to eq(@record_4)
-          expect(@record_5.next_pos_item).to eq(nil)
-          expect(@record_1.prev_pos_item).to eq(nil)
-          expect(@record_3.prev_pos_item).to eq(@record_2)
-          expect(@record_5.prev_pos_item).to eq(@record_4)
+          expect(@record_1.next_position_item).to eq(@record_2)
+          expect(@record_3.next_position_item).to eq(@record_4)
+          expect(@record_5.next_position_item).to eq(nil)
+          expect(@record_1.prev_position_item).to eq(nil)
+          expect(@record_3.prev_position_item).to eq(@record_2)
+          expect(@record_5.prev_position_item).to eq(@record_4)
         end
 
         it "should return a collection of items lower/higher on the list for next_items/previous_items" do
-          expect(@record_1.next_pos_items.to_a).to eq([@record_2, @record_3, @record_4, @record_5])
-          expect(@record_3.next_pos_items.to_a).to eq([@record_4, @record_5])
-          expect(@record_5.next_pos_items.to_a).to eq([])
-          expect(@record_1.previous_pos_items.to_a).to eq([])
-          expect(@record_3.previous_pos_items.to_a).to eq([@record_1, @record_2])
-          expect(@record_5.previous_pos_items.to_a).to eq([@record_1, @record_2, @record_3, @record_4])
+          expect(@record_1.next_position_items.to_a).to eq([@record_2, @record_3, @record_4, @record_5])
+          expect(@record_3.next_position_items.to_a).to eq([@record_4, @record_5])
+          expect(@record_5.next_position_items.to_a).to eq([])
+          expect(@record_1.previous_position_items.to_a).to eq([])
+          expect(@record_3.previous_position_items.to_a).to eq([@record_1, @record_2])
+          expect(@record_5.previous_position_items.to_a).to eq([@record_1, @record_2, @record_3, @record_4])
         end
       end
 

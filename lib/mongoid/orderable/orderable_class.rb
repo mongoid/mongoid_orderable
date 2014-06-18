@@ -25,16 +25,16 @@ module Mongoid
       protected
 
       def add_db_field
-        klass.field column, configuration[:field_opts]
+        klass.field configuration[:column], configuration[:field_opts]
       end
 
       def add_db_index
-        klass.index(MongoidOrderable.mongoid2? ? column : column => 1)
+        klass.index(MongoidOrderable.mongoid2? ? configuration[:column] : configuration[:column] => 1)
       end
 
       def save_configuration
         klass.orderable_configurations ||= {}
-        klass.orderable_configurations[column] = configuration
+        klass.orderable_configurations[column_name] = configuration
       end
 
       def add_callbacks
