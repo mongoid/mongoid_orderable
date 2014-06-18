@@ -121,7 +121,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have proper position column' do
-      SimpleOrderable.fields.key?('position').should be_true
+      SimpleOrderable.fields.key?('position').should be true
       SimpleOrderable.fields['position'].options[:type].should == Integer
     end
 
@@ -751,7 +751,7 @@ describe Mongoid::Orderable do
       let(:serial_nos){ MultipleColumnsOrderable.all.map(&:serial_no).sort }
 
       it 'should have proper serial_no column' do
-        MultipleColumnsOrderable.fields.key?('serial_no').should be_true
+        MultipleColumnsOrderable.fields.key?('serial_no').should be true
         MultipleColumnsOrderable.fields['serial_no'].options[:type].should == Integer
       end
 
