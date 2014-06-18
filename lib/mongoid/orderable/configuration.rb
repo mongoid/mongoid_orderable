@@ -2,7 +2,7 @@ module Mongoid
   module Orderable
     class Configuration
 
-      CONFIG_OPTIONS = %w(column class_name scope foreign_key inherited base index).map(&:to_sym)
+      CONFIG_OPTIONS = %w(column class_name scope foreign_key inherited base index default).map(&:to_sym)
       FIELD_OPTIONS  = %w(as).map(&:to_sym)
       VALID_OPTIONS  = CONFIG_OPTIONS + FIELD_OPTIONS
 
@@ -36,7 +36,10 @@ module Mongoid
       end
 
       def set_field_options
-        @options[:field_opts].merge!(options.slice(*FIELD_OPTIONS))
+        FIELD_OPTIONS.each do |key|
+          next unless options.has_key? key
+          @options[:field_opts][key] = options.delete(key)
+        end
       end
 
       def set_orderable_scope

@@ -7,7 +7,7 @@ module Mongoid
       end
 
       def default_orderable_column
-        self.orderable_keys.first
+        self.class.orderable_configurations.detect{ |c, conf| conf[:default] }.try(:first) || self.orderable_keys.first
       end
 
       private
@@ -22,18 +22,18 @@ module Mongoid
           end
         end
 
-        def orderable_scope_changed?
+        def orderable_scope_changed?(column)
           if Mongoid.respond_to?(:unit_of_work)
             Mongoid.unit_of_work do
-              orderable_scope_changed_query
+              orderable_scope_changed_query(column)
             end
           else
-            orderable_scope_changed_query
+            orderable_scope_changed_query(column)
           end
         end
 
-        def orderable_scope_changed_query
-          !orderable_scoped.where(:_id => _id).exists?
+        def orderable_scope_changed_query(column)
+          !orderable_scoped(column).where(:_id => _id).exists?
         end
 
         def bottom_orderable_position(column = nil)

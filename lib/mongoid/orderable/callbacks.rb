@@ -20,7 +20,7 @@ module Mongoid
         end
 
         def apply_position column, target_position
-          if persisted? && !embedded? && orderable_scope_changed?
+          if persisted? && !embedded? && orderable_scope_changed?(column)
             self.class.unscoped.find(_id).remove_from_list
             self.public_send("orderable_#{column}_position=", nil)
           end
