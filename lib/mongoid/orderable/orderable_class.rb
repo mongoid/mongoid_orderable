@@ -29,7 +29,7 @@ module Mongoid
       end
 
       def add_db_index
-        klass.index(MongoidOrderable.mongoid2? ? configuration[:column] : configuration[:column] => 1)
+        klass.index(MongoidOrderable.mongoid2? ? configuration[:column] : {configuration[:column] => 1})
       end
 
       def save_configuration

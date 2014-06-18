@@ -39,7 +39,7 @@ module Mongoid
         def bottom_orderable_position(column = nil)
           column ||= default_orderable_column
           @bottom_orderable_position = begin
-            positions_list = orderable_scoped(column).distinct(column)
+            positions_list = orderable_scoped(column).distinct(orderable_column(column))
             return orderable_base(column) if positions_list.empty?
             max = positions_list.map(&:to_i).max.to_i
             in_list?(column) ? max : max.next

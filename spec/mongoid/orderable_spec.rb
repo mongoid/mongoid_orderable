@@ -939,17 +939,17 @@ describe Mongoid::Orderable do
       describe 'removement' do
 
         it 'top' do
-          MultipleColumnsOrderable.where(:position => 1).destroy
+          MultipleColumnsOrderable.where(:pos => 1).destroy
           positions.should == [0, 1, 2, 3]
         end
 
         it 'bottom' do
-          MultipleColumnsOrderable.where(:position => 4).destroy
+          MultipleColumnsOrderable.where(:pos => 4).destroy
           positions.should == [0, 1, 2, 3]
         end
 
         it 'middle' do
-          MultipleColumnsOrderable.where(:position => 3).destroy
+          MultipleColumnsOrderable.where(:pos => 3).destroy
           positions.should == [0, 1, 2, 3]
         end
       end
@@ -983,7 +983,7 @@ describe Mongoid::Orderable do
 
       describe 'movement' do
         it 'higher from top' do
-          record = MultipleColumnsOrderable.where(position: 0).first
+          record = MultipleColumnsOrderable.where(pos: 0).first
           position = record.serial_no
           record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
@@ -992,7 +992,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from bottom' do
-          record = MultipleColumnsOrderable.where(position: 4).first
+          record = MultipleColumnsOrderable.where(pos: 4).first
           position = record.serial_no
           record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
@@ -1001,7 +1001,7 @@ describe Mongoid::Orderable do
         end
         
         it 'higher from middle' do
-          record = MultipleColumnsOrderable.where(position: 3).first
+          record = MultipleColumnsOrderable.where(pos: 3).first
           position = record.serial_no
           record.move_position_higher!
           positions.should == [0, 1, 2, 3, 4]
@@ -1010,7 +1010,7 @@ describe Mongoid::Orderable do
         end
         
         it 'lower from top' do
-          record = MultipleColumnsOrderable.where(position: 0).first
+          record = MultipleColumnsOrderable.where(pos: 0).first
           position = record.serial_no
           record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
@@ -1019,7 +1019,7 @@ describe Mongoid::Orderable do
         end
         
         it 'lower from bottom' do
-          record = MultipleColumnsOrderable.where(position: 4).first
+          record = MultipleColumnsOrderable.where(pos: 4).first
           position = record.serial_no
           record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
@@ -1028,7 +1028,7 @@ describe Mongoid::Orderable do
         end
         
         it 'lower from middle' do
-          record = MultipleColumnsOrderable.where(position: 3).first
+          record = MultipleColumnsOrderable.where(pos: 3).first
           position = record.serial_no
           record.move_position_lower!
           positions.should == [0, 1, 2, 3, 4]
@@ -1040,11 +1040,11 @@ describe Mongoid::Orderable do
       describe 'utility methods' do
 
         before do
-          @record_1 = MultipleColumnsOrderable.where(position: 0).first
-          @record_2 = MultipleColumnsOrderable.where(position: 1).first
-          @record_3 = MultipleColumnsOrderable.where(position: 2).first
-          @record_4 = MultipleColumnsOrderable.where(position: 3).first
-          @record_5 = MultipleColumnsOrderable.where(position: 4).first
+          @record_1 = MultipleColumnsOrderable.where(pos: 0).first
+          @record_2 = MultipleColumnsOrderable.where(pos: 1).first
+          @record_3 = MultipleColumnsOrderable.where(pos: 2).first
+          @record_4 = MultipleColumnsOrderable.where(pos: 3).first
+          @record_5 = MultipleColumnsOrderable.where(pos: 4).first
         end
 
         it "should return the lower/higher item on the list for next_item/previous_item" do
