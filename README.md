@@ -10,6 +10,7 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 * It supports mutators api
 * It correctly assigns the position while moving document between scopes
 * It supports mongoid 2, 3 and 4
+* It supports specifying multiple orderable columns
 
 # How?
 
@@ -63,6 +64,58 @@ item.previous_items # return a collection of items lower on the list
 
 item.next_item # returns the next item in the list
 item.previous_item # returns the previous item in the list
+```
+
+# Multiple Columns
+
+You can also define multiple orderable columns for any class including the Mongoid::Orderable module.
+
+```
+class Book
+  include Mongoid::Document
+  include Mongoid::Orderable
+
+  orderable base: 0
+  orderable column: sno, as: :serial_no
+end
+```
+
+The above defines two different orderable_columns on Book - *position* and *serial_no*.
+The following helpers are generated in this case:
+
+```
+item.move_#{column_name}_to 
+item.move_#{column_name}_to=
+item.move_#{column_name}_to!
+
+item.move_#{column_name}_to_top
+item.move_#{column_name}_to_bottom
+item.move_#{column_name}_higher
+item.move_#{column_name}_lower
+
+item.next_#{column_name}_items
+item.previous_#{column_name}_items
+
+item.next_#{column_name}_item
+item.previous_#{column_name}_item
+```
+
+*where column_name is either **position** or  **serial_no**.*
+
+When a model defines multiple orderable columns, the original helpers are also available and work on the first orderable column.
+
+```
+  @book1 = Book.create!
+  @book2 = Book.create!
+  @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
+  @book2.move_to! :top   # this will change the :position of the book to 0 (not serial_no)
+  @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
+```
+
+To specify any other orderable column as default pass the **default: true** option with orderable.
+
+```
+  orderable column: sno, as: :serial_no, default: true
 ```
 
 # Contributing
