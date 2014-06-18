@@ -2,7 +2,7 @@ module Mongoid
   module Orderable
     class Configuration
 
-      CONFIG_OPTIONS = %w(column class_name scope foreign_key inherited base index default).map(&:to_sym)
+      CONFIG_OPTIONS = %w(column scope foreign_key inherited base index default).map(&:to_sym)
       FIELD_OPTIONS  = %w(as).map(&:to_sym)
       VALID_OPTIONS  = CONFIG_OPTIONS + FIELD_OPTIONS
 

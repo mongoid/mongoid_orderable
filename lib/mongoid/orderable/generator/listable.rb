@@ -11,20 +11,20 @@ module Mongoid
         protected
 
         def generate_list_helpers(column)
-          generate_method("next_#{column}_item") do |target_position|
-            next_item(column, target_position)
+          generate_method("next_#{column}_item") do
+            next_item(column)
           end
 
-          generate_method("next_#{column}_items") do |target_position|
-            next_items(column, target_position)
+          generate_method("next_#{column}_items") do
+            next_items(column)
           end
 
-          generate_method("previous_#{column}_item") do |target_position|
-            previous_item(column, target_position)
+          generate_method("previous_#{column}_item") do
+            previous_item(column)
           end
 
-          generate_method("previous_#{column}_items") do |target_position|
-            previous_items(column, target_position)
+          generate_method("previous_#{column}_items") do
+            previous_items(column)
           end
         end
 
