@@ -1,0 +1,9 @@
+en:
+  mongoid:
+    errors:
+      messages:
+        invalid_target_position:
+          message: "`%{value}` is not an acceptable value for target position."
+          summary: "Mongoid::Orderable accepts: a Numeric, a numeric string,
+                    :top, :bottom, or nil."
+          resolution: "You must give an acceptable value for target position."
