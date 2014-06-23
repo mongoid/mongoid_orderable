@@ -23,7 +23,7 @@ module Mongoid
         def apply_position column, target_position
           if persisted? && !embedded? && orderable_scope_changed?(column)
             self.class.unscoped.find(_id).remove_from_list
-            self.public_send("orderable_#{column}_position=", nil)
+            self.send("orderable_#{column}_position=", nil)
           end
 
           return if !target_position && in_list?(column)
@@ -38,7 +38,7 @@ module Mongoid
             MongoidOrderable.inc(scope.where(col.gt => pos, col.lte => target_position), col, -1) if target_position > pos
           end
 
-          self.public_send("orderable_#{column}_position=", target_position)
+          self.send("orderable_#{column}_position=", target_position)
         end
 
         def target_position_to_position column, target_position

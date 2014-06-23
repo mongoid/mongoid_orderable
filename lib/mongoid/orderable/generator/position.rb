@@ -7,16 +7,16 @@ module Mongoid
           klass.class_eval <<-eos
             def orderable_position(column = nil)
               column ||= default_orderable_column
-              public_send "orderable_\#{column}_position"
+              send "orderable_\#{column}_position"
             end
           eos
 
           generate_method("orderable_#{column_name}_position") do
-            public_send column_name
+            send column_name
           end
 
           generate_method("orderable_#{column_name}_position=") do |value|
-            public_send "#{column_name}=", value
+            send "#{column_name}=", value
           end
         end
 

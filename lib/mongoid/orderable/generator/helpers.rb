@@ -6,15 +6,17 @@ module Mongoid
         def generate_orderable_helpers
           self_class = klass
 
-          generate_method(:orderable_base) do |column = nil|
-            column ||= default_orderable_column
-            self_class.orderable_configurations[column][:base]
-          end
+          klass.class_eval <<-eos
+            def orderable_base(column = nil)
+              column ||= default_orderable_column
+              #{self_class}.orderable_configurations[column][:base]
+            end
 
-          generate_method(:orderable_column) do |column = nil|
-            column ||= default_orderable_column
-            self_class.orderable_configurations[column][:column]
-          end
+            def orderable_column(column = nil)
+              column ||= default_orderable_column
+              #{self_class}.orderable_configurations[column][:column]
+            end
+          eos
 
           generate_method(:orderable_inherited_class) do
             self_class.orderable_configurations.any?{ |col, conf| conf[:inherited] } ? self_class : self.class

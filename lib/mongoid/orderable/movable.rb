@@ -2,40 +2,44 @@ module Mongoid
   module Orderable
     module Movable
 
-      def move_to!(column=nil, target_position)
-        move_column_to column, target_position
+      def move_to!(target_position, options={})
+        move_column_to target_position, options
         save
       end
       alias_method :insert_at!, :move_to!
 
-      def move_to(column=nil, target_position)
-        move_column_to column, target_position
+      def move_to(target_position, options={})
+        move_column_to target_position, options
       end
       alias_method :insert_at, :move_to
 
-      def move_to=(column=nil, target_position)
-        move_column_to column, target_position
+      def move_to=(target_position, options={})
+        move_column_to target_position, options
       end
       alias_method :insert_at=, :move_to=
 
       [:top, :bottom].each do |symbol|
-        define_method "move_to_#{symbol}" do |column = nil|
-          move_to column, symbol
-        end
+        class_eval <<-eos
+          def move_to_#{symbol}(options = {})
+            move_to :#{symbol}, options
+          end
 
-        define_method "move_to_#{symbol}!" do |column = nil|
-          move_to! column, symbol
-        end
+          def move_to_#{symbol}!(options = {})
+            move_to! :#{symbol}, options
+          end
+        eos
       end
 
       [:higher, :lower].each do |symbol|
-        define_method "move_#{symbol}" do |column = nil|
-          move_to column, symbol
-        end
+        class_eval <<-eos
+          def move_#{symbol}(options = {})
+            move_to :#{symbol}, options
+          end
 
-        define_method "move_#{symbol}!" do |column = nil|
-          move_to! column, symbol
-        end
+          def move_#{symbol}!(options = {})
+            move_to! :#{symbol}, options
+          end
+        eos
       end
 
       protected
@@ -44,8 +48,8 @@ module Mongoid
         @move_all || {}
       end
 
-      def move_column_to(column, position)
-        column ||= default_orderable_column
+      def move_column_to(position, options)
+        column = options[:column] || default_orderable_column
         @move_all = move_all.merge(column => position)
       end
 
