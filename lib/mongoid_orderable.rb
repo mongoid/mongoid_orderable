@@ -35,3 +35,17 @@ else
 end
 
 require 'mongoid/orderable'
+require 'mongoid/orderable/configuration'
+require 'mongoid/orderable/helpers'
+require 'mongoid/orderable/callbacks'
+require 'mongoid/orderable/listable'
+require 'mongoid/orderable/movable'
+
+require 'mongoid/orderable/generator/listable'
+require 'mongoid/orderable/generator/movable'
+require 'mongoid/orderable/generator/position'
+require 'mongoid/orderable/generator/scope'
+require 'mongoid/orderable/generator/helpers'
+require 'mongoid/orderable/generator'
+
+require 'mongoid/orderable/orderable_class'
