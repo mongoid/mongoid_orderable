@@ -34,7 +34,7 @@ module Mongoid
 
       def save_configuration
         klass.orderable_configurations ||= {}
-        klass.orderable_configurations[column_name] = configuration
+        klass.orderable_configurations = klass.orderable_configurations.merge(column_name => configuration)
       end
 
       def add_callbacks

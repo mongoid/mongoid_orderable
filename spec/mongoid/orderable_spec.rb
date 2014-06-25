@@ -662,6 +662,44 @@ describe Mongoid::Orderable do
       fruit1.position.should == 1
       fruit2.position.should == 2
     end
+
+    describe 'movement' do
+      before :each do
+        Fruit.delete_all
+        5.times do
+          Apple.create!
+        end
+      end
+
+      it 'with symbol position' do
+        first_apple = Apple.first
+        top_pos = first_apple.position
+        bottom_pos = Apple.last.position
+        expect do
+          first_apple.move_to! :bottom
+        end.to change(first_apple, :position).from(top_pos).to bottom_pos
+      end
+
+      it 'with point position' do
+        first_apple = Apple.first
+        top_pos = first_apple.position
+        bottom_pos = Apple.last.position
+        expect do
+          first_apple.move_to! bottom_pos
+        end.to change(first_apple, :position).from(top_pos).to bottom_pos
+      end
+    end
+
+    describe 'add orderable configurations in inherited class' do
+      it 'does not affect the orderable configurations of parent class and sibling class' do
+        class Apple
+          orderable :column => :serial
+        end
+        expect(Fruit.orderable_configurations).not_to eq Apple.orderable_configurations
+        expect(Orange.orderable_configurations).not_to eq Apple.orderable_configurations
+        expect(Fruit.orderable_configurations).to eq Orange.orderable_configurations
+      end
+    end
   end
 
   describe ForeignKeyDiffersOrderable do
