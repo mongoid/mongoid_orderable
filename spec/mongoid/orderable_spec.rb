@@ -689,6 +689,17 @@ describe Mongoid::Orderable do
         end.to change(first_apple, :position).from(top_pos).to bottom_pos
       end
     end
+
+    describe 'add orderable configurations in inherited class' do
+      it 'does not affect the orderable configurations of parent class and sibling class' do
+        class Apple
+          orderable :column => :serial
+        end
+        expect(Fruit.orderable_configurations).not_to eq Apple.orderable_configurations
+        expect(Orange.orderable_configurations).not_to eq Apple.orderable_configurations
+        expect(Fruit.orderable_configurations).to eq Orange.orderable_configurations
+      end
+    end
   end
 
   describe ForeignKeyDiffersOrderable do
