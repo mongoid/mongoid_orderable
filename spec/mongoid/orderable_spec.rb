@@ -662,6 +662,33 @@ describe Mongoid::Orderable do
       fruit1.position.should == 1
       fruit2.position.should == 2
     end
+
+    describe 'movement' do
+      before :each do
+        Fruit.delete_all
+        5.times do
+          Apple.create!
+        end
+      end
+
+      it 'with symbol position' do
+        first_apple = Apple.first
+        top_pos = first_apple.position
+        bottom_pos = Apple.last.position
+        expect do
+          first_apple.move_to! :bottom
+        end.to change(first_apple, :position).from(top_pos).to bottom_pos
+      end
+
+      it 'with point position' do
+        first_apple = Apple.first
+        top_pos = first_apple.position
+        bottom_pos = Apple.last.position
+        expect do
+          first_apple.move_to! bottom_pos
+        end.to change(first_apple, :position).from(top_pos).to bottom_pos
+      end
+    end
   end
 
   describe ForeignKeyDiffersOrderable do

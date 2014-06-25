@@ -6,10 +6,11 @@ module Mongoid::Orderable
     include Mongoid::Orderable::Callbacks
     include Mongoid::Orderable::Movable
     include Mongoid::Orderable::Listable
+
+    class_attribute :orderable_configurations
   end
 
   module ClassMethods
-    attr_accessor :orderable_configurations
 
     def orderable options = {}
       configuration = Mongoid::Orderable::Configuration.build(self, options)
