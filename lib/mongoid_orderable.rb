@@ -1,3 +1,7 @@
+require 'active_support'
+I18n.enforce_available_locales = false
+I18n.load_path << File.join(File.dirname(__FILE__), 'config', 'locales', 'en.yml')
+
 module MongoidOrderable
   def self.mongoid2?
     ::Mongoid.const_defined? :Contexts
@@ -35,6 +39,7 @@ else
 end
 
 require 'mongoid/orderable'
+require 'mongoid/orderable/errors'
 require 'mongoid/orderable/configuration'
 require 'mongoid/orderable/helpers'
 require 'mongoid/orderable/callbacks'

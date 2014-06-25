@@ -180,6 +180,18 @@ describe Mongoid::Orderable do
         positions.should == [1, 2, 3, 4, 5, 6]
         newbie.position.should == 4
       end
+
+      it 'middle (with a numeric string)' do
+        newbie = SimpleOrderable.create! :move_to => '4'
+        positions.should == [1, 2, 3, 4, 5, 6]
+        newbie.position.should == 4
+      end
+
+      it 'middle (with a non-numeric string)' do
+        expect do
+          SimpleOrderable.create! :move_to => 'four'
+        end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
+      end
     end
 
     describe 'movement' do
@@ -307,6 +319,18 @@ describe Mongoid::Orderable do
         positions.should == [1, 2, 1, 2, 3, 4]
         newbie.position.should == 2
       end
+
+      it 'middle (with a numeric string)' do
+        newbie = ScopedOrderable.create! :move_to => '2', :group_id => 2
+        positions.should == [1, 2, 1, 2, 3, 4]
+        newbie.position.should == 2
+      end
+
+      it 'middle (with a non-numeric string)' do
+        expect do
+          ScopedOrderable.create! :move_to => 'two', :group_id => 2
+        end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
+      end
     end
 
     describe 'scope movement' do
@@ -338,6 +362,18 @@ describe Mongoid::Orderable do
           positions.should == [1, 2, 3, 1, 2]
           record.reload.position.should == 2
         end
+
+        it 'with point position (with a numeric string)' do
+          record.update_attributes :group_id => 1, :move_to => '2'
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 2
+        end
+
+        it 'with point position (with a non-numeric string)' do
+          expect do
+            record.update_attributes :group_id => 1, :move_to => 'two'
+          end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
+        end
       end
     end
 
@@ -366,6 +402,18 @@ describe Mongoid::Orderable do
           record.update_attributes :group_id => 1, :move_to => 2
           positions.should == [1, 2, 3, 1, 2]
           record.reload.position.should == 2
+        end
+
+        it 'to an existing scope group (with a numeric string)' do
+          record.update_attributes :group_id => 1, :move_to => '2'
+          positions.should == [1, 2, 3, 1, 2]
+          record.reload.position.should == 2
+        end
+
+        it 'to an existing scope group (with a non-numeric string)' do
+          expect do
+            record.update_attributes :group_id => 1, :move_to => 'two'
+          end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
         end
       end
     end
@@ -518,6 +566,18 @@ describe Mongoid::Orderable do
         newbie = ZeroBasedOrderable.create! :move_to => 3
         positions.should == [0, 1, 2, 3, 4, 5]
         newbie.position.should == 3
+      end
+
+      it 'middle (with a numeric string)' do
+        newbie = ZeroBasedOrderable.create! :move_to => '3'
+        positions.should == [0, 1, 2, 3, 4, 5]
+        newbie.position.should == 3
+      end
+
+      it 'middle (with a non-numeric string)' do
+        expect do
+          ZeroBasedOrderable.create! :move_to => 'three'
+        end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
       end
     end
 

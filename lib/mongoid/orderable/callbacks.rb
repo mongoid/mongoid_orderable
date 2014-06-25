@@ -44,11 +44,13 @@ module Mongoid
         def target_position_to_position column, target_position
           target_position = :bottom unless target_position
 
-          target_position = case target_position.to_sym
-                            when :top then orderable_base(column)
-                            when :bottom then bottom_orderable_position(column)
-                            when :higher then orderable_position(column).pred
-                            when :lower then orderable_position(column).next
+          target_position = case target_position.to_s
+                            when 'top' then orderable_base(column)
+                            when 'bottom' then bottom_orderable_position(column)
+                            when 'higher' then orderable_position(column).pred
+                            when 'lower' then orderable_position(column).next
+                            when /\A\d+\Z/ then target_position.to_i
+                            else raise Mongoid::Orderable::Errors::InvalidTargetPosition.new target_position
                             end unless target_position.is_a? Numeric
 
           target_position = orderable_base(column) if target_position < orderable_base(column)
