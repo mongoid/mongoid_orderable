@@ -531,7 +531,7 @@ describe Mongoid::Orderable do
     end
 
     describe 'reset position' do
-      before{ ZeroBasedOrderable.update_all(position: nil) }
+      before{ ZeroBasedOrderable.update_all({:position => nil}) }
       it 'should properly reset position' do
         ZeroBasedOrderable.all.map(&:save)
         positions.should == [0, 1, 2, 3, 4]
