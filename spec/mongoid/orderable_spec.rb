@@ -114,8 +114,8 @@ describe Mongoid::Orderable do
     belongs_to :apple
     belongs_to :orange
 
-    orderable :column => :posa, scope: :apple_id
-    orderable :column => :poso, scope: :orange_id
+    orderable :column => :posa, :scope => :apple_id
+    orderable :column => :poso, :scope => :orange_id
   end
 
   describe SimpleOrderable do
@@ -1342,15 +1342,15 @@ describe Mongoid::Orderable do
         Apple.create; Orange.create
       end
 
-      MultipleScopedOrderable.create! apple_id: 1, orange_id: 1
-      MultipleScopedOrderable.create! apple_id: 2, orange_id: 1
-      MultipleScopedOrderable.create! apple_id: 2, orange_id: 2
-      MultipleScopedOrderable.create! apple_id: 1, orange_id: 3
-      MultipleScopedOrderable.create! apple_id: 1, orange_id: 1
-      MultipleScopedOrderable.create! apple_id: 3, orange_id: 3
-      MultipleScopedOrderable.create! apple_id: 2, orange_id: 3
-      MultipleScopedOrderable.create! apple_id: 3, orange_id: 2
-      MultipleScopedOrderable.create! apple_id: 1, orange_id: 3
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 2
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 3, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 3, :orange_id => 2
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 3
     end
 
     def apple_positions
