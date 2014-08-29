@@ -15,14 +15,18 @@ module Mongoid
 
         def remove_from_list
           self.orderable_keys.each do |column|
-            col, pos = orderable_column(column), orderable_position(column)
-            MongoidOrderable.inc orderable_scoped(column).where(col.gt => pos), col, -1
+            remove_position_from_list column
           end
+        end
+
+        def remove_position_from_list(column)
+          col, pos = orderable_column(column), orderable_position(column)
+          MongoidOrderable.inc orderable_scoped(column).where(col.gt => pos), col, -1
         end
 
         def apply_position column, target_position
           if persisted? && !embedded? && orderable_scope_changed?(column)
-            self.class.unscoped.find(_id).remove_from_list
+            self.class.unscoped.find(_id).remove_position_from_list(column)
             self.send("orderable_#{column}_position=", nil)
           end
 
