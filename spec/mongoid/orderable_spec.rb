@@ -107,6 +107,17 @@ describe Mongoid::Orderable do
     orderable :column => :groups, :scope => :group
   end
 
+  class MultipleScopedOrderable
+    include Mongoid::Document
+    include Mongoid::Orderable
+
+    belongs_to :apple
+    belongs_to :orange
+
+    orderable :column => :posa, :scope => :apple_id
+    orderable :column => :poso, :scope => :orange_id
+  end
+
   describe SimpleOrderable do
 
     before :each do
@@ -1318,6 +1329,55 @@ describe Mongoid::Orderable do
           expect(@record_3.previous_groups_items.to_a).to eq([@record_1, @record_2])
           expect(@record_5.previous_groups_items.to_a).to eq([@record_4])
         end
+      end
+    end
+  end
+
+  describe MultipleScopedOrderable do
+    before :each do
+      Apple.delete_all; Orange.delete_all;
+      MultipleScopedOrderable.delete_all
+
+      3.times do
+        Apple.create; Orange.create
+      end
+
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 2
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 1
+      MultipleScopedOrderable.create! :apple_id => 3, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 2, :orange_id => 3
+      MultipleScopedOrderable.create! :apple_id => 3, :orange_id => 2
+      MultipleScopedOrderable.create! :apple_id => 1, :orange_id => 3
+    end
+
+    def apple_positions
+      MultipleScopedOrderable.order_by([:apple_id, :asc], [:posa, :asc]).map(&:posa)
+    end
+
+    def orange_positions
+      MultipleScopedOrderable.order_by([:orange_id, :asc], [:poso, :asc]).map(&:poso)
+    end
+
+    describe 'default positions' do
+      it { apple_positions.should == [1, 2, 3, 4, 1, 2, 3, 1, 2] }
+      it { orange_positions.should == [1, 2, 3, 1, 2, 1, 2, 3, 4] }
+    end
+
+    describe 'change the scope of the apple' do
+      let(:record) { MultipleScopedOrderable.first }
+      before do
+        record.update_attribute(:apple_id, 2)
+      end
+
+      it 'should properly set the apple positions' do
+        apple_positions.should == [1, 2, 3, 1, 2, 3, 4, 1, 2]
+      end
+
+      it 'should not affect the orange positions' do
+        orange_positions.should == [1, 2, 3, 1, 2, 1, 2, 3, 4]
       end
     end
   end
