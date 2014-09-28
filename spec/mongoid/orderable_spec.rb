@@ -132,43 +132,43 @@ describe Mongoid::Orderable do
     end
 
     it 'should have proper position column' do
-      SimpleOrderable.fields.key?('position').should be true
-      SimpleOrderable.fields['position'].options[:type].should == Integer
+      expect(SimpleOrderable.fields.key?('position')).to be true
+      expect(SimpleOrderable.fields['position'].options[:type]).to eq(Integer)
     end
 
     it 'should have index on position column' do
       if MongoidOrderable.mongoid2?
-        SimpleOrderable.index_options[:position].should_not be_nil
+        expect(SimpleOrderable.index_options[:position]).not_to be_nil
       elsif MongoidOrderable.mongoid3?
-        SimpleOrderable.index_options[{:position => 1}].should_not be_nil
+        expect(SimpleOrderable.index_options[{:position => 1}]).not_to be_nil
       else
-        SimpleOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }.should_not be_nil
+        expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).not_to be_nil
       end
     end
 
     it 'should have a orderable base of 1' do
-      SimpleOrderable.create!.orderable_base.should == 1
+      expect(SimpleOrderable.create!.orderable_base).to eq(1)
     end
 
     it 'should set proper position while creation' do
-      positions.should == [1, 2, 3, 4, 5]
+      expect(positions).to eq([1, 2, 3, 4, 5])
     end
 
     describe 'removement' do
 
       it 'top' do
         SimpleOrderable.where(:position => 1).destroy
-        positions.should == [1, 2, 3, 4]
+        expect(positions).to eq([1, 2, 3, 4])
       end
 
       it 'bottom' do
         SimpleOrderable.where(:position => 5).destroy
-        positions.should == [1, 2, 3, 4]
+        expect(positions).to eq([1, 2, 3, 4])
       end
 
       it 'middle' do
         SimpleOrderable.where(:position => 3).destroy
-        positions.should == [1, 2, 3, 4]
+        expect(positions).to eq([1, 2, 3, 4])
       end
     end
 
@@ -176,26 +176,26 @@ describe Mongoid::Orderable do
 
       it 'top' do
         newbie = SimpleOrderable.create! :move_to => :top
-        positions.should == [1, 2, 3, 4, 5, 6]
-        newbie.position.should == 1
+        expect(positions).to eq([1, 2, 3, 4, 5, 6])
+        expect(newbie.position).to eq(1)
       end
 
       it 'bottom' do
         newbie = SimpleOrderable.create! :move_to => :bottom
-        positions.should == [1, 2, 3, 4, 5, 6]
-        newbie.position.should == 6
+        expect(positions).to eq([1, 2, 3, 4, 5, 6])
+        expect(newbie.position).to eq(6)
       end
 
       it 'middle' do
         newbie = SimpleOrderable.create! :move_to => 4
-        positions.should == [1, 2, 3, 4, 5, 6]
-        newbie.position.should == 4
+        expect(positions).to eq([1, 2, 3, 4, 5, 6])
+        expect(newbie.position).to eq(4)
       end
 
       it 'middle (with a numeric string)' do
         newbie = SimpleOrderable.create! :move_to => '4'
-        positions.should == [1, 2, 3, 4, 5, 6]
-        newbie.position.should == 4
+        expect(positions).to eq([1, 2, 3, 4, 5, 6])
+        expect(newbie.position).to eq(4)
       end
 
       it 'middle (with a non-numeric string)' do
@@ -210,50 +210,50 @@ describe Mongoid::Orderable do
       it 'higher from top' do
         record = SimpleOrderable.where(:position => 1).first
         record.update_attributes :move_to => :higher
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 1
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(1)
       end
 
       it 'higher from bottom' do
         record = SimpleOrderable.where(:position => 5).first
         record.update_attributes :move_to => :higher
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 4
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(4)
       end
 
       it 'higher from middle' do
         record = SimpleOrderable.where(:position => 3).first
         record.update_attributes :move_to => :higher
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 2
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(2)
       end
 
       it 'lower from top' do
         record = SimpleOrderable.where(:position => 1).first
         record.update_attributes :move_to => :lower
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 2
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(2)
       end
 
       it 'lower from bottom' do
         record = SimpleOrderable.where(:position => 5).first
         record.update_attributes :move_to => :lower
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 5
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(5)
       end
 
       it 'lower from middle' do
         record = SimpleOrderable.where(:position => 3).first
         record.update_attributes :move_to => :lower
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 4
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(4)
       end
 
       it 'does nothing if position not change' do
         record = SimpleOrderable.where(:position => 3).first
         record.save
-        positions.should == [1, 2, 3, 4, 5]
-        record.reload.position.should == 3
+        expect(positions).to eq([1, 2, 3, 4, 5])
+        expect(record.reload.position).to eq(3)
       end
     end
 
@@ -290,24 +290,24 @@ describe Mongoid::Orderable do
     end
 
     it 'should set proper position while creation' do
-      positions.should == [1, 2, 1, 2, 3]
+      expect(positions).to eq([1, 2, 1, 2, 3])
     end
 
     describe 'removement' do
 
       it 'top' do
         ScopedOrderable.where(:position => 1, :group_id => 1).destroy
-        positions.should == [1, 1, 2, 3]
+        expect(positions).to eq([1, 1, 2, 3])
       end
 
       it 'bottom' do
         ScopedOrderable.where(:position => 3, :group_id => 2).destroy
-        positions.should == [1, 2, 1, 2]
+        expect(positions).to eq([1, 2, 1, 2])
       end
 
       it 'middle' do
         ScopedOrderable.where(:position => 2, :group_id => 2).destroy
-        positions.should == [1, 2, 1, 2]
+        expect(positions).to eq([1, 2, 1, 2])
       end
     end
 
@@ -315,26 +315,26 @@ describe Mongoid::Orderable do
 
       it 'top' do
         newbie = ScopedOrderable.create! :move_to => :top, :group_id => 1
-        positions.should == [1, 2, 3, 1, 2, 3]
-        newbie.position.should == 1
+        expect(positions).to eq([1, 2, 3, 1, 2, 3])
+        expect(newbie.position).to eq(1)
       end
 
       it 'bottom' do
         newbie = ScopedOrderable.create! :move_to => :bottom, :group_id => 2
-        positions.should == [1, 2, 1, 2, 3, 4]
-        newbie.position.should == 4
+        expect(positions).to eq([1, 2, 1, 2, 3, 4])
+        expect(newbie.position).to eq(4)
       end
 
       it 'middle' do
         newbie = ScopedOrderable.create! :move_to => 2, :group_id => 2
-        positions.should == [1, 2, 1, 2, 3, 4]
-        newbie.position.should == 2
+        expect(positions).to eq([1, 2, 1, 2, 3, 4])
+        expect(newbie.position).to eq(2)
       end
 
       it 'middle (with a numeric string)' do
         newbie = ScopedOrderable.create! :move_to => '2', :group_id => 2
-        positions.should == [1, 2, 1, 2, 3, 4]
-        newbie.position.should == 2
+        expect(positions).to eq([1, 2, 1, 2, 3, 4])
+        expect(newbie.position).to eq(2)
       end
 
       it 'middle (with a non-numeric string)' do
@@ -350,34 +350,34 @@ describe Mongoid::Orderable do
 
       it 'to a new scope group' do
         record.update_attributes :group_id => 3
-        positions.should == [1, 2, 1, 2, 1]
-        record.position.should == 1
+        expect(positions).to eq([1, 2, 1, 2, 1])
+        expect(record.position).to eq(1)
       end
 
       context 'when moving to an existing scope group' do
 
         it 'without a position' do
           record.update_attributes :group_id => 1
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 3
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(3)
         end
 
         it 'with symbol position' do
           record.update_attributes :group_id => 1, :move_to => :top
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 1
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(1)
         end
 
         it 'with point position' do
           record.update_attributes :group_id => 1, :move_to => 2
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 2
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(2)
         end
 
         it 'with point position (with a numeric string)' do
           record.update_attributes :group_id => 1, :move_to => '2'
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 2
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(2)
         end
 
         it 'with point position (with a non-numeric string)' do
@@ -405,20 +405,20 @@ describe Mongoid::Orderable do
 
         it 'to a new scope group' do
           record.update_attributes :group_id => 3
-          positions.should == [1, 2, 1, 2, 1]
-          record.position.should == 1
+          expect(positions).to eq([1, 2, 1, 2, 1])
+          expect(record.position).to eq(1)
         end
 
         it 'to an existing scope group' do
           record.update_attributes :group_id => 1, :move_to => 2
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 2
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(2)
         end
 
         it 'to an existing scope group (with a numeric string)' do
           record.update_attributes :group_id => 1, :move_to => '2'
-          positions.should == [1, 2, 3, 1, 2]
-          record.reload.position.should == 2
+          expect(positions).to eq([1, 2, 3, 1, 2])
+          expect(record.reload.position).to eq(2)
         end
 
         it 'to an existing scope group (with a non-numeric string)' do
@@ -481,30 +481,30 @@ describe Mongoid::Orderable do
     end
 
     it 'sets proper position while creation' do
-      positions.should == [[1, 2], [1, 2, 3]]
+      expect(positions).to eq([[1, 2], [1, 2, 3]])
     end
 
     it 'moves an item returned by a query to position' do
       embedded_orderable_1 = EmbedsOrderable.first.embedded_orderables.where(:position => 1).first
       embedded_orderable_2 = EmbedsOrderable.first.embedded_orderables.where(:position => 2).first
       embedded_orderable_1.move_to! 2
-      embedded_orderable_2.reload.position.should == 1
+      expect(embedded_orderable_2.reload.position).to eq(1)
     end
   end
 
   describe CustomizedOrderable do
 
     it 'does not have default position field' do
-      CustomizedOrderable.fields.should_not have_key('position')
+      expect(CustomizedOrderable.fields).not_to have_key('position')
     end
 
     it 'should have custom pos field' do
-      CustomizedOrderable.fields.should have_key('pos')
+      expect(CustomizedOrderable.fields).to have_key('pos')
     end
 
     it 'should have an alias my_position which points to pos field on Mongoid 3+' do
       if CustomizedOrderable.respond_to?(:database_field_name)
-        CustomizedOrderable.database_field_name('my_position').should eq('pos')
+        expect(CustomizedOrderable.database_field_name('my_position')).to eq('pos')
       end
     end
   end
@@ -513,9 +513,9 @@ describe Mongoid::Orderable do
 
     it 'should not have index on position column' do
       if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
-        NoIndexOrderable.index_options[:position].should be_nil
+        expect(NoIndexOrderable.index_options[:position]).to be_nil
       else
-        NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }.should be_nil
+        expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
       end
     end
   end
@@ -534,18 +534,18 @@ describe Mongoid::Orderable do
     end
 
     it 'should have a orderable base of 0' do
-      ZeroBasedOrderable.create!.orderable_base.should == 0
+      expect(ZeroBasedOrderable.create!.orderable_base).to eq(0)
     end
 
     it 'should set proper position while creation' do
-      positions.should == [0, 1, 2, 3, 4]
+      expect(positions).to eq([0, 1, 2, 3, 4])
     end
 
     describe 'reset position' do
       before{ ZeroBasedOrderable.update_all({:position => nil}) }
       it 'should properly reset position' do
         ZeroBasedOrderable.all.map(&:save)
-        positions.should == [0, 1, 2, 3, 4]
+        expect(positions).to eq([0, 1, 2, 3, 4])
       end
     end
 
@@ -553,17 +553,17 @@ describe Mongoid::Orderable do
 
       it 'top' do
         ZeroBasedOrderable.where(:position => 0).destroy
-        positions.should == [0, 1, 2, 3]
+        expect(positions).to eq([0, 1, 2, 3])
       end
 
       it 'bottom' do
         ZeroBasedOrderable.where(:position => 4).destroy
-        positions.should == [0, 1, 2, 3]
+        expect(positions).to eq([0, 1, 2, 3])
       end
 
       it 'middle' do
         ZeroBasedOrderable.where(:position => 2).destroy
-        positions.should == [0, 1, 2, 3]
+        expect(positions).to eq([0, 1, 2, 3])
       end
     end
 
@@ -571,26 +571,26 @@ describe Mongoid::Orderable do
 
       it 'top' do
         newbie = ZeroBasedOrderable.create! :move_to => :top
-        positions.should == [0, 1, 2, 3, 4, 5]
-        newbie.position.should == 0
+        expect(positions).to eq([0, 1, 2, 3, 4, 5])
+        expect(newbie.position).to eq(0)
       end
 
       it 'bottom' do
         newbie = ZeroBasedOrderable.create! :move_to => :bottom
-        positions.should == [0, 1, 2, 3, 4, 5]
-        newbie.position.should == 5
+        expect(positions).to eq([0, 1, 2, 3, 4, 5])
+        expect(newbie.position).to eq(5)
       end
 
       it 'middle' do
         newbie = ZeroBasedOrderable.create! :move_to => 3
-        positions.should == [0, 1, 2, 3, 4, 5]
-        newbie.position.should == 3
+        expect(positions).to eq([0, 1, 2, 3, 4, 5])
+        expect(newbie.position).to eq(3)
       end
 
       it 'middle (with a numeric string)' do
         newbie = ZeroBasedOrderable.create! :move_to => '3'
-        positions.should == [0, 1, 2, 3, 4, 5]
-        newbie.position.should == 3
+        expect(positions).to eq([0, 1, 2, 3, 4, 5])
+        expect(newbie.position).to eq(3)
       end
 
       it 'middle (with a non-numeric string)' do
@@ -605,50 +605,50 @@ describe Mongoid::Orderable do
       it 'higher from top' do
         record = ZeroBasedOrderable.where(:position => 0).first
         record.update_attributes :move_to => :higher
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 0
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(0)
       end
 
       it 'higher from bottom' do
         record = ZeroBasedOrderable.where(:position => 4).first
         record.update_attributes :move_to => :higher
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 3
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(3)
       end
 
       it 'higher from middle' do
         record = ZeroBasedOrderable.where(:position => 3).first
         record.update_attributes :move_to => :higher
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 2
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(2)
       end
 
       it 'lower from top' do
         record = ZeroBasedOrderable.where(:position => 0).first
         record.update_attributes :move_to => :lower
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 1
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(1)
       end
 
       it 'lower from bottom' do
         record = ZeroBasedOrderable.where(:position => 4).first
         record.update_attributes :move_to => :lower
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 4
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(4)
       end
 
       it 'lower from middle' do
         record = ZeroBasedOrderable.where(:position => 2).first
         record.update_attributes :move_to => :lower
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 3
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(3)
       end
 
       it 'does nothing if position not change' do
         record = ZeroBasedOrderable.where(:position => 3).first
         record.save
-        positions.should == [0, 1, 2, 3, 4]
-        record.reload.position.should == 3
+        expect(positions).to eq([0, 1, 2, 3, 4])
+        expect(record.reload.position).to eq(3)
       end
     end
 
@@ -678,8 +678,8 @@ describe Mongoid::Orderable do
     it 'should set proper position' do
       fruit1 = Apple.create
       fruit2 = Orange.create
-      fruit1.position.should == 1
-      fruit2.position.should == 2
+      expect(fruit1.position).to eq(1)
+      expect(fruit2.position).to eq(2)
     end
 
     describe 'movement' do
@@ -757,23 +757,23 @@ describe Mongoid::Orderable do
 
         it 'top' do
           newbie.move_to! :top
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 1
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(1)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'bottom' do
           newbie.move_to! :bottom
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 6
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(6)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'middle' do
           newbie.move_to! 4
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 4
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(4)
+          expect(newbie.position).to eq(@position)
         end
       end
 
@@ -782,54 +782,54 @@ describe Mongoid::Orderable do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
           record.move_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 1
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(1)
+          expect(record.position).to eq(position)
         end
 
         it 'higher from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
           record.move_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 4
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(4)
+          expect(record.position).to eq(position)
         end
         
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
           record.move_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 2
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(2)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
           record.move_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 2
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(2)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
           record.move_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 5
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(5)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
           record.move_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 4
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(4)
+          expect(record.position).to eq(position)
         end
       end
 
@@ -868,43 +868,43 @@ describe Mongoid::Orderable do
       let(:serial_nos){ MultipleColumnsOrderable.all.map(&:serial_no).sort }
 
       it 'should have proper serial_no column' do
-        MultipleColumnsOrderable.fields.key?('serial_no').should be true
-        MultipleColumnsOrderable.fields['serial_no'].options[:type].should == Integer
+        expect(MultipleColumnsOrderable.fields.key?('serial_no')).to be true
+        expect(MultipleColumnsOrderable.fields['serial_no'].options[:type]).to eq(Integer)
       end
 
       it 'should have index on serial_no column' do
         if MongoidOrderable.mongoid2?
-          MultipleColumnsOrderable.index_options[:serial_no].should_not be_nil
+          expect(MultipleColumnsOrderable.index_options[:serial_no]).not_to be_nil
         elsif MongoidOrderable.mongoid3?
-          MultipleColumnsOrderable.index_options[{:serial_no => 1}].should_not be_nil
+          expect(MultipleColumnsOrderable.index_options[{:serial_no => 1}]).not_to be_nil
         else
-          MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:serial_no => 1} }.should_not be_nil
+          expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:serial_no => 1} }).not_to be_nil
         end
       end
 
       it 'should have a orderable base of 1' do
-        MultipleColumnsOrderable.first.orderable_base(:serial_no).should == 1
+        expect(MultipleColumnsOrderable.first.orderable_base(:serial_no)).to eq(1)
       end
 
       it 'should set proper position while creation' do
-        serial_nos.should == [1, 2, 3, 4, 5]
+        expect(serial_nos).to eq([1, 2, 3, 4, 5])
       end
 
       describe 'removement' do
 
         it 'top' do
           MultipleColumnsOrderable.where(:serial_no => 1).destroy
-          serial_nos.should == [1, 2, 3, 4]
+          expect(serial_nos).to eq([1, 2, 3, 4])
         end
 
         it 'bottom' do
           MultipleColumnsOrderable.where(:serial_no => 5).destroy
-          serial_nos.should == [1, 2, 3, 4]
+          expect(serial_nos).to eq([1, 2, 3, 4])
         end
 
         it 'middle' do
           MultipleColumnsOrderable.where(:serial_no => 3).destroy
-          serial_nos.should == [1, 2, 3, 4]
+          expect(serial_nos).to eq([1, 2, 3, 4])
         end
       end
 
@@ -915,23 +915,23 @@ describe Mongoid::Orderable do
 
         it 'top' do
           newbie.move_serial_no_to! :top
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 1
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(1)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'bottom' do
           newbie.move_serial_no_to! :bottom
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 6
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(6)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'middle' do
           newbie.move_serial_no_to! 4
-          serial_nos.should == [1, 2, 3, 4, 5, 6]
-          newbie.serial_no.should == 4
-          newbie.position.should == @position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
+          expect(newbie.serial_no).to eq(4)
+          expect(newbie.position).to eq(@position)
         end
       end
 
@@ -940,54 +940,54 @@ describe Mongoid::Orderable do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
           record.move_serial_no_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 1
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(1)
+          expect(record.position).to eq(position)
         end
 
         it 'higher from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
           record.move_serial_no_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 4
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(4)
+          expect(record.position).to eq(position)
         end
         
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
           record.move_serial_no_higher!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 2
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(2)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
           record.move_serial_no_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 2
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(2)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
           record.move_serial_no_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 5
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(5)
+          expect(record.position).to eq(position)
         end
         
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
           record.move_serial_no_lower!
-          serial_nos.should == [1, 2, 3, 4, 5]
-          record.serial_no.should == 4
-          record.position.should == position
+          expect(serial_nos).to eq([1, 2, 3, 4, 5])
+          expect(record.serial_no).to eq(4)
+          expect(record.position).to eq(position)
         end
       end
 
@@ -1027,47 +1027,47 @@ describe Mongoid::Orderable do
       let(:positions){ MultipleColumnsOrderable.all.map(&:position).sort }
 
       it 'should not have default position field' do
-        MultipleColumnsOrderable.fields.should_not have_key('position')
+        expect(MultipleColumnsOrderable.fields).not_to have_key('position')
       end
 
       it 'should have custom pos field' do
-        MultipleColumnsOrderable.fields.should have_key('pos')
-        MultipleColumnsOrderable.fields['pos'].options[:type].should == Integer
+        expect(MultipleColumnsOrderable.fields).to have_key('pos')
+        expect(MultipleColumnsOrderable.fields['pos'].options[:type]).to eq(Integer)
       end
 
       it 'should have index on position column' do
         if MongoidOrderable.mongoid2?
-          MultipleColumnsOrderable.index_options[:position].should be_nil
+          expect(MultipleColumnsOrderable.index_options[:position]).to be_nil
         elsif MongoidOrderable.mongoid3?
-          MultipleColumnsOrderable.index_options[{:position => 1}].should be_nil
+          expect(MultipleColumnsOrderable.index_options[{:position => 1}]).to be_nil
         else
-          MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }.should be_nil
+          expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil
         end
       end
 
       it 'should have a orderable base of 0' do
-        MultipleColumnsOrderable.first.orderable_base(:position).should == 0
+        expect(MultipleColumnsOrderable.first.orderable_base(:position)).to eq(0)
       end
 
       it 'should set proper position while creation' do
-        positions.should == [0, 1, 2, 3, 4]
+        expect(positions).to eq([0, 1, 2, 3, 4])
       end
 
       describe 'removement' do
 
         it 'top' do
           MultipleColumnsOrderable.where(:pos => 1).destroy
-          positions.should == [0, 1, 2, 3]
+          expect(positions).to eq([0, 1, 2, 3])
         end
 
         it 'bottom' do
           MultipleColumnsOrderable.where(:pos => 4).destroy
-          positions.should == [0, 1, 2, 3]
+          expect(positions).to eq([0, 1, 2, 3])
         end
 
         it 'middle' do
           MultipleColumnsOrderable.where(:pos => 3).destroy
-          positions.should == [0, 1, 2, 3]
+          expect(positions).to eq([0, 1, 2, 3])
         end
       end
 
@@ -1078,23 +1078,23 @@ describe Mongoid::Orderable do
 
         it 'top' do
           newbie.move_position_to! :top
-          positions.should == [0, 1, 2, 3, 4, 5]
-          newbie.position.should == 0
-          newbie.serial_no.should == @serial_no
+          expect(positions).to eq([0, 1, 2, 3, 4, 5])
+          expect(newbie.position).to eq(0)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
 
         it 'bottom' do
           newbie.move_position_to! :bottom
-          positions.should == [0, 1, 2, 3, 4, 5]
-          newbie.position.should == 5
-          newbie.serial_no.should == @serial_no
+          expect(positions).to eq([0, 1, 2, 3, 4, 5])
+          expect(newbie.position).to eq(5)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
 
         it 'middle' do
           newbie.move_position_to! 4
-          positions.should == [0, 1, 2, 3, 4, 5]
-          newbie.position.should == 4
-          newbie.serial_no.should == @serial_no
+          expect(positions).to eq([0, 1, 2, 3, 4, 5])
+          expect(newbie.position).to eq(4)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
       end
 
@@ -1103,54 +1103,54 @@ describe Mongoid::Orderable do
           record = MultipleColumnsOrderable.where(:pos => 0).first
           position = record.serial_no
           record.move_position_higher!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 0
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(0)
+          expect(record.serial_no).to eq(position)
         end
 
         it 'higher from bottom' do
           record = MultipleColumnsOrderable.where(:pos => 4).first
           position = record.serial_no
           record.move_position_higher!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 3
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(3)
+          expect(record.serial_no).to eq(position)
         end
         
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:pos => 3).first
           position = record.serial_no
           record.move_position_higher!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 2
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(2)
+          expect(record.serial_no).to eq(position)
         end
         
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:pos => 0).first
           position = record.serial_no
           record.move_position_lower!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 1
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(1)
+          expect(record.serial_no).to eq(position)
         end
         
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:pos => 4).first
           position = record.serial_no
           record.move_position_lower!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 4
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(4)
+          expect(record.serial_no).to eq(position)
         end
         
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:pos => 3).first
           position = record.serial_no
           record.move_position_lower!
-          positions.should == [0, 1, 2, 3, 4]
-          record.position.should == 4
-          record.serial_no.should == position
+          expect(positions).to eq([0, 1, 2, 3, 4])
+          expect(record.position).to eq(4)
+          expect(record.serial_no).to eq(position)
         end
       end
 
@@ -1195,24 +1195,24 @@ describe Mongoid::Orderable do
       let(:all_groups){ MultipleColumnsOrderable.order_by([:group_id, :asc], [:groups, :asc]).map(&:groups) }
 
       it 'should set proper position while creation' do
-        all_groups.should == [1, 2, 1, 2, 3]
+        expect(all_groups).to eq([1, 2, 1, 2, 3])
       end
 
       describe 'removement' do
 
         it 'top' do
           MultipleColumnsOrderable.where(:groups => 1, :group_id => 1).destroy
-          all_groups.should == [1, 1, 2, 3]
+          expect(all_groups).to eq([1, 1, 2, 3])
         end
 
         it 'bottom' do
           MultipleColumnsOrderable.where(:groups => 3, :group_id => 2).destroy
-          all_groups.should == [1, 2, 1, 2]
+          expect(all_groups).to eq([1, 2, 1, 2])
         end
 
         it 'middle' do
           MultipleColumnsOrderable.where(:groups => 2, :group_id => 2).destroy
-          all_groups.should == [1, 2, 1, 2]
+          expect(all_groups).to eq([1, 2, 1, 2])
         end
       end
 
@@ -1221,22 +1221,22 @@ describe Mongoid::Orderable do
         it 'top' do
           newbie = MultipleColumnsOrderable.create! :group_id => 1
           newbie.move_groups_to! :top
-          all_groups.should == [1, 2, 3, 1, 2, 3]
-          newbie.groups.should == 1
+          expect(all_groups).to eq([1, 2, 3, 1, 2, 3])
+          expect(newbie.groups).to eq(1)
         end
 
         it 'bottom' do
           newbie = MultipleColumnsOrderable.create! :group_id => 2
           newbie.move_groups_to! :bottom
-          all_groups.should == [1, 2, 1, 2, 3, 4]
-          newbie.groups.should == 4
+          expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
+          expect(newbie.groups).to eq(4)
         end
 
         it 'middle' do
           newbie = MultipleColumnsOrderable.create! :group_id => 2
           newbie.move_groups_to! 2
-          all_groups.should == [1, 2, 1, 2, 3, 4]
-          newbie.groups.should == 2
+          expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
+          expect(newbie.groups).to eq(2)
         end
       end
 
@@ -1246,30 +1246,30 @@ describe Mongoid::Orderable do
       
         it 'to a new scope group' do
           record.update_attributes :group_id => 3
-          all_groups.should == [1, 2, 1, 2, 1]
-          record.groups.should == 1
+          expect(all_groups).to eq([1, 2, 1, 2, 1])
+          expect(record.groups).to eq(1)
         end
       
         context 'when moving to an existing scope group' do
       
           it 'without a position' do
             record.update_attributes :group_id => 1
-            all_groups.should == [1, 2, 3, 1, 2]
-            record.reload.groups.should == 3
+            expect(all_groups).to eq([1, 2, 3, 1, 2])
+            expect(record.reload.groups).to eq(3)
           end
       
           it 'with symbol position' do
             record.update_attributes :group_id => 1
             record.move_groups_to! :top
-            all_groups.should == [1, 2, 3, 1, 2]
-            record.reload.groups.should == 1
+            expect(all_groups).to eq([1, 2, 3, 1, 2])
+            expect(record.reload.groups).to eq(1)
           end
       
           it 'with point position' do
             record.update_attributes :group_id => 1
             record.move_groups_to! 2
-            all_groups.should == [1, 2, 3, 1, 2]
-            record.reload.groups.should == 2
+            expect(all_groups).to eq([1, 2, 3, 1, 2])
+            expect(record.reload.groups).to eq(2)
           end
         end
       end
@@ -1289,15 +1289,15 @@ describe Mongoid::Orderable do
 
           it 'to a new scope group' do
             record.update_attributes :group_id => 3
-            all_groups.should == [1, 2, 1, 2, 1]
-            record.groups.should == 1
+            expect(all_groups).to eq([1, 2, 1, 2, 1])
+            expect(record.groups).to eq(1)
           end
 
           it 'to an existing scope group' do
             record.update_attributes :group_id => 1
             record.move_groups_to! 2
-            all_groups.should == [1, 2, 3, 1, 2]
-            record.groups.should == 2
+            expect(all_groups).to eq([1, 2, 3, 1, 2])
+            expect(record.groups).to eq(2)
           end
         end
       end
@@ -1362,8 +1362,8 @@ describe Mongoid::Orderable do
     end
 
     describe 'default positions' do
-      it { apple_positions.should == [1, 2, 3, 4, 1, 2, 3, 1, 2] }
-      it { orange_positions.should == [1, 2, 3, 1, 2, 1, 2, 3, 4] }
+      it { expect(apple_positions).to eq([1, 2, 3, 4, 1, 2, 3, 1, 2]) }
+      it { expect(orange_positions).to eq([1, 2, 3, 1, 2, 1, 2, 3, 4]) }
     end
 
     describe 'change the scope of the apple' do
@@ -1373,11 +1373,11 @@ describe Mongoid::Orderable do
       end
 
       it 'should properly set the apple positions' do
-        apple_positions.should == [1, 2, 3, 1, 2, 3, 4, 1, 2]
+        expect(apple_positions).to eq([1, 2, 3, 1, 2, 3, 4, 1, 2])
       end
 
       it 'should not affect the orange positions' do
-        orange_positions.should == [1, 2, 3, 1, 2, 1, 2, 3, 4]
+        expect(orange_positions).to eq([1, 2, 3, 1, 2, 1, 2, 3, 4])
       end
     end
   end
