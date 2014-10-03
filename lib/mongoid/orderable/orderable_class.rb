@@ -29,7 +29,13 @@ module Mongoid
       end
 
       def add_db_index
-        klass.index(MongoidOrderable.mongoid2? ? configuration[:column] : {configuration[:column] => 1})
+        spec = [[configuration[:column], 1]]
+        spec.unshift([configuration[:scope], 1]) if configuration[:scope].is_a?(Symbol)
+        if MongoidOrderable.mongoid2?
+          klass.index(spec)
+        else
+          klass.index(Hash[spec])
+        end
       end
 
       def save_configuration

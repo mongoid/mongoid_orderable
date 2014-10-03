@@ -138,7 +138,7 @@ describe Mongoid::Orderable do
 
     it 'should have index on position column' do
       if MongoidOrderable.mongoid2?
-        expect(SimpleOrderable.index_options[:position]).not_to be_nil
+        expect(SimpleOrderable.index_options[[[:position, 1]]]).not_to be_nil
       elsif MongoidOrderable.mongoid3?
         expect(SimpleOrderable.index_options[{:position => 1}]).not_to be_nil
       else
@@ -344,6 +344,29 @@ describe Mongoid::Orderable do
       end
     end
 
+    describe 'index' do
+
+      it 'is not on position alone' do
+        if MongoidOrderable.mongoid2?
+          expect(ScopedOrderable.index_options[[[:position, 1]]]).to be_nil
+        elsif MongoidOrderable.mongoid3?
+          expect(ScopedOrderable.index_options[{:position => 1}]).to be_nil
+        else
+          expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil
+        end
+      end
+
+      it 'is on compound fields' do
+        if MongoidOrderable.mongoid2?
+          expect(ScopedOrderable.index_options[[[:group_id, 1], [:position, 1]]]).to_not be_nil
+        elsif MongoidOrderable.mongoid3?
+          expect(ScopedOrderable.index_options[{:group_id => 1, :position => 1}]).to_not be_nil
+        else
+          expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:group_id => 1, :position => 1} }).to_not be_nil
+        end
+      end
+    end
+
     describe 'scope movement' do
 
       let(:record){ ScopedOrderable.where(:group_id => 2, :position => 2).first }
@@ -513,7 +536,7 @@ describe Mongoid::Orderable do
 
     it 'should not have index on position column' do
       if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
-        expect(NoIndexOrderable.index_options[:position]).to be_nil
+        expect(NoIndexOrderable.index_options[[[:position, 1]]]).to be_nil
       else
         expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
       end
@@ -874,7 +897,7 @@ describe Mongoid::Orderable do
 
       it 'should have index on serial_no column' do
         if MongoidOrderable.mongoid2?
-          expect(MultipleColumnsOrderable.index_options[:serial_no]).not_to be_nil
+          expect(MultipleColumnsOrderable.index_options[[[:serial_no, 1]]]).not_to be_nil
         elsif MongoidOrderable.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:serial_no => 1}]).not_to be_nil
         else
@@ -1037,7 +1060,7 @@ describe Mongoid::Orderable do
 
       it 'should have index on position column' do
         if MongoidOrderable.mongoid2?
-          expect(MultipleColumnsOrderable.index_options[:position]).to be_nil
+          expect(MultipleColumnsOrderable.index_options[[[:position, 1]]]).to be_nil
         elsif MongoidOrderable.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:position => 1}]).to be_nil
         else
