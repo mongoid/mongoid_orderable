@@ -1,5 +1,9 @@
 # master
 
+# Next release
+
+* Fix: index should respect scope (@joeyAghion)
+
 # 4.1.0
 
   * Resolving scope foreign key form passed relation name (@dsci)
