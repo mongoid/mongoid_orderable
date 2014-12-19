@@ -1,8 +1,8 @@
 # master
 
-# Next release
+# 4.1.1
 
-* Fix: index should respect scope (@joeyAghion)
+  * Fix: index should respect scope (@joeyAghion)
 
 # 4.1.0
 
