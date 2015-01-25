@@ -14,14 +14,14 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 
 # How?
 
-```
+```ruby
 gem 'mongoid_orderable'
 ```
 
 Gem has the same api as others. Just include Mongoid::Orderable into your model and call `orderable` method.
 Embedded objects are automatically scoped by their parent.
 
-```
+```ruby
 class Item
   include Mongoid::Document
   include Mongoid::Orderable
@@ -42,7 +42,7 @@ end
 
 # Usage
 
-```
+```ruby
 item.move_to 2 # just change position
 item.move_to! 2 # and save
 item.move_to = 2 # assignable method
@@ -70,7 +70,7 @@ item.previous_item # returns the previous item in the list
 
 You can also define multiple orderable columns for any class including the Mongoid::Orderable module.
 
-```
+```ruby
 class Book
   include Mongoid::Document
   include Mongoid::Orderable
@@ -83,7 +83,7 @@ end
 The above defines two different orderable_columns on Book - *position* and *serial_no*.
 The following helpers are generated in this case:
 
-```
+```ruby
 item.move_#{column_name}_to 
 item.move_#{column_name}_to=
 item.move_#{column_name}_to!
@@ -104,7 +104,7 @@ item.previous_#{column_name}_item
 
 When a model defines multiple orderable columns, the original helpers are also available and work on the first orderable column.
 
-```
+```ruby
   @book1 = Book.create!
   @book2 = Book.create!
   @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
@@ -114,7 +114,7 @@ When a model defines multiple orderable columns, the original helpers are also a
 
 To specify any other orderable column as default pass the **default: true** option with orderable.
 
-```
+```ruby
   orderable column: sno, as: :serial_no, default: true
 ```
 
