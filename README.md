@@ -118,6 +118,27 @@ To specify any other orderable column as default pass the **default: true** opti
   orderable column: sno, as: :serial_no, default: true
 ```
 
+# Embedded documents
+```ruby
+class Question
+  include Mongoid::Document
+  include Mongoid::Orderable
+  
+  embedded_in :survey
+
+  orderable
+end
+```
+If you bulk import embedded documents without specifying their position, no field `position` will be written. 
+```ruby
+class Survey
+  include Mongoid::Document
+  
+  embeds_many :questions, cascade_callbacks: true
+end
+```
+To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation. 
+
 # Contributing
 
 Fork && Patch && Spec && Push && Pull request.
