@@ -3,11 +3,14 @@ I18n.enforce_available_locales = false
 I18n.load_path << File.join(File.dirname(__FILE__), 'config', 'locales', 'en.yml')
 
 module MongoidOrderable
-  def self.mongoid2?
-    ::Mongoid.const_defined? :Contexts
-  end
-  def self.mongoid3?
-    ::Mongoid.const_defined? :Observer
+  SUPPORTED_MONGOID_VERSIONS = [2, 3, 4]
+
+  SUPPORTED_MONGOID_VERSIONS.each do |version|
+    self.class.instance_eval do
+      define_method "mongoid#{version}?" do
+        ::Gem::Version.new(::Mongoid::VERSION).segments.first == version
+      end
+    end
   end
 
   def self.inc instance, attribute, value
