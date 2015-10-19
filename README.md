@@ -9,7 +9,7 @@ Mongoid::Orderable is a ordered list implementation for your mongoid models.
 * It uses native mongo batch increment feature
 * It supports mutators api
 * It correctly assigns the position while moving document between scopes
-* It supports mongoid 2, 3 and 4
+* It supports mongoid 2, 3, 4 and 5
 * It supports specifying multiple orderable columns
 
 # How?
@@ -84,7 +84,7 @@ The above defines two different orderable_columns on Book - *position* and *seri
 The following helpers are generated in this case:
 
 ```ruby
-item.move_#{column_name}_to 
+item.move_#{column_name}_to
 item.move_#{column_name}_to=
 item.move_#{column_name}_to!
 
@@ -123,21 +123,21 @@ To specify any other orderable column as default pass the **default: true** opti
 class Question
   include Mongoid::Document
   include Mongoid::Orderable
-  
+
   embedded_in :survey
 
   orderable
 end
 ```
-If you bulk import embedded documents without specifying their position, no field `position` will be written. 
+If you bulk import embedded documents without specifying their position, no field `position` will be written.
 ```ruby
 class Survey
   include Mongoid::Document
-  
+
   embeds_many :questions, cascade_callbacks: true
 end
 ```
-To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation. 
+To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation.
 
 # Contributing
 
