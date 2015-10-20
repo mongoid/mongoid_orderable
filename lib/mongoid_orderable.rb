@@ -3,7 +3,7 @@ I18n.enforce_available_locales = false
 I18n.load_path << File.join(File.dirname(__FILE__), 'config', 'locales', 'en.yml')
 
 module MongoidOrderable
-  SUPPORTED_MONGOID_VERSIONS = [2, 3, 4]
+  SUPPORTED_MONGOID_VERSIONS = [2, 3, 4, 5]
 
   SUPPORTED_MONGOID_VERSIONS.each do |version|
     self.class.instance_eval do
