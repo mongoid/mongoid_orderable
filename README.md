@@ -1,4 +1,5 @@
-[![Build Status](https://secure.travis-ci.org/pyromaniac/mongoid_orderable.png)](http://travis-ci.org/pyromaniac/mongoid_orderable)
+[![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
+[![Build Status](https://travis-ci.org/pyromaniac/mongoid_orderable.svg?branch=master)](https://travis-ci.org/pyromaniac/mongoid_orderable)
 
 # What?
 
