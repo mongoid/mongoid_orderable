@@ -137,9 +137,9 @@ describe Mongoid::Orderable do
     end
 
     it 'should have index on position column' do
-      if MongoidOrderable.mongoid2?
+      if ::Mongoid::Compatibility::Version.mongoid2?
         expect(SimpleOrderable.index_options[[[:position, 1]]]).not_to be_nil
-      elsif MongoidOrderable.mongoid3?
+      elsif ::Mongoid::Compatibility::Version.mongoid3?
         expect(SimpleOrderable.index_options[{:position => 1}]).not_to be_nil
       else
         expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).not_to be_nil
@@ -347,9 +347,9 @@ describe Mongoid::Orderable do
     describe 'index' do
 
       it 'is not on position alone' do
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           expect(ScopedOrderable.index_options[[[:position, 1]]]).to be_nil
-        elsif MongoidOrderable.mongoid3?
+        elsif ::Mongoid::Compatibility::Version.mongoid3?
           expect(ScopedOrderable.index_options[{:position => 1}]).to be_nil
         else
           expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil
@@ -357,9 +357,9 @@ describe Mongoid::Orderable do
       end
 
       it 'is on compound fields' do
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           expect(ScopedOrderable.index_options[[[:group_id, 1], [:position, 1]]]).to_not be_nil
-        elsif MongoidOrderable.mongoid3?
+        elsif ::Mongoid::Compatibility::Version.mongoid3?
           expect(ScopedOrderable.index_options[{:group_id => 1, :position => 1}]).to_not be_nil
         else
           expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:group_id => 1, :position => 1} }).to_not be_nil
@@ -452,14 +452,19 @@ describe Mongoid::Orderable do
       end
     end
 
-    describe 'utiity methods' do
+    describe 'utility methods' do
+
+      before do
+        ScopedOrderable.delete_all
+        5.times { ScopedOrderable.create! }
+      end
 
       it "should return a collection of items lower/higher on the list for next_items/previous_items" do
-        record_1 = SimpleOrderable.where(:position => 1).first
-        record_2 = SimpleOrderable.where(:position => 2).first
-        record_3 = SimpleOrderable.where(:position => 3).first
-        record_4 = SimpleOrderable.where(:position => 4).first
-        record_5 = SimpleOrderable.where(:position => 5).first
+        record_1 = ScopedOrderable.where(:position => 1).first
+        record_2 = ScopedOrderable.where(:position => 2).first
+        record_3 = ScopedOrderable.where(:position => 3).first
+        record_4 = ScopedOrderable.where(:position => 4).first
+        record_5 = ScopedOrderable.where(:position => 5).first
         expect(record_1.next_items.to_a).to eq([record_2, record_3, record_4, record_5])
         expect(record_5.previous_items.to_a).to eq([record_1, record_2, record_3, record_4])
         expect(record_3.previous_items.to_a).to eq([record_1, record_2])
@@ -476,9 +481,9 @@ describe Mongoid::Orderable do
   describe StringScopedOrderable do
 
     it 'uses the foreign key of the relationship as scope' do
-      orderable1 = StringScopedOrderable.create(:some_scope => 1)
-      orderable2 = StringScopedOrderable.create(:some_scope => 1)
-      orderable3 = StringScopedOrderable.create(:some_scope => 2)
+      orderable1 = StringScopedOrderable.create!(:some_scope => 1)
+      orderable2 = StringScopedOrderable.create!(:some_scope => 1)
+      orderable3 = StringScopedOrderable.create!(:some_scope => 2)
       expect(orderable1.position).to eq 1
       expect(orderable2.position).to eq 2
       expect(orderable3.position).to eq 1
@@ -535,7 +540,7 @@ describe Mongoid::Orderable do
   describe NoIndexOrderable do
 
     it 'should not have index on position column' do
-      if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
+      if ::Mongoid::Compatibility::Version.mongoid2? || ::Mongoid::Compatibility::Version.mongoid3?
         expect(NoIndexOrderable.index_options[[[:position, 1]]]).to be_nil
       else
         expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
@@ -714,18 +719,18 @@ describe Mongoid::Orderable do
       end
 
       it 'with symbol position' do
-        first_apple = Apple.first
+        first_apple = Apple.asc(:_id).first
         top_pos = first_apple.position
-        bottom_pos = Apple.last.position
+        bottom_pos = Apple.asc(:_id).last.position
         expect do
           first_apple.move_to! :bottom
         end.to change(first_apple, :position).from(top_pos).to bottom_pos
       end
 
       it 'with point position' do
-        first_apple = Apple.first
+        first_apple = Apple.asc(:_id).first
         top_pos = first_apple.position
-        bottom_pos = Apple.last.position
+        bottom_pos = Apple.asc(:_id).last.position
         expect do
           first_apple.move_to! bottom_pos
         end.to change(first_apple, :position).from(top_pos).to bottom_pos
@@ -751,9 +756,9 @@ describe Mongoid::Orderable do
       parent_scope1 = ForeignKeyDiffersOrderable.create
       parent_scope2 = ForeignKeyDiffersOrderable.create
       expect do
-        orderable1 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope1)
-        orderable2 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope1)
-        orderable3 = ForeignKeyDiffersOrderable.create(:different_scope => parent_scope2)
+        orderable1 = ForeignKeyDiffersOrderable.create!(:different_scope => parent_scope1)
+        orderable2 = ForeignKeyDiffersOrderable.create!(:different_scope => parent_scope1)
+        orderable3 = ForeignKeyDiffersOrderable.create!(:different_scope => parent_scope2)
       end.to_not raise_error
       expect(orderable1.position).to eq 1
       expect(orderable2.position).to eq 2
@@ -818,7 +823,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(4)
           expect(record.position).to eq(position)
         end
-        
+
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
@@ -827,7 +832,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(2)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
@@ -836,7 +841,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(2)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
@@ -845,7 +850,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(5)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
@@ -896,9 +901,9 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on serial_no column' do
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           expect(MultipleColumnsOrderable.index_options[[[:serial_no, 1]]]).not_to be_nil
-        elsif MongoidOrderable.mongoid3?
+        elsif ::Mongoid::Compatibility::Version.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:serial_no => 1}]).not_to be_nil
         else
           expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:serial_no => 1} }).not_to be_nil
@@ -976,7 +981,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(4)
           expect(record.position).to eq(position)
         end
-        
+
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
@@ -985,7 +990,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(2)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:serial_no => 1).first
           position = record.position
@@ -994,7 +999,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(2)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:serial_no => 5).first
           position = record.position
@@ -1003,7 +1008,7 @@ describe Mongoid::Orderable do
           expect(record.serial_no).to eq(5)
           expect(record.position).to eq(position)
         end
-        
+
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:serial_no => 3).first
           position = record.position
@@ -1059,9 +1064,9 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on position column' do
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           expect(MultipleColumnsOrderable.index_options[[[:position, 1]]]).to be_nil
-        elsif MongoidOrderable.mongoid3?
+        elsif ::Mongoid::Compatibility::Version.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:position => 1}]).to be_nil
         else
           expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil
@@ -1139,7 +1144,7 @@ describe Mongoid::Orderable do
           expect(record.position).to eq(3)
           expect(record.serial_no).to eq(position)
         end
-        
+
         it 'higher from middle' do
           record = MultipleColumnsOrderable.where(:pos => 3).first
           position = record.serial_no
@@ -1148,7 +1153,7 @@ describe Mongoid::Orderable do
           expect(record.position).to eq(2)
           expect(record.serial_no).to eq(position)
         end
-        
+
         it 'lower from top' do
           record = MultipleColumnsOrderable.where(:pos => 0).first
           position = record.serial_no
@@ -1157,7 +1162,7 @@ describe Mongoid::Orderable do
           expect(record.position).to eq(1)
           expect(record.serial_no).to eq(position)
         end
-        
+
         it 'lower from bottom' do
           record = MultipleColumnsOrderable.where(:pos => 4).first
           position = record.serial_no
@@ -1166,7 +1171,7 @@ describe Mongoid::Orderable do
           expect(record.position).to eq(4)
           expect(record.serial_no).to eq(position)
         end
-        
+
         it 'lower from middle' do
           record = MultipleColumnsOrderable.where(:pos => 3).first
           position = record.serial_no
@@ -1264,30 +1269,30 @@ describe Mongoid::Orderable do
       end
 
       describe 'scope movement' do
-      
+
         let(:record){ MultipleColumnsOrderable.where(:group_id => 2, :groups => 2).first }
-      
+
         it 'to a new scope group' do
           record.update_attributes :group_id => 3
           expect(all_groups).to eq([1, 2, 1, 2, 1])
           expect(record.groups).to eq(1)
         end
-      
+
         context 'when moving to an existing scope group' do
-      
+
           it 'without a position' do
             record.update_attributes :group_id => 1
             expect(all_groups).to eq([1, 2, 3, 1, 2])
             expect(record.reload.groups).to eq(3)
           end
-      
+
           it 'with symbol position' do
             record.update_attributes :group_id => 1
             record.move_groups_to! :top
             expect(all_groups).to eq([1, 2, 3, 1, 2])
             expect(record.reload.groups).to eq(1)
           end
-      
+
           it 'with point position' do
             record.update_attributes :group_id => 1
             record.move_groups_to! 2

@@ -1,39 +1,34 @@
 require 'active_support'
-I18n.enforce_available_locales = false
+
+I18n.enforce_available_locales = false if I18n.respond_to?(:enforce_available_locales)
 I18n.load_path << File.join(File.dirname(__FILE__), 'config', 'locales', 'en.yml')
 
+require 'mongoid'
+require 'mongoid/compatibility'
+
 module MongoidOrderable
-  SUPPORTED_MONGOID_VERSIONS = [2, 3, 4]
-
-  SUPPORTED_MONGOID_VERSIONS.each do |version|
-    self.class.instance_eval do
-      define_method "mongoid#{version}?" do
-        ::Gem::Version.new(::Mongoid::VERSION).segments.first == version
-      end
-    end
-  end
-
-  def self.inc instance, attribute, value
-    if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
+  if ::Mongoid::Compatibility::Version.mongoid2? || ::Mongoid::Compatibility::Version.mongoid3?
+    def self.inc instance, attribute, value
       instance.inc attribute, value
-    else
+    end
+
+    def self.metadata instance
+      instance.metadata
+    end
+  else
+    def self.inc instance, attribute, value
       instance.inc(attribute => value)
     end
-  end
 
-  def self.metadata instance
-    if MongoidOrderable.mongoid2? || MongoidOrderable.mongoid3?
-      instance.metadata
-    else
+    def self.metadata instance
       instance.relation_metadata
     end
   end
 end
 
-require 'mongoid'
 require 'mongoid_orderable/version'
 
-if MongoidOrderable.mongoid2?
+if ::Mongoid::Compatibility::Version.mongoid2?
   require 'mongoid_orderable/mongoid/contexts/mongo'
   require 'mongoid_orderable/mongoid/contexts/enumerable'
   require 'mongoid_orderable/mongoid/criteria'

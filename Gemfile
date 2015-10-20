@@ -3,13 +3,16 @@ source "http://rubygems.org"
 # Specify your gem's dependencies in mongoid_orderable.gemspec
 gemspec
 
-case version = ENV['MONGOID_VERSION'] || "~> 3.1"
-when /4/
-  gem "mongoid", :github => 'mongoid/mongoid'
-when /3/
-  gem "mongoid", "~> 3.1"
-when /2/
-  gem "mongoid", "~> 2.8"
+case version = ENV['MONGOID_VERSION'] || '5.0'
+when /^5/
+  gem 'mongoid', '~> 5.0'
+when /^4/
+  gem 'mongoid', '~> 4.0'
+when /^3/
+  gem 'mongoid', '~> 3.1'
+when /^2/
+  gem 'mongoid', '~> 2.0'
+  gem 'bson_ext', platforms: :ruby
 else
-  gem "mongoid", version
+  gem 'mongoid', version
 end

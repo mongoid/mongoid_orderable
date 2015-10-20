@@ -1,5 +1,7 @@
 # master
 
+  * Compatibility with Mongoid 5 (@dblock)
+
 # 4.1.1
 
   * Fix: index should respect scope (@joeyAghion)

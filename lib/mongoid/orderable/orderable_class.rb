@@ -31,7 +31,7 @@ module Mongoid
       def add_db_index
         spec = [[configuration[:column], 1]]
         spec.unshift([configuration[:scope], 1]) if configuration[:scope].is_a?(Symbol)
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           klass.index(spec)
         else
           klass.index(Hash[spec])
