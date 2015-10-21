@@ -1,6 +1,9 @@
 # master
 
-  * Compatibility with Mongoid 5 (@dblock)
+# 5.0.0
+
+  * Mongoid 5 support (@dblock)
+  * Ruby 1.8 support dropped
 
 # 4.1.1
 
