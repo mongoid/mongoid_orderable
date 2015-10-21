@@ -1,37 +1,30 @@
 require 'bundler'
 Bundler.require
 
-DATABASE_NAME = "mongoid_#{Process.pid}"
-
-if MongoidOrderable.mongoid2?
+if ::Mongoid::Compatibility::Version.mongoid2?
   Mongoid.configure do |config|
-    # database = Mongo::Connection.new.db DATABASE_NAME
-    # database.add_user "mongoid", "test"
-    config.master = Mongo::Connection.new.db DATABASE_NAME
+    config.master = Mongo::Connection.new.db 'mongoid_orderable_test'
     config.logger = nil
   end
 else
   Mongoid.configure do |config|
-    config.connect_to DATABASE_NAME
+    config.connect_to 'mongoid_orderable_test'
   end
 end
 
+unless Mongoid::Compatibility::Version.mongoid2?
+  Mongoid.logger.level = Logger::INFO
+  Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5?
+end
+
 RSpec.configure do |config|
-  config.mock_with :rspec
-
-  config.before :suite do
-    #DatabaseCleaner[:mongoid].strategy = :truncation
-  end
-
-  config.after :each do
-    #DatabaseCleaner[:mongoid].clean
-  end
-
-  config.after(:suite) do
-    if MongoidOrderable.mongoid2?
-      Mongoid.master.connection.drop_database DATABASE_NAME
-    else
+  config.after(:all) do
+    if Mongoid::Compatibility::Version.mongoid2?
+      Mongoid.master.connection.drop_database(Mongoid.database.name)
+    elsif Mongoid::Compatibility::Version.mongoid3? || Mongoid::Compatibility::Version.mongoid4?
       Mongoid.default_session.drop
+    else
+      Mongoid::Clients.default.database.drop
     end
   end
 end

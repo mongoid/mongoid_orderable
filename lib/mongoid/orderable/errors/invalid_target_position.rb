@@ -7,7 +7,7 @@ module Mongoid::Orderable
 
       private
       def _compose_message value
-        if MongoidOrderable.mongoid2?
+        if ::Mongoid::Compatibility::Version.mongoid2?
           translate 'invalid_target_position', { :value => value.inspect }
         else
           compose_message 'invalid_target_position', { :value => value.inspect }

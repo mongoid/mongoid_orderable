@@ -1,8 +1,9 @@
-[![Build Status](https://secure.travis-ci.org/pyromaniac/mongoid_orderable.png)](http://travis-ci.org/pyromaniac/mongoid_orderable)
+[![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
+[![Build Status](https://travis-ci.org/pyromaniac/mongoid_orderable.svg?branch=master)](https://travis-ci.org/pyromaniac/mongoid_orderable)
 
 # What?
 
-Mongoid::Orderable is a ordered list implementation for your mongoid models.
+Mongoid::Orderable is a ordered list implementation for your Mongoid 2, 3, 4 and 5 models.
 
 # Why?
 
@@ -84,7 +85,7 @@ The above defines two different orderable_columns on Book - *position* and *seri
 The following helpers are generated in this case:
 
 ```ruby
-item.move_#{column_name}_to 
+item.move_#{column_name}_to
 item.move_#{column_name}_to=
 item.move_#{column_name}_to!
 
@@ -123,21 +124,21 @@ To specify any other orderable column as default pass the **default: true** opti
 class Question
   include Mongoid::Document
   include Mongoid::Orderable
-  
+
   embedded_in :survey
 
   orderable
 end
 ```
-If you bulk import embedded documents without specifying their position, no field `position` will be written. 
+If you bulk import embedded documents without specifying their position, no field `position` will be written.
 ```ruby
 class Survey
   include Mongoid::Document
-  
+
   embeds_many :questions, cascade_callbacks: true
 end
 ```
-To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation. 
+To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation.
 
 # Contributing
 

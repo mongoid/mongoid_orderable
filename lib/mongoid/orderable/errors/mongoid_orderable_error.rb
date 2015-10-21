@@ -2,7 +2,7 @@ module Mongoid::Orderable
   module Errors
     class MongoidOrderableError < ::Mongoid::Errors::MongoidError
 
-      if MongoidOrderable.mongoid2?
+      if ::Mongoid::Compatibility::Version.mongoid2?
         def translate key, options
           [:message, :summary, :resolution].map do |section|
             ::I18n.translate "#{BASE_KEY}.#{key}.#{section}", options
