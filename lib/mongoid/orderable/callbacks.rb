@@ -35,11 +35,12 @@ module Mongoid
           target_position = target_position_to_position column, target_position
           scope, col, pos = orderable_scoped(column), orderable_column(column), orderable_position(column)
 
-          unless in_list?(column)
+          if !in_list?(column)
             MongoidOrderable.inc scope.where(col.gte => target_position), col, 1
-          else
-            MongoidOrderable.inc(scope.where(col.gte => target_position, col.lt => pos), col, 1) if target_position < pos
-            MongoidOrderable.inc(scope.where(col.gt => pos, col.lte => target_position), col, -1) if target_position > pos
+          elsif target_position < pos
+            MongoidOrderable.inc(scope.where(col.gte => target_position, col.lt => pos), col, 1)
+          elsif target_position > pos
+            MongoidOrderable.inc(scope.where(col.gt => pos, col.lte => target_position), col, -1)
           end
 
           self.send("orderable_#{column}_position=", target_position)
