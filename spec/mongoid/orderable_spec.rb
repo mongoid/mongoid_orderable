@@ -137,9 +137,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have index on position column' do
-      if ::Mongoid::Compatibility::Version.mongoid2?
-        expect(SimpleOrderable.index_options[[[:position, 1]]]).not_to be_nil
-      elsif ::Mongoid::Compatibility::Version.mongoid3?
+      if ::Mongoid::Compatibility::Version.mongoid3?
         expect(SimpleOrderable.index_options[{:position => 1}]).not_to be_nil
       else
         expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).not_to be_nil
@@ -347,9 +345,7 @@ describe Mongoid::Orderable do
     describe 'index' do
 
       it 'is not on position alone' do
-        if ::Mongoid::Compatibility::Version.mongoid2?
-          expect(ScopedOrderable.index_options[[[:position, 1]]]).to be_nil
-        elsif ::Mongoid::Compatibility::Version.mongoid3?
+        if ::Mongoid::Compatibility::Version.mongoid3?
           expect(ScopedOrderable.index_options[{:position => 1}]).to be_nil
         else
           expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil
@@ -357,9 +353,7 @@ describe Mongoid::Orderable do
       end
 
       it 'is on compound fields' do
-        if ::Mongoid::Compatibility::Version.mongoid2?
-          expect(ScopedOrderable.index_options[[[:group_id, 1], [:position, 1]]]).to_not be_nil
-        elsif ::Mongoid::Compatibility::Version.mongoid3?
+        if ::Mongoid::Compatibility::Version.mongoid3?
           expect(ScopedOrderable.index_options[{:group_id => 1, :position => 1}]).to_not be_nil
         else
           expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == {:group_id => 1, :position => 1} }).to_not be_nil
@@ -540,7 +534,7 @@ describe Mongoid::Orderable do
   describe NoIndexOrderable do
 
     it 'should not have index on position column' do
-      if ::Mongoid::Compatibility::Version.mongoid2? || ::Mongoid::Compatibility::Version.mongoid3?
+      if ::Mongoid::Compatibility::Version.mongoid3?
         expect(NoIndexOrderable.index_options[[[:position, 1]]]).to be_nil
       else
         expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
@@ -901,9 +895,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on serial_no column' do
-        if ::Mongoid::Compatibility::Version.mongoid2?
-          expect(MultipleColumnsOrderable.index_options[[[:serial_no, 1]]]).not_to be_nil
-        elsif ::Mongoid::Compatibility::Version.mongoid3?
+        if ::Mongoid::Compatibility::Version.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:serial_no => 1}]).not_to be_nil
         else
           expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:serial_no => 1} }).not_to be_nil
@@ -1064,9 +1056,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on position column' do
-        if ::Mongoid::Compatibility::Version.mongoid2?
-          expect(MultipleColumnsOrderable.index_options[[[:position, 1]]]).to be_nil
-        elsif ::Mongoid::Compatibility::Version.mongoid3?
+        if ::Mongoid::Compatibility::Version.mongoid3?
           expect(MultipleColumnsOrderable.index_options[{:position => 1}]).to be_nil
         else
           expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == {:position => 1} }).to be_nil

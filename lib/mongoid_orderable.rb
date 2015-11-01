@@ -7,7 +7,7 @@ require 'mongoid'
 require 'mongoid/compatibility'
 
 module MongoidOrderable
-  if ::Mongoid::Compatibility::Version.mongoid2? || ::Mongoid::Compatibility::Version.mongoid3?
+  if ::Mongoid::Compatibility::Version.mongoid3?
     def self.inc instance, attribute, value
       instance.inc attribute, value
     end
@@ -28,13 +28,7 @@ end
 
 require 'mongoid_orderable/version'
 
-if ::Mongoid::Compatibility::Version.mongoid2?
-  require 'mongoid_orderable/mongoid/contexts/mongo'
-  require 'mongoid_orderable/mongoid/contexts/enumerable'
-  require 'mongoid_orderable/mongoid/criteria'
-else
-  require 'mongoid_orderable/mongoid/contextual/memory'
-end
+require 'mongoid_orderable/mongoid/contextual/memory'
 
 require 'mongoid/orderable'
 require 'mongoid/orderable/errors'
