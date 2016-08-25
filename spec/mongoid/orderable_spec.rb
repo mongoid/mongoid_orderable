@@ -201,6 +201,16 @@ describe Mongoid::Orderable do
           SimpleOrderable.create! :move_to => 'four'
         end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
       end
+
+      it 'parallel' do
+        newbie = SimpleOrderable.new
+        newbie.send(:add_to_list)
+        another = SimpleOrderable.create!
+        newbie.save!
+        expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
+        expect(newbie.position).to eq(7)
+        expect(another.position).to eq(6)
+      end
     end
 
     describe 'movement' do
