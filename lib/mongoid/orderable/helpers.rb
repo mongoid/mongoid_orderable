@@ -16,7 +16,7 @@ module Mongoid
           column ||= default_orderable_column
 
           if embedded?
-            send(MongoidOrderable.metadata(self).inverse).send(MongoidOrderable.metadata(self).name).send("orderable_#{column}_scope", self)
+            _parent.send(MongoidOrderable.metadata(self).name).send("orderable_#{column}_scope", self)
           else
             self.orderable_inherited_class.send("orderable_#{column}_scope", self)
           end
