@@ -142,8 +142,10 @@ To ensure the position is written correctly, you will need to provide the cascad
 
 # Contributing
 
-Fork && Patch && Spec && Push && Pull request.
+See [CONTRIBUTING](CONTRIBUTING.md).
 
-# License
+# Copyright & License
 
-Mongoid::Orderable is released under the MIT license.
+Copyright (c) 2011-2016 Arkadiy Zabazhanov & Contributors.
+
+MIT license, see [LICENSE](LICENSE.txt) for details.
