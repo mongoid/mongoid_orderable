@@ -1,22 +1,21 @@
 module Mongoid
   module Orderable
     module Movable
-
-      def move_to!(target_position, options={})
+      def move_to!(target_position, options = {})
         move_column_to target_position, options
         save
       end
-      alias_method :insert_at!, :move_to!
+      alias insert_at! move_to!
 
-      def move_to(target_position, options={})
+      def move_to(target_position, options = {})
         move_column_to target_position, options
       end
-      alias_method :insert_at, :move_to
+      alias insert_at move_to
 
-      def move_to=(target_position, options={})
+      def move_to=(target_position, options = {})
         move_column_to target_position, options
       end
-      alias_method :insert_at=, :move_to=
+      alias insert_at= move_to=
 
       [:top, :bottom].each do |symbol|
         class_eval <<-eos
@@ -52,7 +51,6 @@ module Mongoid
         column = options[:column] || default_orderable_column
         @move_all = move_all.merge(column => position)
       end
-
     end
   end
 end

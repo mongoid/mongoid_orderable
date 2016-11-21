@@ -5,7 +5,7 @@ module Mongoid
 
       attr_reader :klass, :configuration
 
-      def initialize klass, configuration
+      def initialize(klass, configuration)
         @klass = klass
         @configuration = configuration
       end
@@ -18,7 +18,7 @@ module Mongoid
         add_callbacks
       end
 
-      def self.setup(klass, configuration={})
+      def self.setup(klass, configuration = {})
         new(klass, configuration).setup
       end
 

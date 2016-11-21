@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
 # Specify your gem's dependencies in mongoid_orderable.gemspec
 gemspec
@@ -15,5 +15,6 @@ else
 end
 
 group :test do
+  gem 'rubocop', '0.45.0'
   gem 'mongoid-danger', '~> 0.1.0', require: false
 end

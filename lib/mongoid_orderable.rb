@@ -8,19 +8,19 @@ require 'mongoid/compatibility'
 
 module MongoidOrderable
   if ::Mongoid::Compatibility::Version.mongoid3?
-    def self.inc instance, attribute, value
+    def self.inc(instance, attribute, value)
       instance.inc attribute, value
     end
 
-    def self.metadata instance
+    def self.metadata(instance)
       instance.metadata
     end
   else
-    def self.inc instance, attribute, value
+    def self.inc(instance, attribute, value)
       instance.inc(attribute => value)
     end
 
-    def self.metadata instance
+    def self.metadata(instance)
       instance.relation_metadata
     end
   end

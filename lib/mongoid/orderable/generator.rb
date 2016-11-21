@@ -28,7 +28,6 @@ module Mongoid
       def generate_method(name, &block)
         klass.send(:define_method, name, &block)
       end
-
     end
   end
 end

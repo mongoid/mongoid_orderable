@@ -2,7 +2,6 @@ module Mongoid
   module Orderable
     module Generator
       module Movable
-
         def generate_movable_helpers(column_name)
           generate_move_to_helpers(column_name)
           generate_insert_at_helpers(column_name)
@@ -13,16 +12,16 @@ module Mongoid
 
         def generate_move_to_helpers(column_name)
           generate_method("move_#{column_name}_to") do |target_position|
-            move_column_to target_position, :column => column_name
+            move_column_to target_position, column: column_name
           end
 
           generate_method("move_#{column_name}_to!") do |target_position|
-            move_column_to target_position, :column => column_name
+            move_column_to target_position, column: column_name
             save
           end
 
           generate_method("move_#{column_name}_to=") do |target_position|
-            move_column_to target_position, :column => column_name
+            move_column_to target_position, column: column_name
           end
         end
 
@@ -37,25 +36,24 @@ module Mongoid
         def generate_shorthand_helpers(column_name)
           [:top, :bottom].each do |symbol|
             generate_method "move_#{column_name}_to_#{symbol}" do
-              move_to symbol, :column => column_name
+              move_to symbol, column: column_name
             end
 
             generate_method "move_#{column_name}_to_#{symbol}!" do
-              move_to! symbol, :column => column_name
+              move_to! symbol, column: column_name
             end
           end
 
           [:higher, :lower].each do |symbol|
             generate_method "move_#{column_name}_#{symbol}" do
-              move_to symbol, :column => column_name
+              move_to symbol, column: column_name
             end
 
             generate_method "move_#{column_name}_#{symbol}!" do
-              move_to! symbol, :column => column_name
+              move_to! symbol, column: column_name
             end
           end
         end
-
       end
     end
   end

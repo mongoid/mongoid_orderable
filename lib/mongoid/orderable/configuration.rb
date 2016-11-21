@@ -1,7 +1,6 @@
 module Mongoid
   module Orderable
     class Configuration
-
       CONFIG_OPTIONS = %w(column scope foreign_key inherited base index default).map(&:to_sym)
       FIELD_OPTIONS  = %w(as).map(&:to_sym)
       VALID_OPTIONS  = CONFIG_OPTIONS + FIELD_OPTIONS
@@ -16,11 +15,11 @@ module Mongoid
       end
 
       def default_configuration
-        { :column => :position,
-          :index  => true,
-          :scope  => nil,
-          :base   => 1,
-          :field_opts => { :type => Integer }}
+        { column: :position,
+          index: true,
+          scope: nil,
+          base: 1,
+          field_opts: { type: Integer } }
       end
 
       def self.build(parent, options = {})
@@ -37,7 +36,7 @@ module Mongoid
 
       def set_field_options
         FIELD_OPTIONS.each do |key|
-          next unless options.has_key? key
+          next unless options.key? key
           @options[:field_opts][key] = options.delete(key)
         end
       end
@@ -45,16 +44,15 @@ module Mongoid
       def set_orderable_scope
         if options[:scope].is_a?(Symbol) && options[:scope].to_s !~ /_id$/
           scope_relation = @orderable_class.relations[options[:scope].to_s]
-          if scope_relation
-            @options[:scope] = scope_relation.key.to_sym
-          else
-            @options[:scope] = "#{options[:scope]}_id".to_sym
-          end
+          @options[:scope] = if scope_relation
+                               scope_relation.key.to_sym
+                             else
+                               "#{options[:scope]}_id".to_sym
+                             end
         elsif options[:scope].is_a?(String)
           @options[:scope] = options[:scope].to_sym
         end
       end
-
     end
   end
 end

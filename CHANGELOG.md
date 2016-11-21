@@ -1,6 +1,7 @@
 # 5.1.0 (Next)
 
 * [#50](https://github.com/mongoid/mongoid_orderable/pull/50): Added Danger, PR linter - [@dblock](https://github.com/dblock).
+* [#51](https://github.com/mongoid/mongoid_orderable/pull/51): Added RuboCop - [@dblock](https://github.com/dblock).
 * [#49](https://github.com/mongoid/mongoid_orderable/pull/49): Fix orderable on embedded documents inside an inherited model - [@rafaelgaspar](https://github.com/rafaelgaspar).
 * Your contribution here.
 

@@ -2,7 +2,6 @@ module Mongoid
   module Orderable
     module Generator
       module Position
-
         def generate_position_helpers(column_name)
           klass.class_eval <<-eos
             def orderable_position(column = nil)
@@ -19,7 +18,6 @@ module Mongoid
             send "#{column_name}=", value
           end
         end
-
       end
     end
   end
