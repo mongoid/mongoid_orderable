@@ -1,11 +1,33 @@
+sudo: false
+
+language: ruby
+
+cache: bundler
+
+services: mongodb
+
 rvm:
-  - 2.0.0
-  - 2.2
-  - 2.3
+  - 2.3.1
 
 env:
   - MONGOID_VERSION=3
   - MONGOID_VERSION=4
   - MONGOID_VERSION=5
+  - MONGOID_VERSION=HEAD
 
-services: mongodb
+before_install:
+  - gem update bundler
+
+before_script:
+  - bundle exec danger
+
+addons:
+  apt:
+    sources:
+      - mongodb-3.2-precise
+    packages:
+      - mongodb-org-server
+
+matrix:
+  allow_failures:
+    - env: MONGOID_VERSION=HEAD

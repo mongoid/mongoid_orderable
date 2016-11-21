@@ -1,22 +1,53 @@
-# master
+# 5.1.0 (Next)
 
-# 5.0.0
+* [#50](https://github.com/mongoid/mongoid_orderable/pull/50): Added Danger, PR linter - [@dblock](https://github.com/dblock).
+* [#49](https://github.com/mongoid/mongoid_orderable/pull/49): Fix orderable on embedded documents inside an inherited model - [@rafaelgaspar](https://github.com/rafaelgaspar).
+* Your contribution here.
 
-  * Mongoid 5 support (@dblock)
-  * Ruby 1.8 support dropped
+# 5.0.0 (2015/10/21)
 
-# 4.1.1
+* [#41](https://github.com/mongoid/mongoid_orderable/pull/41): Mongoid 5 support - [@dblock](https://github.com/dblock).
+* [#41](https://github.com/mongoid/mongoid_orderable/pull/41): Dropped support for ruby 1.8 - [@dblock](https://github.com/dblock).
 
-  * Fix: index should respect scope (@joeyAghion)
+# 4.1.1 (2014/12/19)
 
-# 4.1.0
+* [#34](https://github.com/mongoid/mongoid_orderable/pull/34): Fix: index should respect scope - [@joeyAghion](https://github.com/joeyAghion).
 
-  * Resolving scope foreign key form passed relation name (@dsci)
-  * Fix: relation metadata quering (@pjkelly)
-  * `previous_items` and `next_items` methods (@mrjlynch)
+# 4.1.0 (2014/3/19)
 
-# 4.0.0
+* [#30](https://github.com/mongoid/mongoid_orderable/pull/30): Fix: reset a single column when `orderable_scope` changed instead of removing it from list - [@Bharat311](https://github.com/Bharat311).
+* [#29](https://github.com/mongoid/mongoid_orderable/pull/29): Fix: incorrect position when orderable base is set - [@Bharat311](https://github.com/Bharat311).
+* [#28](https://github.com/mongoid/mongoid_orderable/pull/28): Inherited `orderable_configurations` - [@johnny-miyake](https://github.com/johnny-miyake).
+* [#27](https://github.com/mongoid/mongoid_orderable/pull/27): Allowed numeric string to specify a target position - [@johnny-miyake](https://github.com/johnny-miyake).
+* [#26](https://github.com/mongoid/mongoid_orderable/pull/26): Added support for multiple orderable columns - [@Bharat311](https://github.com/Bharat311).
+* [#22](https://github.com/mongoid/mongoid_orderable/pull/22): Added lazy support for scopes with different foreign key names - [@dsci](https://github.com/dsci).
+* [#21](https://github.com/mongoid/mongoid_orderable/pull/21): Accounting for change in Mongoid's metadata API - [@pjkelly](https://github.com/pjkelly).
+* [#20](https://github.com/mongoid/mongoid_orderable/pull/20): Added next and previous item methods - [@mrjlynch](https://github.com/mrjlynch).
+* [#19](https://github.com/mongoid/mongoid_orderable/pull/19): Added lower and higher item methods - [@mrjlynch](https://github.com/mrjlynch).
 
-  * Semantic versioning
-  * Added Mongoid 4 support (@dblock)
-  * Fixes by @johnnyshields and @zhengjia
+# 4.0.0 (2013/10/22)
+
+* [#18](https://github.com/mongoid/mongoid_orderable/pull/18): Added Mongoid 4 support - [@dblock](https://github.com/dblock).
+* [#16](https://github.com/mongoid/mongoid_orderable/pull/16): Fix for Mongoid identity map combined with scoped orderable - [@johnnyshields](https://github.com/johnnyshields).
+* [#15](https://github.com/mongoid/mongoid_orderable/pull/15): Support pass-thru of Mongoid field alias (`:as` parameter) - [@johnnyshields](https://github.com/johnnyshields).
+* [#13](https://github.com/mongoid/mongoid_orderable/pull/13): Support inheritance - [@zhengjia](https://github.com/zhengjia).
+
+# 1.2.0 (2013/1/10)
+
+* [#12](https://github.com/mongoid/mongoid_orderable/pull/12): Added support for "base" in config options, in order to do a zero-based position - [@johnnyshields](https://github.com/johnnyshields).
+
+# 1.1.0 (2012/5/23)
+
+* Added Mongoid 3 support - [@pyromaniac](https://github.com/pyromaniac).
+
+# 1.0.0 (2012/2/14)
+
+* [#5](https://github.com/mongoid/mongoid_orderable/pull/5): Allow for use with default scopes - [@mattiassvedhem](https://github.com/mattiassvedhem).
+
+# 0.9.1 (2012/2/3)
+
+# 0.9.0 (2011/11/23)
+
+# 0.0.1 (2011/11/1)
+
+* Initial public release - [@pyromaniac](https://github.com/pyromaniac).
