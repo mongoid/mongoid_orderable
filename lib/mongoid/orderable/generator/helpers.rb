@@ -2,7 +2,6 @@ module Mongoid
   module Orderable
     module Generator
       module Helpers
-
         def generate_orderable_helpers
           self_class = klass
 
@@ -19,10 +18,9 @@ module Mongoid
           eos
 
           generate_method(:orderable_inherited_class) do
-            self_class.orderable_configurations.any?{ |col, conf| conf[:inherited] } ? self_class : self.class
+            self_class.orderable_configurations.any? { |_col, conf| conf[:inherited] } ? self_class : self.class
           end
         end
-
       end
     end
   end

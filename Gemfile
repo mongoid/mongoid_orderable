@@ -1,9 +1,11 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
 # Specify your gem's dependencies in mongoid_orderable.gemspec
 gemspec
 
 case version = ENV['MONGOID_VERSION'] || '5.0'
+when 'HEAD'
+  gem 'mongoid', github: 'mongodb/mongoid'
 when /^5/
   gem 'mongoid', '~> 5.0'
 when /^4/
@@ -15,5 +17,6 @@ else
 end
 
 group :test do
+  gem 'rubocop', '0.45.0'
   gem 'mongoid-danger', '~> 0.1.0', require: false
 end

@@ -11,12 +11,10 @@ module Mongoid::Orderable
   end
 
   module ClassMethods
-
-    def orderable options = {}
+    def orderable(options = {})
       configuration = Mongoid::Orderable::Configuration.build(self, options)
 
       Mongoid::Orderable::OrderableClass.setup(self, configuration)
     end
-
   end
 end

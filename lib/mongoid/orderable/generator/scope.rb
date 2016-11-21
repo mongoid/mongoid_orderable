@@ -5,9 +5,9 @@ module Mongoid
         def generate_scope_helpers(column_name, order_scope)
           klass.class_eval do
             scope "orderable_#{column_name}_scope", case order_scope
-                                                    when Symbol then lambda { |document| where(order_scope => document.send(order_scope)) }
+                                                    when Symbol then ->(document) { where(order_scope => document.send(order_scope)) }
                                                     when Proc   then order_scope
-                                                    else lambda { |document| where({}) }
+                                                    else ->(_document) { where({}) }
                                                     end
           end
         end

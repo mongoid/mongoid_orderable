@@ -2,7 +2,6 @@ module Mongoid
   module Orderable
     module Generator
       module Listable
-
         def generate_listable_helpers(column_name)
           generate_list_helpers(column_name)
           generate_aliased_helpers(column_name)
@@ -34,7 +33,6 @@ module Mongoid
             alias_method "prev_#{column_name}_item",  "previous_#{column_name}_item"
           end
         end
-
       end
     end
   end
