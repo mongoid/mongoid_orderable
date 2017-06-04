@@ -10,16 +10,14 @@ rvm:
   - 2.3.1
 
 env:
-  - MONGOID_VERSION=3
-  - MONGOID_VERSION=4
-  - MONGOID_VERSION=5
   - MONGOID_VERSION=HEAD
+  - MONGOID_VERSION=6
+  - MONGOID_VERSION=5
+  - MONGOID_VERSION=4
+  - MONGOID_VERSION=3
 
 before_install:
   - gem update bundler
-
-before_script:
-  - bundle exec danger
 
 addons:
   apt:
@@ -31,3 +29,9 @@ addons:
 matrix:
   allow_failures:
     - env: MONGOID_VERSION=HEAD
+  include:
+    env:
+      - MONGOID_VERSION=6
+    before_script:
+      - bundle exec danger
+

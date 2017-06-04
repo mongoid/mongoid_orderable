@@ -1,5 +1,6 @@
 ### 5.1.1 (Next)
 
+* [#52](https://github.com/mongoid/mongoid_orderable/pull/52): Test against Mongoid 6 - [@dblock](https://github.com/dblock).
 * Your contribution here.
 
 ### 5.1.0 (2017/06/04)

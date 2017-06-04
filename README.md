@@ -3,14 +3,13 @@
 
 # What?
 
-Mongoid::Orderable is a ordered list implementation for your Mongoid 2, 3, 4 and 5 models.
+Mongoid::Orderable is a ordered list implementation for your Mongoid 3, 4, 5 and 6 models.
 
 # Why?
 
 * It uses native mongo batch increment feature
 * It supports mutators api
 * It correctly assigns the position while moving document between scopes
-* It supports mongoid 2, 3 and 4
 * It supports specifying multiple orderable columns
 
 # How?
