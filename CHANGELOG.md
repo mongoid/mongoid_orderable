@@ -1,3 +1,7 @@
+### 5.1.1 (Next)
+
+* Your contribution here.
+
 ### 5.1.0 (2017/06/04)
 
 * [#50](https://github.com/mongoid/mongoid_orderable/pull/50): Added Danger, PR linter - [@dblock](https://github.com/dblock).
