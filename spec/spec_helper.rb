@@ -6,7 +6,9 @@ Mongoid.configure do |config|
 end
 
 Mongoid.logger.level = Logger::INFO
-Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5?
+Mongo::Logger.logger.level = Logger::INFO if Mongoid::Compatibility::Version.mongoid5? || Mongoid::Compatibility::Version.mongoid6?
+
+Mongoid::Config.belongs_to_required_by_default = false if Mongoid::Compatibility::Version.mongoid6?
 
 RSpec.configure do |config|
   config.after(:all) do
