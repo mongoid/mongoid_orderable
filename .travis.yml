@@ -7,7 +7,11 @@ cache: bundler
 services: mongodb
 
 rvm:
-  - 2.3.1
+  - 2.1.10
+  - 2.2.9
+  - 2.3.6
+  - 2.4.2
+  - 2.5.0
 
 env:
   - MONGOID_VERSION=HEAD
@@ -27,11 +31,18 @@ addons:
       - mongodb-org-server
 
 matrix:
+  fast_finish: true
   allow_failures:
     - env: MONGOID_VERSION=HEAD
+  exclude:
+    - MONGOID_VERSION=HEAD
+      rvm: 2.1.10
+    - MONGOID_VERSION=6
+      rvm: 2.1.10
+    - MONGOID_VERSION=5
+      rvm: 2.1.10
   include:
     env:
       - MONGOID_VERSION=6
     before_script:
       - bundle exec danger
-
