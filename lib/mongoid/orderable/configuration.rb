@@ -16,11 +16,11 @@ module Mongoid
       end
 
       def default_configuration
-        { :column => :position,
-          :index  => true,
-          :scope  => nil,
-          :base   => 1,
-          :field_opts => { :type => Integer }}
+        { column: :position,
+          index: true,
+          scope: nil,
+          base: 1,
+          field_opts: { type: Integer }}
       end
 
       def self.build(parent, options = {})

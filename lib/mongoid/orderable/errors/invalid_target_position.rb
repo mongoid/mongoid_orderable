@@ -9,7 +9,7 @@ module Mongoid::Orderable
       private
 
       def _compose_message value
-        compose_message 'invalid_target_position', { :value => value.inspect }
+        compose_message 'invalid_target_position', { value: value.inspect }
       end
     end
   end

@@ -33,7 +33,7 @@ module Mongoid
         end
 
         def orderable_scope_changed_query(column)
-          !orderable_scoped(column).where(:_id => _id).exists?
+          !orderable_scoped(column).where(_id: _id).exists?
         end
 
         def bottom_orderable_position(column = nil)
