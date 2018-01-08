@@ -40,5 +40,5 @@ matrix:
       rvm: 2.1.10
   include:
     - env: MONGOID_VERSION=6
-      rvm: 2.3.1
+      rvm: 2.3.6
       before_script: bundle exec danger
