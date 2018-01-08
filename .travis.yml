@@ -9,7 +9,6 @@ services: mongodb
 rvm:
   - 2.1.10
   - 2.3.6
-  - 2.5.0
 
 env:
   - MONGOID_VERSION=HEAD
@@ -39,8 +38,3 @@ matrix:
       rvm: 2.1.10
     - env: MONGOID_VERSION=5
       rvm: 2.1.10
-  include:
-    env:
-      - MONGOID_VERSION=6
-    before_script:
-      - bundle exec danger
