@@ -2,7 +2,7 @@ module MongoidOrderable #:nodoc:
   module Mongoid #:nodoc:
     module Contextual #:nodoc:
       module Memory #:nodoc:
-        def inc(* args)
+        def inc(*args)
           each do |document|
             document.inc *args
           end

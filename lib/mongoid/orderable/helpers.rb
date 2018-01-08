@@ -22,11 +22,7 @@ module Mongoid
       end
 
       def orderable_scope_changed?(column)
-        if Mongoid.respond_to?(:unit_of_work)
-          Mongoid.unit_of_work do
-            orderable_scope_changed_query(column)
-          end
-        else
+        without_identity_map do
           orderable_scope_changed_query(column)
         end
       end
@@ -37,11 +33,18 @@ module Mongoid
 
       def bottom_orderable_position(column = nil)
         column ||= default_orderable_column
-        @bottom_orderable_position = begin
-          positions_list = orderable_scoped(column).distinct(orderable_column(column)).compact
-          return orderable_base(column) if positions_list.empty?
-          max = positions_list.map(&:to_i).max.to_i
-          in_list?(column) ? max : max.next
+        col = orderable_column(column)
+        max = orderable_scoped(column).ne(col => nil).max(col)
+        return orderable_base(column) unless max
+        in_list?(column) ? max : max.next
+      end
+
+      # Prevents usage of identity map in Mongoid 3
+      def without_identity_map(&block)
+        if Mongoid.respond_to?(:unit_of_work)
+          Mongoid.unit_of_work(&block)
+        else
+          block.call
         end
       end
     end
