@@ -35,11 +35,11 @@ matrix:
   allow_failures:
     - env: MONGOID_VERSION=HEAD
   exclude:
-    - MONGOID_VERSION=HEAD
+    - env: MONGOID_VERSION=HEAD
       rvm: 2.1.10
-    - MONGOID_VERSION=6
+    - env: MONGOID_VERSION=6
       rvm: 2.1.10
-    - MONGOID_VERSION=5
+    - env: MONGOID_VERSION=5
       rvm: 2.1.10
   include:
     env:
