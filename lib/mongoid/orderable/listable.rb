@@ -40,7 +40,7 @@ module Mongoid
       end
 
       def in_list?(column = nil)
-        !orderable_position(column).nil?
+        persisted? && !orderable_position(column).nil?
       end
     end
   end
