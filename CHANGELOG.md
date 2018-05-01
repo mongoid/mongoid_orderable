@@ -1,8 +1,7 @@
-### 5.1.1 (Next)
+### 5.2.0 (2018/05/01)
 
-* [#57](https://github.com/mongoid/mongoid_orderable/pull/57): Ensure compatibility with mongoid 7 - [@tomasc](https://github.com/tomasc).
+* [#57](https://github.com/mongoid/mongoid_orderable/pull/57): Compatibility with Mongoid 7 - [@tomasc](https://github.com/tomasc).
 * [#52](https://github.com/mongoid/mongoid_orderable/pull/52): Test against Mongoid 6 - [@dblock](https://github.com/dblock).
-* Your contribution here.
 
 ### 5.1.0 (2017/06/04)
 

@@ -3,7 +3,7 @@
 
 # What?
 
-Mongoid::Orderable is a ordered list implementation for your Mongoid 3, 4, 5 and 6 models.
+Mongoid::Orderable is a ordered list implementation for your Mongoid 3, 4, 5, 6 and 7 models.
 
 # Why?
 
