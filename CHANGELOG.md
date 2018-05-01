@@ -1,3 +1,7 @@
+### 5.2.1 (Next)
+
+* Your contribution here.
+
 ### 5.2.0 (2018/05/01)
 
 * [#57](https://github.com/mongoid/mongoid_orderable/pull/57): Compatibility with Mongoid 7 - [@tomasc](https://github.com/tomasc).
