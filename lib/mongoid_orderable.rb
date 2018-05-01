@@ -15,6 +15,14 @@ module MongoidOrderable
     def self.metadata(instance)
       instance.metadata
     end
+  elsif ::Mongoid::Compatibility::Version.mongoid7?
+    def self.inc(instance, attribute, value)
+      instance.inc(attribute => value)
+    end
+
+    def self.metadata(instance)
+      instance._association
+    end
   else
     def self.inc(instance, attribute, value)
       instance.inc(attribute => value)
