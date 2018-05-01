@@ -20,7 +20,11 @@ describe Mongoid::Orderable do
     include Mongoid::Orderable
 
     field :group_id
-    belongs_to :scoped_group
+    if ::Mongoid::Compatibility::Version.mongoid7?
+      belongs_to :scoped_group, optional: true
+    else
+      belongs_to :scoped_group
+    end
 
     orderable scope: :group
   end
@@ -87,8 +91,14 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
-                                 foreign_key: 'different_orderable_id'
+    if ::Mongoid::Compatibility::Version.mongoid7?
+      belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
+                                   foreign_key: 'different_orderable_id',
+                                   optional: true
+    else
+      belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
+                                   foreign_key: 'different_orderable_id'
+    end
 
     orderable scope: :different_scope
   end
@@ -99,7 +109,11 @@ describe Mongoid::Orderable do
 
     field :group_id
 
-    belongs_to :scoped_group
+    if ::Mongoid::Compatibility::Version.mongoid7?
+      belongs_to :scoped_group, optional: true
+    else
+      belongs_to :scoped_group
+    end
 
     orderable column: :pos, base: 0, index: false, as: :position
     orderable column: :serial_no, default: true
@@ -110,8 +124,13 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    belongs_to :apple
-    belongs_to :orange
+    if ::Mongoid::Compatibility::Version.mongoid7?
+      belongs_to :apple, optional: true
+      belongs_to :orange, optional: true
+    else
+      belongs_to :apple
+      belongs_to :orange
+    end
 
     orderable column: :posa, scope: :apple_id
     orderable column: :poso, scope: :orange_id
