@@ -1,11 +1,18 @@
 [![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
 [![Build Status](https://travis-ci.org/mongoid/mongoid_orderable.svg?branch=master)](https://travis-ci.org/mongoid/mongoid_orderable)
 
-# What?
+# Mongoid Orderable
 
 Mongoid::Orderable is a ordered list implementation for your Mongoid 7+ projects.
 
-# Supported Versions
+### Core Features
+
+* Sets a position index field on your documents which allows you to sort them in order.
+* Uses MongoDB's `$inc` operator to batch-update position.
+* Supports scope for position index, including changing scopes.
+* Supports multiple position indexes on the same document.
+
+### Version Support
 
 As of version 6.0.0, Mongoid::Orderable supports the following dependency versions:
 
@@ -15,25 +22,19 @@ As of version 6.0.0, Mongoid::Orderable supports the following dependency versio
 
 For older versions, please use Mongoid::Orderable 5.x and earlier.
 
-# Why?
+## Usage
 
-* It uses native mongo batch increment feature
-* It supports mutators api
-* It correctly assigns the position while moving document between scopes
-* It supports specifying multiple orderable columns
-
-# How?
+### Getting Started
 
 ```ruby
 gem 'mongoid_orderable'
 ```
 
-Gem has the same api as others. Just include Mongoid::Orderable into
-your model and call `orderable` method. Embedded objects are
-automatically scoped to their parent.
+Include `Mongoid::Orderable` into your model and call `orderable` method.
+Embedded objects are automatically scoped to their parent.
 
 ```ruby
-class Item
+class MyModel
   include Mongoid::Document
   include Mongoid::Orderable
 
@@ -72,7 +73,7 @@ Mongoid::Orderable.configure do |config|
 end
 ```
 
-# Usage
+### Moving Position
 
 ```ruby
 item.move_to 2 # just change position
@@ -98,7 +99,7 @@ item.next_item # returns the next item in the list
 item.previous_item # returns the previous item in the list
 ```
 
-# Multiple Columns
+### Multiple Columns
 
 You can also define multiple orderable columns for any class including the Mongoid::Orderable module.
 
@@ -116,23 +117,23 @@ The above defines two different orderable_columns on Book - *position* and *seri
 The following helpers are generated in this case:
 
 ```ruby
-item.move_#{column_name}_to
-item.move_#{column_name}_to=
-item.move_#{column_name}_to!
+book.move_#{field}_to
+book.move_#{field}_to=
+book.move_#{field}_to!
 
-item.move_#{column_name}_to_top
-item.move_#{column_name}_to_bottom
-item.move_#{column_name}_higher
-item.move_#{column_name}_lower
+book.move_#{field}_to_top
+book.move_#{field}_to_bottom
+book.move_#{field}_higher
+book.move_#{field}_lower
 
-item.next_#{column_name}_items
-item.previous_#{column_name}_items
+book.next_#{field}_items
+book.previous_#{field}_items
 
-item.next_#{column_name}_item
-item.previous_#{column_name}_item
+book.next_#{field}_item
+book.previous_#{field}_item
 ```
 
-*where column_name is either **position** or  **serial_no**.*
+where `#{field}` is either `position` or `serial_no`.
 
 When a model defines multiple orderable columns, the original helpers are also available and work on the first orderable column.
 
@@ -150,7 +151,8 @@ To specify any other orderable column as default pass the **default: true** opti
   orderable column: sno, as: :serial_no, default: true
 ```
 
-# Embedded documents
+### Embedded Documents
+
 ```ruby
 class Question
   include Mongoid::Document
@@ -161,7 +163,10 @@ class Question
   orderable
 end
 ```
-If you bulk import embedded documents without specifying their position, no field `position` will be written.
+
+If you bulk import embedded documents without specifying their position,
+no field `position` will be written.
+
 ```ruby
 class Survey
   include Mongoid::Document
@@ -169,13 +174,15 @@ class Survey
   embeds_many :questions, cascade_callbacks: true
 end
 ```
-To ensure the position is written correctly, you will need to provide the cascade callbacks option to the relation.
 
-# Contributing
+To ensure the position is written correctly, you will need to set
+`cascade_callbacks: true` on the relation.
+
+### Contributing
 
 Please fork the project on Github and raise a pull request including passing specs.
 
-# Copyright & License
+### Copyright & License
 
 Copyright (c) 2011 Arkadiy Zabazhanov & contributors.
 
