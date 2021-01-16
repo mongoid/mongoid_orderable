@@ -104,19 +104,19 @@ module Mixins
         target_position
       end
 
-      def use_transactions
-        true
+      def orderable_use_transactions
+        orderable_keys.any? {|k| self.class.orderable_configs[k][:use_transactions] }
       end
 
-      def transaction_max_retries
-        10
+      def orderable_transaction_max_retries
+        orderable_keys.map {|k| self.class.orderable_configs[k][:transaction_max_retries] }.compact.max
       end
 
       def with_orderable_transaction(&_block)
         Mongoid::QueryCache.uncached do
-          if use_transactions && !Thread.current[ORDERABLE_TRANSACTION_KEY]
+          if orderable_use_transactions && !Thread.current[ORDERABLE_TRANSACTION_KEY]
             Thread.current[ORDERABLE_TRANSACTION_KEY] = true
-            retries = transaction_max_retries
+            retries = orderable_transaction_max_retries
             begin
               self.class.with_session(causal_consistency: true) do |session|
                 session.start_transaction(read: { mode: :primary },

@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Mongoid::Orderable do
+  Mongoid::Orderable.configure do |c|
+    c.use_transactions = true
+  end
+
   class SimpleOrderable
     include Mongoid::Document
     include Mongoid::Orderable
