@@ -28,7 +28,7 @@ module Mixins
       !orderable_scope(field).where(_id: _id).exists?
     end
 
-    def orderable_bottom(field = nil, in_list: true)
+    def orderable_bottom(field = nil, in_list = true)
       field ||= default_orderable_field
       f = orderable_field(field)
       max = orderable_scope(field).ne(f => nil).max(f)
