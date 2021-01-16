@@ -11,7 +11,7 @@ require 'mongoid/orderable/version'
 
 require 'mongoid/orderable'
 require 'mongoid/orderable/configs/global_config'
-require 'mongoid/orderable/configs/model_config'
+require 'mongoid/orderable/configs/field_config'
 require 'mongoid/orderable/errors/invalid_target_position'
 require 'mongoid/orderable/mixins/helpers'
 require 'mongoid/orderable/mixins/callbacks'

@@ -45,10 +45,10 @@ class MyModel
   orderable
 
   # if you set :scope as a symbol, it will resolve the foreign key from relation
-  orderable scope: :drawer, column: :pos
+  orderable scope: :drawer, field: :pos
 
-  # if you set :scope as a string, it will use it as the column name for scope
-  orderable scope: 'drawer', column: :pos
+  # if you set :scope as a string, it will use it as the field name for scope
+  orderable scope: 'drawer', field: :pos
 
   # scope can also be a proc
   orderable scope: lambda { |document| where(group_id: document.group_id) }
@@ -67,7 +67,7 @@ applied when calling the `orderable` macro in a model.
 ```ruby
 # configs/initializers/mongoid_orderable.rb
 Mongoid::Orderable.configure do |config|
-  config.column = :pos
+  config.field = :pos
   config.base = 0
   config.index = false
 end
@@ -99,9 +99,9 @@ item.next_item # returns the next item in the list
 item.previous_item # returns the previous item in the list
 ```
 
-### Multiple Columns
+### Multiple Fields
 
-You can also define multiple orderable columns for any class including the Mongoid::Orderable module.
+You can also define multiple orderable fields for any class including the Mongoid::Orderable module.
 
 ```ruby
 class Book
@@ -109,11 +109,11 @@ class Book
   include Mongoid::Orderable
 
   orderable base: 0
-  orderable column: sno, as: :serial_no
+  orderable field: sno, as: :serial_no
 end
 ```
 
-The above defines two different orderable_columns on Book - *position* and *serial_no*.
+The above defines two different orderable_fields on Book - *position* and *serial_no*.
 The following helpers are generated in this case:
 
 ```ruby
@@ -135,7 +135,7 @@ book.previous_#{field}_item
 
 where `#{field}` is either `position` or `serial_no`.
 
-When a model defines multiple orderable columns, the original helpers are also available and work on the first orderable column.
+When a model defines multiple orderable fields, the original helpers are also available and work on the first orderable field.
 
 ```ruby
   @book1 = Book.create!
@@ -145,10 +145,10 @@ When a model defines multiple orderable columns, the original helpers are also a
   @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
 ```
 
-To specify any other orderable column as default pass the **default: true** option with orderable.
+To specify any other orderable field as default pass the **default: true** option with orderable.
 
 ```ruby
-  orderable column: sno, as: :serial_no, default: true
+  orderable field: sno, as: :serial_no, default: true
 ```
 
 ### Embedded Documents

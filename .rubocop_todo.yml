@@ -1,14 +1,17 @@
 Metrics/AbcSize:
-  Max: 34
+  Enabled: false
 
 Metrics/BlockLength:
-  Max: 1032
+  Enabled: false
 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Enabled: false
 
 Metrics/MethodLength:
-  Max: 21
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
 
 Metrics/PerceivedComplexity:
-  Max: 12
+  Enabled: false

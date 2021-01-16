@@ -12,16 +12,14 @@ describe Mongoid::Orderable do
     include Mongoid::Document
 
     has_many :scoped_orderables
-    has_many :multiple_columns_orderables
+    has_many :multiple_fields_orderables
   end
 
   class ScopedOrderable
     include Mongoid::Document
     include Mongoid::Orderable
 
-    field :group_id
-
-    belongs_to :scoped_group, optional: true
+    belongs_to :group, class_name: 'ScopedGroup', optional: true
 
     orderable scope: :group
   end
@@ -54,7 +52,7 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    orderable column: :pos, as: :my_position
+    orderable field: :pos, as: :my_position
   end
 
   class NoIndexOrderable
@@ -95,17 +93,15 @@ describe Mongoid::Orderable do
     orderable scope: :different_scope
   end
 
-  class MultipleColumnsOrderable
+  class MultipleFieldsOrderable
     include Mongoid::Document
     include Mongoid::Orderable
 
-    field :group_id
+    belongs_to :group, class_name: 'ScopedGroup', optional: true
 
-    belongs_to :scoped_group, optional: true
-
-    orderable column: :pos, base: 0, index: false, as: :position
-    orderable column: :serial_no, default: true
-    orderable column: :groups, scope: :group
+    orderable field: :pos, base: 0, index: false, as: :position
+    orderable field: :serial_no, default: true
+    orderable field: :groups, scope: :group
   end
 
   class MultipleScopedOrderable
@@ -115,8 +111,8 @@ describe Mongoid::Orderable do
     belongs_to :apple, optional: true
     belongs_to :orange, optional: true
 
-    orderable column: :posa, scope: :apple_id
-    orderable column: :poso, scope: :orange_id
+    orderable field: :posa, scope: :apple_id
+    orderable field: :poso, scope: :orange_id
   end
 
   describe SimpleOrderable do
@@ -128,17 +124,17 @@ describe Mongoid::Orderable do
       SimpleOrderable.all.map(&:position).sort
     end
 
-    it 'should have proper position column' do
+    it 'should have proper position field' do
       expect(SimpleOrderable.fields.key?('position')).to be true
       expect(SimpleOrderable.fields['position'].options[:type]).to eq(Integer)
     end
 
-    it 'should have index on position column' do
+    it 'should have index on position field' do
       expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).not_to be_nil
     end
 
     it 'should have a orderable base of 1' do
-      expect(SimpleOrderable.create!.orderable_base).to eq(1)
+      expect(SimpleOrderable.create!.orderable_top).to eq(1)
     end
 
     it 'should set proper position while creation' do
@@ -199,6 +195,16 @@ describe Mongoid::Orderable do
         expect(newbie.position).to eq(6)
         another = SimpleOrderable.create!
         expect(another.position).to eq(6)
+        newbie.save!
+        expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
+        expect(newbie.position).to eq(7)
+        expect(another.position).to eq(6)
+      end
+
+      it 'parallel updates' do
+        newbie = SimpleOrderable.new
+        newbie.send(:add_to_list)
+        another = SimpleOrderable.create!
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
         expect(newbie.position).to eq(7)
@@ -462,7 +468,7 @@ describe Mongoid::Orderable do
   end
 
   describe NoIndexOrderable do
-    it 'should not have index on position column' do
+    it 'should not have index on position field' do
       expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
     end
   end
@@ -477,7 +483,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have a orderable base of 0' do
-      expect(ZeroBasedOrderable.create!.orderable_base).to eq(0)
+      expect(ZeroBasedOrderable.create!.orderable_top).to eq(0)
     end
 
     it 'should set proper position while creation' do
@@ -646,7 +652,7 @@ describe Mongoid::Orderable do
     describe 'add orderable configs in inherited class' do
       it 'does not affect the orderable configs of parent class and sibling class' do
         class Apple
-          orderable column: :serial
+          orderable field: :serial
         end
         expect(Fruit.orderable_configs).not_to eq Apple.orderable_configs
         expect(Orange.orderable_configs).not_to eq Apple.orderable_configs
@@ -671,16 +677,16 @@ describe Mongoid::Orderable do
     end
   end
 
-  describe MultipleColumnsOrderable do
+  describe MultipleFieldsOrderable do
     before :each do
-      5.times { MultipleColumnsOrderable.create! }
+      5.times { MultipleFieldsOrderable.create! }
     end
 
     context 'default orderable' do
-      let(:serial_nos) { MultipleColumnsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
 
       describe 'inserting' do
-        let(:newbie) { MultipleColumnsOrderable.create! }
+        let(:newbie) { MultipleFieldsOrderable.create! }
 
         before { @position = newbie.position }
 
@@ -708,7 +714,7 @@ describe Mongoid::Orderable do
 
       describe 'movement' do
         it 'higher from top' do
-          record = MultipleColumnsOrderable.where(serial_no: 1).first
+          record = MultipleFieldsOrderable.where(serial_no: 1).first
           position = record.position
           record.move_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -717,7 +723,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from bottom' do
-          record = MultipleColumnsOrderable.where(serial_no: 5).first
+          record = MultipleFieldsOrderable.where(serial_no: 5).first
           position = record.position
           record.move_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -726,7 +732,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from middle' do
-          record = MultipleColumnsOrderable.where(serial_no: 3).first
+          record = MultipleFieldsOrderable.where(serial_no: 3).first
           position = record.position
           record.move_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -735,7 +741,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from top' do
-          record = MultipleColumnsOrderable.where(serial_no: 1).first
+          record = MultipleFieldsOrderable.where(serial_no: 1).first
           position = record.position
           record.move_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -744,7 +750,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from bottom' do
-          record = MultipleColumnsOrderable.where(serial_no: 5).first
+          record = MultipleFieldsOrderable.where(serial_no: 5).first
           position = record.position
           record.move_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -753,7 +759,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from middle' do
-          record = MultipleColumnsOrderable.where(serial_no: 3).first
+          record = MultipleFieldsOrderable.where(serial_no: 3).first
           position = record.position
           record.move_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -764,11 +770,11 @@ describe Mongoid::Orderable do
 
       describe 'utility methods' do
         before do
-          @record1 = MultipleColumnsOrderable.where(serial_no: 1).first
-          @record2 = MultipleColumnsOrderable.where(serial_no: 2).first
-          @record3 = MultipleColumnsOrderable.where(serial_no: 3).first
-          @record4 = MultipleColumnsOrderable.where(serial_no: 4).first
-          @record5 = MultipleColumnsOrderable.where(serial_no: 5).first
+          @record1 = MultipleFieldsOrderable.where(serial_no: 1).first
+          @record2 = MultipleFieldsOrderable.where(serial_no: 2).first
+          @record3 = MultipleFieldsOrderable.where(serial_no: 3).first
+          @record4 = MultipleFieldsOrderable.where(serial_no: 4).first
+          @record5 = MultipleFieldsOrderable.where(serial_no: 5).first
         end
 
         it 'should return the lower/higher item on the list for next_item/previous_item' do
@@ -792,19 +798,19 @@ describe Mongoid::Orderable do
     end
 
     context 'serial_no orderable' do
-      let(:serial_nos) { MultipleColumnsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
 
-      it 'should have proper serial_no column' do
-        expect(MultipleColumnsOrderable.fields.key?('serial_no')).to be true
-        expect(MultipleColumnsOrderable.fields['serial_no'].options[:type]).to eq(Integer)
+      it 'should have proper serial_no field' do
+        expect(MultipleFieldsOrderable.fields.key?('serial_no')).to be true
+        expect(MultipleFieldsOrderable.fields['serial_no'].options[:type]).to eq(Integer)
       end
 
-      it 'should have index on serial_no column' do
-        expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { serial_no: 1 } }).not_to be_nil
+      it 'should have index on serial_no field' do
+        expect(MultipleFieldsOrderable.index_specifications.detect { |spec| spec.key == { serial_no: 1 } }).not_to be_nil
       end
 
       it 'should have a orderable base of 1' do
-        expect(MultipleColumnsOrderable.first.orderable_base(:serial_no)).to eq(1)
+        expect(MultipleFieldsOrderable.first.orderable_top(:serial_no)).to eq(1)
       end
 
       it 'should set proper position while creation' do
@@ -813,23 +819,23 @@ describe Mongoid::Orderable do
 
       describe 'removement' do
         it 'top' do
-          MultipleColumnsOrderable.where(serial_no: 1).destroy
+          MultipleFieldsOrderable.where(serial_no: 1).destroy
           expect(serial_nos).to eq([1, 2, 3, 4])
         end
 
         it 'bottom' do
-          MultipleColumnsOrderable.where(serial_no: 5).destroy
+          MultipleFieldsOrderable.where(serial_no: 5).destroy
           expect(serial_nos).to eq([1, 2, 3, 4])
         end
 
         it 'middle' do
-          MultipleColumnsOrderable.where(serial_no: 3).destroy
+          MultipleFieldsOrderable.where(serial_no: 3).destroy
           expect(serial_nos).to eq([1, 2, 3, 4])
         end
       end
 
       describe 'inserting' do
-        let(:newbie) { MultipleColumnsOrderable.create! }
+        let(:newbie) { MultipleFieldsOrderable.create! }
 
         before { @position = newbie.position }
 
@@ -857,7 +863,7 @@ describe Mongoid::Orderable do
 
       describe 'movement' do
         it 'higher from top' do
-          record = MultipleColumnsOrderable.where(serial_no: 1).first
+          record = MultipleFieldsOrderable.where(serial_no: 1).first
           position = record.position
           record.move_serial_no_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -866,7 +872,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from bottom' do
-          record = MultipleColumnsOrderable.where(serial_no: 5).first
+          record = MultipleFieldsOrderable.where(serial_no: 5).first
           position = record.position
           record.move_serial_no_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -875,7 +881,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from middle' do
-          record = MultipleColumnsOrderable.where(serial_no: 3).first
+          record = MultipleFieldsOrderable.where(serial_no: 3).first
           position = record.position
           record.move_serial_no_higher!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -884,7 +890,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from top' do
-          record = MultipleColumnsOrderable.where(serial_no: 1).first
+          record = MultipleFieldsOrderable.where(serial_no: 1).first
           position = record.position
           record.move_serial_no_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -893,7 +899,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from bottom' do
-          record = MultipleColumnsOrderable.where(serial_no: 5).first
+          record = MultipleFieldsOrderable.where(serial_no: 5).first
           position = record.position
           record.move_serial_no_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -902,7 +908,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from middle' do
-          record = MultipleColumnsOrderable.where(serial_no: 3).first
+          record = MultipleFieldsOrderable.where(serial_no: 3).first
           position = record.position
           record.move_serial_no_lower!
           expect(serial_nos).to eq([1, 2, 3, 4, 5])
@@ -913,11 +919,11 @@ describe Mongoid::Orderable do
 
       describe 'utility methods' do
         before do
-          @record1 = MultipleColumnsOrderable.where(serial_no: 1).first
-          @record2 = MultipleColumnsOrderable.where(serial_no: 2).first
-          @record3 = MultipleColumnsOrderable.where(serial_no: 3).first
-          @record4 = MultipleColumnsOrderable.where(serial_no: 4).first
-          @record5 = MultipleColumnsOrderable.where(serial_no: 5).first
+          @record1 = MultipleFieldsOrderable.where(serial_no: 1).first
+          @record2 = MultipleFieldsOrderable.where(serial_no: 2).first
+          @record3 = MultipleFieldsOrderable.where(serial_no: 3).first
+          @record4 = MultipleFieldsOrderable.where(serial_no: 4).first
+          @record5 = MultipleFieldsOrderable.where(serial_no: 5).first
         end
 
         it 'should return the lower/higher item on the list for next_item/previous_item' do
@@ -941,23 +947,23 @@ describe Mongoid::Orderable do
     end
 
     context 'position orderable' do
-      let(:positions) { MultipleColumnsOrderable.all.map(&:position).sort }
+      let(:positions) { MultipleFieldsOrderable.all.map(&:position).sort }
 
       it 'should not have default position field' do
-        expect(MultipleColumnsOrderable.fields).not_to have_key('position')
+        expect(MultipleFieldsOrderable.fields).not_to have_key('position')
       end
 
       it 'should have custom pos field' do
-        expect(MultipleColumnsOrderable.fields).to have_key('pos')
-        expect(MultipleColumnsOrderable.fields['pos'].options[:type]).to eq(Integer)
+        expect(MultipleFieldsOrderable.fields).to have_key('pos')
+        expect(MultipleFieldsOrderable.fields['pos'].options[:type]).to eq(Integer)
       end
 
-      it 'should have index on position column' do
-        expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
+      it 'should have index on position field' do
+        expect(MultipleFieldsOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
       end
 
       it 'should have a orderable base of 0' do
-        expect(MultipleColumnsOrderable.first.orderable_base(:position)).to eq(0)
+        expect(MultipleFieldsOrderable.first.orderable_top(:position)).to eq(0)
       end
 
       it 'should set proper position while creation' do
@@ -966,23 +972,23 @@ describe Mongoid::Orderable do
 
       describe 'removement' do
         it 'top' do
-          MultipleColumnsOrderable.where(pos: 1).destroy
+          MultipleFieldsOrderable.where(pos: 1).destroy
           expect(positions).to eq([0, 1, 2, 3])
         end
 
         it 'bottom' do
-          MultipleColumnsOrderable.where(pos: 4).destroy
+          MultipleFieldsOrderable.where(pos: 4).destroy
           expect(positions).to eq([0, 1, 2, 3])
         end
 
         it 'middle' do
-          MultipleColumnsOrderable.where(pos: 3).destroy
+          MultipleFieldsOrderable.where(pos: 3).destroy
           expect(positions).to eq([0, 1, 2, 3])
         end
       end
 
       describe 'inserting' do
-        let(:newbie) { MultipleColumnsOrderable.create! }
+        let(:newbie) { MultipleFieldsOrderable.create! }
 
         before { @serial_no = newbie.serial_no }
 
@@ -1010,7 +1016,7 @@ describe Mongoid::Orderable do
 
       describe 'movement' do
         it 'higher from top' do
-          record = MultipleColumnsOrderable.where(pos: 0).first
+          record = MultipleFieldsOrderable.where(pos: 0).first
           position = record.serial_no
           record.move_position_higher!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1019,7 +1025,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from bottom' do
-          record = MultipleColumnsOrderable.where(pos: 4).first
+          record = MultipleFieldsOrderable.where(pos: 4).first
           position = record.serial_no
           record.move_position_higher!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1028,7 +1034,7 @@ describe Mongoid::Orderable do
         end
 
         it 'higher from middle' do
-          record = MultipleColumnsOrderable.where(pos: 3).first
+          record = MultipleFieldsOrderable.where(pos: 3).first
           position = record.serial_no
           record.move_position_higher!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1037,7 +1043,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from top' do
-          record = MultipleColumnsOrderable.where(pos: 0).first
+          record = MultipleFieldsOrderable.where(pos: 0).first
           position = record.serial_no
           record.move_position_lower!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1046,7 +1052,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from bottom' do
-          record = MultipleColumnsOrderable.where(pos: 4).first
+          record = MultipleFieldsOrderable.where(pos: 4).first
           position = record.serial_no
           record.move_position_lower!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1055,7 +1061,7 @@ describe Mongoid::Orderable do
         end
 
         it 'lower from middle' do
-          record = MultipleColumnsOrderable.where(pos: 3).first
+          record = MultipleFieldsOrderable.where(pos: 3).first
           position = record.serial_no
           record.move_position_lower!
           expect(positions).to eq([0, 1, 2, 3, 4])
@@ -1066,11 +1072,11 @@ describe Mongoid::Orderable do
 
       describe 'utility methods' do
         before do
-          @record1 = MultipleColumnsOrderable.where(pos: 0).first
-          @record2 = MultipleColumnsOrderable.where(pos: 1).first
-          @record3 = MultipleColumnsOrderable.where(pos: 2).first
-          @record4 = MultipleColumnsOrderable.where(pos: 3).first
-          @record5 = MultipleColumnsOrderable.where(pos: 4).first
+          @record1 = MultipleFieldsOrderable.where(pos: 0).first
+          @record2 = MultipleFieldsOrderable.where(pos: 1).first
+          @record3 = MultipleFieldsOrderable.where(pos: 2).first
+          @record4 = MultipleFieldsOrderable.where(pos: 3).first
+          @record5 = MultipleFieldsOrderable.where(pos: 4).first
         end
 
         it 'should return the lower/higher item on the list for next_item/previous_item' do
@@ -1095,12 +1101,12 @@ describe Mongoid::Orderable do
 
     context 'group_count orderable' do
       before :each do
-        MultipleColumnsOrderable.delete_all
-        2.times { MultipleColumnsOrderable.create! group_id: 1 }
-        3.times { MultipleColumnsOrderable.create! group_id: 2 }
+        MultipleFieldsOrderable.delete_all
+        2.times { MultipleFieldsOrderable.create! group_id: 1 }
+        3.times { MultipleFieldsOrderable.create! group_id: 2 }
       end
 
-      let(:all_groups) { MultipleColumnsOrderable.order_by([:group_id, :asc], [:groups, :asc]).map(&:groups) }
+      let(:all_groups) { MultipleFieldsOrderable.order_by([:group_id, :asc], [:groups, :asc]).map(&:groups) }
 
       it 'should set proper position while creation' do
         expect(all_groups).to eq([1, 2, 1, 2, 3])
@@ -1108,38 +1114,38 @@ describe Mongoid::Orderable do
 
       describe 'removement' do
         it 'top' do
-          MultipleColumnsOrderable.where(groups: 1, group_id: 1).destroy
+          MultipleFieldsOrderable.where(groups: 1, group_id: 1).destroy
           expect(all_groups).to eq([1, 1, 2, 3])
         end
 
         it 'bottom' do
-          MultipleColumnsOrderable.where(groups: 3, group_id: 2).destroy
+          MultipleFieldsOrderable.where(groups: 3, group_id: 2).destroy
           expect(all_groups).to eq([1, 2, 1, 2])
         end
 
         it 'middle' do
-          MultipleColumnsOrderable.where(groups: 2, group_id: 2).destroy
+          MultipleFieldsOrderable.where(groups: 2, group_id: 2).destroy
           expect(all_groups).to eq([1, 2, 1, 2])
         end
       end
 
       describe 'inserting' do
         it 'top' do
-          newbie = MultipleColumnsOrderable.create! group_id: 1
+          newbie = MultipleFieldsOrderable.create! group_id: 1
           newbie.move_groups_to! :top
           expect(all_groups).to eq([1, 2, 3, 1, 2, 3])
           expect(newbie.groups).to eq(1)
         end
 
         it 'bottom' do
-          newbie = MultipleColumnsOrderable.create! group_id: 2
+          newbie = MultipleFieldsOrderable.create! group_id: 2
           newbie.move_groups_to! :bottom
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(newbie.groups).to eq(4)
         end
 
         it 'middle' do
-          newbie = MultipleColumnsOrderable.create! group_id: 2
+          newbie = MultipleFieldsOrderable.create! group_id: 2
           newbie.move_groups_to! 2
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(newbie.groups).to eq(2)
@@ -1147,7 +1153,7 @@ describe Mongoid::Orderable do
       end
 
       describe 'scope movement' do
-        let(:record) { MultipleColumnsOrderable.where(group_id: 2, groups: 2).first }
+        let(:record) { MultipleFieldsOrderable.where(group_id: 2, groups: 2).first }
 
         it 'to a new scope group' do
           record.update_attributes group_id: 3
@@ -1180,11 +1186,11 @@ describe Mongoid::Orderable do
 
       describe 'utility methods' do
         before do
-          @record1 = MultipleColumnsOrderable.where(group_id: 2, groups: 1).first
-          @record2 = MultipleColumnsOrderable.where(group_id: 2, groups: 2).first
-          @record3 = MultipleColumnsOrderable.where(group_id: 2, groups: 3).first
-          @record4 = MultipleColumnsOrderable.where(group_id: 1, groups: 1).first
-          @record5 = MultipleColumnsOrderable.where(group_id: 1, groups: 2).first
+          @record1 = MultipleFieldsOrderable.where(group_id: 2, groups: 1).first
+          @record2 = MultipleFieldsOrderable.where(group_id: 2, groups: 2).first
+          @record3 = MultipleFieldsOrderable.where(group_id: 2, groups: 3).first
+          @record4 = MultipleFieldsOrderable.where(group_id: 1, groups: 1).first
+          @record5 = MultipleFieldsOrderable.where(group_id: 1, groups: 2).first
         end
 
         it 'should return the lower/higher item on the list for next_item/previous_item' do

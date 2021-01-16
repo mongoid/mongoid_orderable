@@ -7,7 +7,7 @@ module Orderable
 
     def initialize(klass, options = {})
       @klass = klass
-      @config = Mongoid::Orderable::Configs::ModelConfig.new(klass, options).options
+      @config = Mongoid::Orderable::Configs::FieldConfig.new(klass, options).options
     end
 
     def setup
@@ -20,8 +20,8 @@ module Orderable
 
     protected
 
-    def column_name
-      config[:field_opts][:as] || config[:column]
+    def field_name
+      config[:field_opts][:as] || config[:field]
     end
 
     def order_scope
@@ -29,18 +29,18 @@ module Orderable
     end
 
     def add_db_field
-      klass.field(config[:column], config[:field_opts])
+      klass.field(config[:field], config[:field_opts])
     end
 
     def add_db_index
-      spec = [[config[:column], 1]]
-      spec.unshift([config[:scope], 1]) if config[:scope].is_a?(Symbol)
+      spec = [[config[:field], 1]]
+      config[:scope].each {|field| spec.unshift([field, 1]) } if config[:scope].is_a?(Array)
       klass.index(Hash[spec])
     end
 
     def save_config
       klass.orderable_configs ||= {}
-      klass.orderable_configs = klass.orderable_configs.merge(column_name => config)
+      klass.orderable_configs = klass.orderable_configs.merge(field_name => config)
     end
 
     def include_mixins
@@ -51,10 +51,10 @@ module Orderable
     end
 
     def generate_all_helpers
-      Generators::Scope.new(klass).generate(column_name, order_scope)
-      Generators::Position.new(klass).generate(column_name)
-      Generators::Movable.new(klass).generate(column_name)
-      Generators::Listable.new(klass).generate(column_name)
+      Generators::Scope.new(klass).generate(field_name, order_scope)
+      Generators::Position.new(klass).generate(field_name)
+      Generators::Movable.new(klass).generate(field_name)
+      Generators::Listable.new(klass).generate(field_name)
       Generators::Helpers.new(klass).generate
     end
   end

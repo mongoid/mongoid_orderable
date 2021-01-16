@@ -8,32 +8,32 @@ module Mixins
       Array(orderable_inherited_class.orderable_configs.try(:keys))
     end
 
-    def default_orderable_column
-      self.class.orderable_configs.detect { |_c, conf| conf[:default] }.try(:first) || orderable_keys.first
+    def default_orderable_field
+      self.class.orderable_configs.detect {|_c, conf| conf[:default] }.try(:first) || orderable_keys.first
     end
 
     private
 
-    def orderable_scope(column = nil)
-      column ||= default_orderable_column
+    def orderable_scope(field = nil)
+      field ||= default_orderable_field
 
       if embedded?
-        _parent.send(_association.name).send("orderable_#{column}_scope", self)
+        _parent.send(_association.name).send("orderable_#{field}_scope", self)
       else
-        orderable_inherited_class.send("orderable_#{column}_scope", self)
+        orderable_inherited_class.send("orderable_#{field}_scope", self)
       end
     end
 
-    def orderable_scope_changed?(column)
-      !orderable_scope(column).where(_id: _id).exists?
+    def orderable_scope_changed?(field)
+      !orderable_scope(field).where(_id: _id).exists?
     end
 
-    def bottom_orderable_position(column = nil)
-      column ||= default_orderable_column
-      col = orderable_column(column)
-      max = orderable_scope(column).ne(col => nil).max(col)
-      return orderable_base(column) unless max
-      in_list?(column) ? max : max.next
+    def orderable_bottom(field = nil)
+      field ||= default_orderable_field
+      f = orderable_field(field)
+      max = orderable_scope(field).ne(f => nil).max(f)
+      return orderable_top(field) unless max
+      in_list?(field) ? max : max.next
     end
   end
 end
