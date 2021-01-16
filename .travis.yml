@@ -7,17 +7,12 @@ cache: bundler
 services: mongodb
 
 rvm:
-  - 2.1.10
-  - 2.3.6
-  - 2.5.0
+  - 2.6.6
+  - 2.7.2
 
 env:
   - MONGOID_VERSION=HEAD
   - MONGOID_VERSION=7
-  - MONGOID_VERSION=6
-  - MONGOID_VERSION=5
-  - MONGOID_VERSION=4
-  - MONGOID_VERSION=3
 
 before_install:
   - gem update bundler
@@ -33,16 +28,3 @@ matrix:
   fast_finish: true
   allow_failures:
     - env: MONGOID_VERSION=HEAD
-  exclude:
-    - env: MONGOID_VERSION=HEAD
-      rvm: 2.1.10
-    - env: MONGOID_VERSION=7
-      rvm: 2.1.10
-    - env: MONGOID_VERSION=6
-      rvm: 2.1.10
-    - env: MONGOID_VERSION=5
-      rvm: 2.1.10
-  include:
-    - env: MONGOID_VERSION=6
-      rvm: 2.3.6
-      before_script: bundle exec danger

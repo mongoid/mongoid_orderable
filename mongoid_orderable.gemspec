@@ -1,26 +1,23 @@
-# -*- encoding: utf-8 -*-
-$LOAD_PATH.push File.expand_path('../lib', __FILE__)
-require 'mongoid_orderable/version'
+# frozen_string_literal: true
 
-Gem::Specification.new do |s|
-  s.name        = 'mongoid_orderable'
-  s.version     = MongoidOrderable::VERSION
-  s.authors     = ['pyromaniac']
-  s.email       = ['kinwizard@gmail.com']
-  s.homepage    = ''
-  s.summary     = 'Acts as list mongoid implementation'
-  s.description = 'Gem allows mongoid model behave as orderable list'
+$LOAD_PATH.push File.expand_path('lib', __dir__)
+require 'mongoid/orderable/version'
 
-  s.rubyforge_project = 'mongoid_orderable'
+Gem::Specification.new do |gem|
+  gem.name        = 'mongoid_orderable'
+  gem.version     = Mongoid::Orderable::VERSION
+  gem.authors     = ['pyromaniac']
+  gem.email       = ['kinwizard@gmail.com']
+  gem.homepage    = 'https://github.com/mongoid/mongoid_orderable'
+  gem.summary     = 'Mongoid orderable list implementation'
+  gem.description = 'Enables Mongoid models to track their position in list'
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
-  s.require_paths = ['lib']
+  gem.files         = Dir.glob('lib/**/*') + %w[CHANGELOG.md LICENSE.txt README.md Rakefile]
+  gem.test_files    = Dir.glob('spec/**/*')
+  gem.require_path  = 'lib'
 
-  # specify any dependencies here; for example:
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec'
-  s.add_runtime_dependency 'mongoid', '>= 3.0.0'
-  s.add_runtime_dependency 'mongoid-compatibility'
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rspec', '>= 3.0.0'
+  gem.add_development_dependency 'rubocop', '>= 1.8.1'
+  gem.add_runtime_dependency 'mongoid', '>= 7.0.0'
 end

@@ -20,11 +20,8 @@ describe Mongoid::Orderable do
     include Mongoid::Orderable
 
     field :group_id
-    if ::Mongoid::Compatibility::Version.mongoid7?
-      belongs_to :scoped_group, optional: true
-    else
-      belongs_to :scoped_group
-    end
+
+    belongs_to :scoped_group, optional: true
 
     orderable scope: :group
   end
@@ -91,14 +88,9 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    if ::Mongoid::Compatibility::Version.mongoid7?
-      belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
-                                   foreign_key: 'different_orderable_id',
-                                   optional: true
-    else
-      belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
-                                   foreign_key: 'different_orderable_id'
-    end
+    belongs_to :different_scope, class_name: 'ForeignKeyDiffersOrderable',
+                                 foreign_key: 'different_orderable_id',
+                                 optional: true
 
     orderable scope: :different_scope
   end
@@ -109,11 +101,7 @@ describe Mongoid::Orderable do
 
     field :group_id
 
-    if ::Mongoid::Compatibility::Version.mongoid7?
-      belongs_to :scoped_group, optional: true
-    else
-      belongs_to :scoped_group
-    end
+    belongs_to :scoped_group, optional: true
 
     orderable column: :pos, base: 0, index: false, as: :position
     orderable column: :serial_no, default: true
@@ -124,13 +112,8 @@ describe Mongoid::Orderable do
     include Mongoid::Document
     include Mongoid::Orderable
 
-    if ::Mongoid::Compatibility::Version.mongoid7?
-      belongs_to :apple, optional: true
-      belongs_to :orange, optional: true
-    else
-      belongs_to :apple
-      belongs_to :orange
-    end
+    belongs_to :apple, optional: true
+    belongs_to :orange, optional: true
 
     orderable column: :posa, scope: :apple_id
     orderable column: :poso, scope: :orange_id
@@ -138,10 +121,7 @@ describe Mongoid::Orderable do
 
   describe SimpleOrderable do
     before :each do
-      SimpleOrderable.delete_all
-      5.times do
-        SimpleOrderable.create!
-      end
+      5.times { SimpleOrderable.create! }
     end
 
     def positions
@@ -154,11 +134,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have index on position column' do
-      if ::Mongoid::Compatibility::Version.mongoid3?
-        expect(SimpleOrderable.index_options[{ position: 1 }]).not_to be_nil
-      else
-        expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).not_to be_nil
-      end
+      expect(SimpleOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).not_to be_nil
     end
 
     it 'should have a orderable base of 1' do
@@ -216,6 +192,18 @@ describe Mongoid::Orderable do
           SimpleOrderable.create! move_to: 'four'
         end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
       end
+
+      it 'simultaneous create and update' do
+        newbie = SimpleOrderable.new
+        newbie.send(:add_to_list)
+        expect(newbie.position).to eq(6)
+        another = SimpleOrderable.create!
+        expect(another.position).to eq(6)
+        newbie.save!
+        expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
+        expect(newbie.position).to eq(7)
+        expect(another.position).to eq(6)
+      end
     end
 
     describe 'movement' do
@@ -269,7 +257,7 @@ describe Mongoid::Orderable do
       end
     end
 
-    describe 'utiity methods' do
+    describe 'utility methods' do
       it 'should return a collection of items lower/higher on the list for next_items/previous_items' do
         record1 = SimpleOrderable.where(position: 1).first
         record2 = SimpleOrderable.where(position: 2).first
@@ -280,19 +268,18 @@ describe Mongoid::Orderable do
         expect(record5.previous_items.to_a).to eq([record1, record2, record3, record4])
         expect(record3.previous_items.to_a).to eq([record1, record2])
         expect(record3.next_items.to_a).to eq([record4, record5])
+        expect(record1.next_item).to eq(record2)
+        expect(record2.previous_item).to eq(record1)
+        expect(record1.previous_item).to eq(nil)
+        expect(record5.next_item).to eq(nil)
       end
     end
   end
 
   describe ScopedOrderable do
     before :each do
-      ScopedOrderable.delete_all
-      2.times do
-        ScopedOrderable.create! group_id: 1
-      end
-      3.times do
-        ScopedOrderable.create! group_id: 2
-      end
+      2.times { ScopedOrderable.create! group_id: 1 }
+      3.times { ScopedOrderable.create! group_id: 2 }
     end
 
     def positions
@@ -354,19 +341,11 @@ describe Mongoid::Orderable do
 
     describe 'index' do
       it 'is not on position alone' do
-        if ::Mongoid::Compatibility::Version.mongoid3?
-          expect(ScopedOrderable.index_options[{ position: 1 }]).to be_nil
-        else
-          expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
-        end
+        expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
       end
 
       it 'is on compound fields' do
-        if ::Mongoid::Compatibility::Version.mongoid3?
-          expect(ScopedOrderable.index_options[{ group_id: 1, position: 1 }]).to_not be_nil
-        else
-          expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == { group_id: 1, position: 1 } }).to_not be_nil
-        end
+        expect(ScopedOrderable.index_specifications.detect { |spec| spec.key == { group_id: 1, position: 1 } }).to_not be_nil
       end
     end
 
@@ -412,67 +391,21 @@ describe Mongoid::Orderable do
       end
     end
 
-    if defined?(Mongoid::IdentityMap)
-
-      context 'when identity map is enabled' do
-        let(:record) { ScopedOrderable.where(group_id: 2, position: 2).first }
-
-        before do
-          Mongoid.identity_map_enabled = true
-          Mongoid::IdentityMap[ScopedOrderable.collection_name] = { record.id => record }
-        end
-
-        after do
-          Mongoid.identity_map_enabled = false
-        end
-
-        it 'to a new scope group' do
-          record.update_attributes group_id: 3
-          expect(positions).to eq([1, 2, 1, 2, 1])
-          expect(record.position).to eq(1)
-        end
-
-        it 'to an existing scope group' do
-          record.update_attributes group_id: 1, move_to: 2
-          expect(positions).to eq([1, 2, 3, 1, 2])
-          expect(record.reload.position).to eq(2)
-        end
-
-        it 'to an existing scope group (with a numeric string)' do
-          record.update_attributes group_id: 1, move_to: '2'
-          expect(positions).to eq([1, 2, 3, 1, 2])
-          expect(record.reload.position).to eq(2)
-        end
-
-        it 'to an existing scope group (with a non-numeric string)' do
-          expect do
-            record.update_attributes group_id: 1, move_to: 'two'
-          end.to raise_error Mongoid::Orderable::Errors::InvalidTargetPosition
-        end
-      end
-    end
-
     describe 'utility methods' do
-      before do
-        ScopedOrderable.delete_all
-        5.times { ScopedOrderable.create! }
-      end
-
       it 'should return a collection of items lower/higher on the list for next_items/previous_items' do
-        record1 = ScopedOrderable.where(position: 1).first
-        record2 = ScopedOrderable.where(position: 2).first
-        record3 = ScopedOrderable.where(position: 3).first
-        record4 = ScopedOrderable.where(position: 4).first
-        record5 = ScopedOrderable.where(position: 5).first
-        expect(record1.next_items.to_a).to eq([record2, record3, record4, record5])
-        expect(record5.previous_items.to_a).to eq([record1, record2, record3, record4])
-        expect(record3.previous_items.to_a).to eq([record1, record2])
+        record1 = ScopedOrderable.where(group_id: 1, position: 1).first
+        record2 = ScopedOrderable.where(group_id: 1, position: 2).first
+        record3 = ScopedOrderable.where(group_id: 2, position: 1).first
+        record4 = ScopedOrderable.where(group_id: 2, position: 2).first
+        record5 = ScopedOrderable.where(group_id: 2, position: 3).first
+        expect(record1.next_items.to_a).to eq([record2])
+        expect(record5.previous_items.to_a).to eq([record3, record4])
+        expect(record3.previous_items.to_a).to eq([])
         expect(record3.next_items.to_a).to eq([record4, record5])
-        # next_item & previous_item testing
         expect(record1.next_item).to eq(record2)
         expect(record2.previous_item).to eq(record1)
         expect(record1.previous_item).to eq(nil)
-        expect(record5.next_item).to eq(nil)
+        expect(record2.next_item).to eq(nil)
       end
     end
   end
@@ -490,15 +423,10 @@ describe Mongoid::Orderable do
 
   describe EmbeddedOrderable do
     before :each do
-      EmbedsOrderable.delete_all
       eo = EmbedsOrderable.create!
-      2.times do
-        eo.embedded_orderables.create!
-      end
+      2.times { eo.embedded_orderables.create! }
       eo = EmbedsOrderable.create!
-      3.times do
-        eo.embedded_orderables.create!
-      end
+      3.times { eo.embedded_orderables.create! }
     end
 
     def positions
@@ -535,20 +463,13 @@ describe Mongoid::Orderable do
 
   describe NoIndexOrderable do
     it 'should not have index on position column' do
-      if ::Mongoid::Compatibility::Version.mongoid3?
-        expect(NoIndexOrderable.index_options[[[:position, 1]]]).to be_nil
-      else
-        expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
-      end
+      expect(NoIndexOrderable.index_specifications.detect { |spec| spec.key == :position }).to be_nil
     end
   end
 
   describe ZeroBasedOrderable do
     before :each do
-      ZeroBasedOrderable.delete_all
-      5.times do
-        ZeroBasedOrderable.create!
-      end
+      5.times { ZeroBasedOrderable.create! }
     end
 
     def positions
@@ -671,18 +592,17 @@ describe Mongoid::Orderable do
       end
     end
 
-    describe 'utiity methods' do
+    describe 'utility methods' do
       it 'should return a collection of items lower/higher on the list for next_items/previous_items' do
-        record1 = SimpleOrderable.where(position: 1).first
-        record2 = SimpleOrderable.where(position: 2).first
-        record3 = SimpleOrderable.where(position: 3).first
-        record4 = SimpleOrderable.where(position: 4).first
-        record5 = SimpleOrderable.where(position: 5).first
+        record1 = ZeroBasedOrderable.where(position: 0).first
+        record2 = ZeroBasedOrderable.where(position: 1).first
+        record3 = ZeroBasedOrderable.where(position: 2).first
+        record4 = ZeroBasedOrderable.where(position: 3).first
+        record5 = ZeroBasedOrderable.where(position: 4).first
         expect(record1.next_items.to_a).to eq([record2, record3, record4, record5])
         expect(record5.previous_items.to_a).to eq([record1, record2, record3, record4])
         expect(record3.previous_items.to_a).to eq([record1, record2])
         expect(record3.next_items.to_a).to eq([record4, record5])
-        # next_item & previous_item testing
         expect(record1.next_item).to eq(record2)
         expect(record2.previous_item).to eq(record1)
         expect(record1.previous_item).to eq(nil)
@@ -701,10 +621,7 @@ describe Mongoid::Orderable do
 
     describe 'movement' do
       before :each do
-        Fruit.delete_all
-        5.times do
-          Apple.create!
-        end
+        5.times { Apple.create! }
       end
 
       it 'with symbol position' do
@@ -726,14 +643,14 @@ describe Mongoid::Orderable do
       end
     end
 
-    describe 'add orderable configurations in inherited class' do
-      it 'does not affect the orderable configurations of parent class and sibling class' do
+    describe 'add orderable configs in inherited class' do
+      it 'does not affect the orderable configs of parent class and sibling class' do
         class Apple
           orderable column: :serial
         end
-        expect(Fruit.orderable_configurations).not_to eq Apple.orderable_configurations
-        expect(Orange.orderable_configurations).not_to eq Apple.orderable_configurations
-        expect(Fruit.orderable_configurations).to eq Orange.orderable_configurations
+        expect(Fruit.orderable_configs).not_to eq Apple.orderable_configs
+        expect(Orange.orderable_configs).not_to eq Apple.orderable_configs
+        expect(Fruit.orderable_configs).to eq Orange.orderable_configs
       end
     end
   end
@@ -756,10 +673,7 @@ describe Mongoid::Orderable do
 
   describe MultipleColumnsOrderable do
     before :each do
-      MultipleColumnsOrderable.delete_all
-      5.times do
-        MultipleColumnsOrderable.create!
-      end
+      5.times { MultipleColumnsOrderable.create! }
     end
 
     context 'default orderable' do
@@ -886,11 +800,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on serial_no column' do
-        if ::Mongoid::Compatibility::Version.mongoid3?
-          expect(MultipleColumnsOrderable.index_options[{ serial_no: 1 }]).not_to be_nil
-        else
-          expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { serial_no: 1 } }).not_to be_nil
-        end
+        expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { serial_no: 1 } }).not_to be_nil
       end
 
       it 'should have a orderable base of 1' do
@@ -1043,11 +953,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have index on position column' do
-        if ::Mongoid::Compatibility::Version.mongoid3?
-          expect(MultipleColumnsOrderable.index_options[{ position: 1 }]).to be_nil
-        else
-          expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
-        end
+        expect(MultipleColumnsOrderable.index_specifications.detect { |spec| spec.key == { position: 1 } }).to be_nil
       end
 
       it 'should have a orderable base of 0' do
@@ -1272,33 +1178,6 @@ describe Mongoid::Orderable do
         end
       end
 
-      if defined?(Mongoid::IdentityMap)
-
-        context 'when identity map is enabled' do
-          let(:record) { MultipleColumnsOrderable.where(group_id: 2, groups: 2).first }
-
-          before do
-            Mongoid.identity_map_enabled = true
-            Mongoid::IdentityMap[MultipleColumnsOrderable.collection_name] = { record.id => record }
-          end
-
-          after { Mongoid.identity_map_enabled = false }
-
-          it 'to a new scope group' do
-            record.update_attributes group_id: 3
-            expect(all_groups).to eq([1, 2, 1, 2, 1])
-            expect(record.groups).to eq(1)
-          end
-
-          it 'to an existing scope group' do
-            record.update_attributes group_id: 1
-            record.move_groups_to! 2
-            expect(all_groups).to eq([1, 2, 3, 1, 2])
-            expect(record.groups).to eq(2)
-          end
-        end
-      end
-
       describe 'utility methods' do
         before do
           @record1 = MultipleColumnsOrderable.where(group_id: 2, groups: 1).first
@@ -1331,13 +1210,10 @@ describe Mongoid::Orderable do
 
   describe MultipleScopedOrderable do
     before :each do
-      Apple.delete_all; Orange.delete_all
-      MultipleScopedOrderable.delete_all
-
       3.times do
-        Apple.create; Orange.create
+        Apple.create
+        Orange.create
       end
-
       MultipleScopedOrderable.create! apple_id: 1, orange_id: 1
       MultipleScopedOrderable.create! apple_id: 2, orange_id: 1
       MultipleScopedOrderable.create! apple_id: 2, orange_id: 2

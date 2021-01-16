@@ -1,6 +1,32 @@
-AllCops:
-  Exclude:
-    - vendor/**/*
-    - bin/**/*
-
 inherit_from: .rubocop_todo.yml
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 2.6
+  Exclude:
+    - spec/**/*
+    - vendor/**/*
+
+Bundler/DuplicatedGem:
+  Exclude:
+    - 'Gemfile'
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/IndentationWidth:
+  IgnoredPatterns:
+    - '^\s*module'
+
+Layout/LineLength:
+  Max: 120
+
+Style/Documentation:
+  Enabled: false
+
+Style/DocumentDynamicEvalDefinition:
+  Enabled: false

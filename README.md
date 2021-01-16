@@ -3,7 +3,17 @@
 
 # What?
 
-Mongoid::Orderable is a ordered list implementation for your Mongoid 3, 4, 5, 6 and 7 models.
+Mongoid::Orderable is a ordered list implementation for your Mongoid 7+ projects.
+
+# Supported Versions
+
+As of version 6.0.0, Mongoid::Orderable supports the following dependency versions:
+
+* Ruby 2.6+
+* Mongoid 7.0+
+* Rails 5.2+
+
+For older versions, please use Mongoid::Orderable 5.x and earlier.
 
 # Why?
 
@@ -18,25 +28,47 @@ Mongoid::Orderable is a ordered list implementation for your Mongoid 3, 4, 5, 6 
 gem 'mongoid_orderable'
 ```
 
-Gem has the same api as others. Just include Mongoid::Orderable into your model and call `orderable` method.
-Embedded objects are automatically scoped by their parent.
+Gem has the same api as others. Just include Mongoid::Orderable into
+your model and call `orderable` method. Embedded objects are
+automatically scoped to their parent.
 
 ```ruby
 class Item
   include Mongoid::Document
   include Mongoid::Orderable
 
-  # belongs_to :group
-  # belongs_to :drawer, class_name: "Office::Drawer",
-  #            foreign_key: "legacy_drawer_key_id"
+  belongs_to :group
+  belongs_to :drawer, class_name: "Office::Drawer",
+             foreign_key: "legacy_drawer_key_id"
 
-  # orderable
-  # orderable scope: :group, column: :pos
-  # orderable scope: :drawer, column: :pos # resolves scope foreign key from relation
-  # orderable scope: 'drawer', column: :pos # but if you pass a string - it will use it as is, as the column name for scope
-  # orderable scope: lambda { |document| where(group_id: document.group_id) }
-  # orderable index: false # this one if you want specify indexes manually
-  # orderable base: 0 # count position from zero as the top-most value (1 is the default value)
+  orderable
+
+  # if you set :scope as a symbol, it will resolve the foreign key from relation
+  orderable scope: :drawer, column: :pos
+
+  # if you set :scope as a string, it will use it as the column name for scope
+  orderable scope: 'drawer', column: :pos
+
+  # scope can also be a proc
+  orderable scope: lambda { |document| where(group_id: document.group_id) }
+
+  # this one if you want specify indexes manually
+  orderable index: false 
+
+  # count position from zero as the top-most value (1 is the default value)
+  orderable base: 0
+end
+```
+
+You can also set default config values in an initializer, which will be
+applied when calling the `orderable` macro in a model.
+
+```ruby
+# configs/initializers/mongoid_orderable.rb
+Mongoid::Orderable.configure do |config|
+  config.column = :pos
+  config.base = 0
+  config.index = false
 end
 ```
 
@@ -141,10 +173,10 @@ To ensure the position is written correctly, you will need to provide the cascad
 
 # Contributing
 
-See [CONTRIBUTING](CONTRIBUTING.md).
+Please fork the project on Github and raise a pull request including passing specs.
 
 # Copyright & License
 
-Copyright (c) 2011-2016 Arkadiy Zabazhanov & Contributors.
+Copyright (c) 2011 Arkadiy Zabazhanov & contributors.
 
 MIT license, see [LICENSE](LICENSE.txt) for details.

@@ -1,20 +1,29 @@
-module Mongoid::Orderable
-  extend ActiveSupport::Concern
+# frozen_string_literal: true
 
-  included do
-    include Mongoid::Orderable::Helpers
-    include Mongoid::Orderable::Callbacks
-    include Mongoid::Orderable::Movable
-    include Mongoid::Orderable::Listable
+module Mongoid
+  module Orderable
+    LOCK = Mutex.new
 
-    class_attribute :orderable_configurations
-  end
+    class << self
+      def configure
+        yield(config) if block_given?
+      end
 
-  module ClassMethods
-    def orderable(options = {})
-      configuration = Mongoid::Orderable::Configuration.build(self, options)
+      def config
+        @config || LOCK.synchronize { @config = ::Mongoid::Orderable::Configs::GlobalConfig.new }
+      end
+    end
 
-      Mongoid::Orderable::OrderableClass.setup(self, configuration)
+    extend ActiveSupport::Concern
+
+    included do
+      class_attribute :orderable_configs
+    end
+
+    class_methods do
+      def orderable(options = {})
+        Mongoid::Orderable::Installer.new(self, options).setup
+      end
     end
   end
 end
