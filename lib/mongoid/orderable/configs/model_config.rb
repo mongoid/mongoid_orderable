@@ -4,7 +4,7 @@ module Mongoid
 module Orderable
 module Configs
   class ModelConfig
-    CONFIG_OPTIONS = %i[column scope foreign_key inherited base index default].freeze
+    CONFIG_OPTIONS = %i[column scope foreign_key inherited base index default use_transactions transaction_max_retries].freeze
     FIELD_OPTIONS  = %i[as].freeze
     VALID_OPTIONS  = (CONFIG_OPTIONS | FIELD_OPTIONS).freeze
 
@@ -24,7 +24,9 @@ module Configs
         index: cfg.index,
         scope: cfg.scope,
         base: cfg.base,
-        field_opts: cfg.field_opts.dup }
+        field_opts: cfg.field_opts.dup,
+        use_transactions: cfg.use_transactions,
+        transaction_max_retries: cfg.transaction_max_retries }
     end
 
     protected

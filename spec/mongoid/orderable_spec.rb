@@ -274,6 +274,63 @@ describe Mongoid::Orderable do
         expect(record5.next_item).to eq(nil)
       end
     end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+    end
   end
 
   describe ScopedOrderable do

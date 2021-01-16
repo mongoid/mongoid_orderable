@@ -8,7 +8,9 @@ module Configs
                   :index,
                   :scope,
                   :base,
-                  :field_opts
+                  :field_opts,
+                  :use_transactions,
+                  :transaction_max_retries
 
     def initialize
       self.column = :position
@@ -16,6 +18,8 @@ module Configs
       self.scope = nil
       self.base = 1
       self.field_opts = { type: Integer }
+      self.use_transactions = false
+      self.transaction_max_retries = 10
     end
   end
 end
