@@ -9,63 +9,76 @@ module Mixins
     ORDERABLE_TRANSACTION_KEY = :__mongoid_orderable_in_txn
 
     included do
-      before_save :add_to_list
-      after_destroy :remove_from_list
+      around_save :orderable_apply_positions
+      after_destroy :orderable_remove_positions
 
       protected
 
-      def add_to_list
-        orderable_keys.each do |column|
-          apply_position(column, move_all[column])
-        end
-      end
-
-      def remove_from_list
-        orderable_keys.each do |column|
-          remove_position_from_list(column)
-        end
-      end
-
-      def remove_position_from_list(column)
+      # If the scope of the orderable changes, it is necessary to ensure
+      # that both the new position and the
+      def orderable_apply_positions(&_block)
+        any_scope_changed = false
         with_orderable_transaction do
-          col = orderable_column(column)
-          pos = orderable_position(column)
-          orderable_scope(column).gt(col => pos).inc(col => -1)
+          any_scope_changed = orderable_keys.map do |column|
+            orderable_apply_one_position(column, move_all[column])
+          end.any?
+          yield if any_scope_changed
+        end
+        yield unless any_scope_changed
+      end
+
+      def orderable_remove_positions
+        orderable_keys.each do |column|
+          orderable_remove_one_position(column)
         end
       end
 
-      def apply_position(column, target_position)
-        with_orderable_transaction do
-          if persisted? && !embedded? && orderable_scope_changed?(column)
-            self.class.unscoped.find(_id).remove_position_from_list(column)
-            set(column => nil)
-          end
+      # Returns boolean value as follows:
+      # - true: The document is persisted and its orderable scope was changed.
+      #         Document#save must be performed transactionally.
+      # - false: Document#save does not need to be performed transactionally.
+      def orderable_apply_one_position(column, target_position, &_block)
+        col = orderable_column(column)
+        target = resolve_target_position(column, target_position)
+        scope = orderable_scope(column)
+        scope_changed = orderable_scope_changed?(column)
 
-          return if !target_position && in_list?(column)
+        current = if scope_changed
+                    nil
+                  elsif persisted? && !embedded?
+                    scope.where(_id: _id).pluck(col).first
+                  else
+                    orderable_position(column)
+                  end
 
-          target_position = resolve_target_position(column, target_position)
-          scope = orderable_scope(column)
-          col = orderable_column(column)
-          if persisted? && !embedded?
-            pos = self.class.unscoped.find(_id).send(col)
-          else
-            pos = orderable_position(column)
-          end
+        # Return if there is no instruction to change the position
+        in_list = persisted? && current
+        return false if in_list && !target_position
 
-          if !in_list?(column)
-            scope.gte(col => target_position).inc(col => 1)
-          elsif target_position < pos
-            scope.where(col => { '$gte' => target_position, '$lt' => pos }).inc(col => 1)
-          elsif target_position > pos
-            scope.where(col => { '$gt' => pos, '$lte' => target_position }).inc(col => -1)
-          end
-
-          if persisted?
-            set(column => target_position)
-          else
-            send("orderable_#{column}_position=", target_position)
-          end
+        if persisted? && !embedded? && scope_changed
+          existing_doc = self.class.unscoped.find(_id)
+          existing_doc.orderable_remove_one_position(column)
         end
+
+        if !in_list
+          scope.gte(col => target).inc(col => 1)
+        elsif target < current
+          scope.where(col => { '$gte' => target, '$lt' => current }).inc(col => 1)
+        elsif target > current
+          scope.where(col => { '$gt' => current, '$lte' => target }).inc(col => -1)
+        end
+
+        set(col => target) if persisted?
+        send("orderable_#{column}_position=", target)
+
+        # Indicates whether Document#save must be performed transactionally
+        persisted? && scope_changed
+      end
+
+      def orderable_remove_one_position(column)
+        col = orderable_column(column)
+        current = orderable_position(column)
+        orderable_scope(column).gt(col => current).inc(col => -1)
       end
 
       def resolve_target_position(column, target_position)
@@ -78,7 +91,7 @@ module Mixins
                             when 'higher' then orderable_position(column).pred
                             when 'lower' then orderable_position(column).next
                             when /\A\d+\Z/ then target_position.to_i
-                            else raise Mongoid::Orderable::Errors::InvalidTargetPosition, target_position
+                            else raise Mongoid::Orderable::Errors::InvalidTargetPosition.new(target_position)
                             end
         end
 
@@ -105,17 +118,17 @@ module Mixins
             Thread.current[ORDERABLE_TRANSACTION_KEY] = true
             retries = transaction_max_retries
             begin
-              self.class.with_session do |session|
+              self.class.with_session(causal_consistency: true) do |session|
                 session.start_transaction(read: { mode: :primary },
-                                          read_concern: { level: :local },
-                                          write_concern: { w: 1 })
+                                          read_concern: { level: 'majority' },
+                                          write_concern: { w: 'majority' })
                 yield
                 session.commit_transaction
               end
-            rescue Mongo::Error::OperationFailure => error
+            rescue Mongo::Error::OperationFailure => e
               retries -= 1
               retry if retries >= 0
-              raise error
+              raise Mongoid::Orderable::Errors::TransactionFailed.new(e)
             ensure
               Thread.current[ORDERABLE_TRANSACTION_KEY] = nil
             end

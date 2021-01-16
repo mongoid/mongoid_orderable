@@ -20,7 +20,7 @@ module Generators
       KLASS
 
       generate_method(:orderable_inherited_class) do
-        self_class.orderable_configs.any? { |_col, conf| conf[:inherited] } ? self_class : self.class
+        self_class.orderable_configs.any? {|_col, conf| conf[:inherited] } ? self_class : self.class
       end
     end
   end

@@ -4,7 +4,6 @@ module Mongoid
 module Orderable
 module Mixins
   module Listable
-
     def in_list?(column = nil)
       persisted? && !orderable_position(column).nil?
     end

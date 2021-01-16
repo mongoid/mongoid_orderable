@@ -138,7 +138,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have a orderable base of 1' do
-      expect(SimpleOrderable.create!.orderable_base).to eq(1)
+      expect(SimpleOrderable.create!.orderable_top).to eq(1)
     end
 
     it 'should set proper position while creation' do
@@ -532,23 +532,44 @@ describe Mongoid::Orderable do
         expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
       end
 
-      # it 'should correctly move items to a random scope and position' do
-      #   20.times.map do
-      #     Thread.new do
-      #       record = ScopedOrderable.all.sample
-      #       record.update_attributes group_id: [1, 2, 3].sample, move_to: (1..5).to_a.sample
-      #     end
-      #   end.each(&:join)
-      #
-      #   result = ScopedOrderable.pluck(:position).sort
-      #   expect(result.first).to eq(1)
-      #   expect(result.last).to be_in(2..5)
-      #   tally = result.tally
-      #   puts tally
-      #   sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
-      #   expect(sorted_tally.map(&:first).last).to eq tally.size
-      #   expect(sorted_tally.first.first).to eq 1
-      # end
+      it 'should correctly move items to a random scope', retry: 5 do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            record.update_attributes group_id: group_id
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.pluck(:position).sort
+        tally = result.tally
+        sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
+        expect(result.first).to eq(1)
+        expect(result.last).to be_in(2..5)
+        expect(sorted_tally.map(&:first).last).to eq tally.size
+        expect(sorted_tally.first.first).to eq 1
+        expect(sorted_tally.first.last).to be_in(1..3)
+      end
+
+      it 'should correctly move items to a random position and scope', retry: 5 do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            position = (1..5).to_a.sample
+            record.update_attributes group_id: group_id, move_to: position
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.pluck(:position).sort
+        tally = result.tally
+        sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
+        expect(result.first).to eq(1)
+        expect(result.last).to be_in(2..5)
+        expect(sorted_tally.map(&:first).last).to eq tally.size
+        expect(sorted_tally.first.first).to eq 1
+        expect(sorted_tally.first.last).to be_in(1..3)
+      end
     end
   end
 
@@ -619,7 +640,7 @@ describe Mongoid::Orderable do
     end
 
     it 'should have a orderable base of 0' do
-      expect(ZeroBasedOrderable.create!.orderable_base).to eq(0)
+      expect(ZeroBasedOrderable.create!.orderable_top).to eq(0)
     end
 
     it 'should set proper position while creation' do
@@ -946,7 +967,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have a orderable base of 1' do
-        expect(MultipleColumnsOrderable.first.orderable_base(:serial_no)).to eq(1)
+        expect(MultipleColumnsOrderable.first.orderable_top(:serial_no)).to eq(1)
       end
 
       it 'should set proper position while creation' do
@@ -1099,7 +1120,7 @@ describe Mongoid::Orderable do
       end
 
       it 'should have a orderable base of 0' do
-        expect(MultipleColumnsOrderable.first.orderable_base(:position)).to eq(0)
+        expect(MultipleColumnsOrderable.first.orderable_top(:position)).to eq(0)
       end
 
       it 'should set proper position while creation' do

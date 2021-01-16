@@ -9,7 +9,7 @@ module Mixins
     end
 
     def default_orderable_column
-      self.class.orderable_configs.detect { |_c, conf| conf[:default] }.try(:first) || orderable_keys.first
+      self.class.orderable_configs.detect {|_c, conf| conf[:default] }.try(:first) || orderable_keys.first
     end
 
     private
