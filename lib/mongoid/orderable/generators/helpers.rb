@@ -8,7 +8,7 @@ module Generators
       self_class = klass
 
       klass.class_eval <<~KLASS, __FILE__, __LINE__ + 1
-        def orderable_base(column = nil)
+        def orderable_top(column = nil)
           column ||= default_orderable_column
           #{self_class}.orderable_configs[column][:base]
         end

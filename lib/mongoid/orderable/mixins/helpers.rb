@@ -28,11 +28,11 @@ module Mixins
       !orderable_scope(column).where(_id: _id).exists?
     end
 
-    def bottom_orderable_position(column = nil)
+    def orderable_bottom(column = nil)
       column ||= default_orderable_column
       col = orderable_column(column)
       max = orderable_scope(column).ne(col => nil).max(col)
-      return orderable_base(column) unless max
+      return orderable_top(column) unless max
       in_list?(column) ? max : max.next
     end
   end

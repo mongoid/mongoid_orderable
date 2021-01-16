@@ -73,8 +73,8 @@ module Mixins
 
         unless target_position.is_a? Numeric
           target_position = case target_position.to_s
-                            when 'top' then (top ||= orderable_base(column))
-                            when 'bottom' then (bottom ||= bottom_orderable_position(column))
+                            when 'top' then (min ||= orderable_top(column))
+                            when 'bottom' then (max ||= orderable_bottom(column))
                             when 'higher' then orderable_position(column).pred
                             when 'lower' then orderable_position(column).next
                             when /\A\d+\Z/ then target_position.to_i
@@ -82,10 +82,10 @@ module Mixins
                             end
         end
 
-        if target_position < (top ||= orderable_base(column))
-          target_position = top
-        elsif target_position > (bottom ||= bottom_orderable_position(column))
-          target_position = bottom
+        if target_position <= (min ||= orderable_top(column))
+          target_position = min
+        elsif target_position > (max ||= orderable_bottom(column))
+          target_position = max
         end
 
         target_position

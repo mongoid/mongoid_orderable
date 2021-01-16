@@ -38,11 +38,11 @@ module Mixins
     end
 
     def first?(column = nil)
-      in_list?(column) && orderable_position(column) == orderable_base(column)
+      in_list?(column) && orderable_position(column) == orderable_top(column)
     end
 
     def last?(column = nil)
-      in_list?(column) && orderable_position(column) == bottom_orderable_position(column)
+      in_list?(column) && orderable_position(column) == orderable_bottom(column)
     end
   end
 end
