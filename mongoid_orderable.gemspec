@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.require_path  = 'lib'
 
   gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec', '>= 3.10.1'
+  gem.add_development_dependency 'rspec', '>= 3.0.0'
   gem.add_development_dependency 'rubocop', '>= 1.8.1'
   gem.add_runtime_dependency 'mongoid', '>= 7.0.0'
 end
