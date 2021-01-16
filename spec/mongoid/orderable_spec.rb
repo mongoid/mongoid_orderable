@@ -275,6 +275,16 @@ describe Mongoid::Orderable do
       end
     end
 
+    it 'parallel inserts' do
+      newbie = SimpleOrderable.new
+      newbie.send(:add_to_list)
+      another = SimpleOrderable.create!
+      newbie.save!
+      expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
+      expect(newbie.position).to eq(7)
+      expect(another.position).to eq(6)
+    end
+
     describe 'concurrency' do
       it 'should correctly move items to top' do
         20.times.map do
