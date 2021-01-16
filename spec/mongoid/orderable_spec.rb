@@ -475,6 +475,81 @@ describe Mongoid::Orderable do
         expect(record2.next_item).to eq(nil)
       end
     end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      # it 'should correctly move items to a random scope and position' do
+      #   20.times.map do
+      #     Thread.new do
+      #       record = ScopedOrderable.all.sample
+      #       record.update_attributes group_id: [1, 2, 3].sample, move_to: (1..5).to_a.sample
+      #     end
+      #   end.each(&:join)
+      #
+      #   result = ScopedOrderable.pluck(:position).sort
+      #   expect(result.first).to eq(1)
+      #   expect(result.last).to be_in(2..5)
+      #   tally = result.tally
+      #   puts tally
+      #   sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
+      #   expect(sorted_tally.map(&:first).last).to eq tally.size
+      #   expect(sorted_tally.first.first).to eq 1
+      # end
+    end
   end
 
   describe StringScopedOrderable do

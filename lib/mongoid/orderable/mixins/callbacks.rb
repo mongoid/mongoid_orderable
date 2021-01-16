@@ -27,9 +27,11 @@ module Mixins
       end
 
       def remove_position_from_list(column)
-        col = orderable_column(column)
-        pos = orderable_position(column)
-        orderable_scope(column).where(col.gt => pos).inc(col => -1)
+        with_orderable_transaction do
+          col = orderable_column(column)
+          pos = orderable_position(column)
+          orderable_scope(column).gt(col => pos).inc(col => -1)
+        end
       end
 
       def apply_position(column, target_position)
@@ -53,9 +55,9 @@ module Mixins
           if !in_list?(column)
             scope.gte(col => target_position).inc(col => 1)
           elsif target_position < pos
-            scope.where(col.gte => target_position, col.lt => pos).inc(col => 1)
+            scope.where(col => { '$gte' => target_position, '$lt' => pos }).inc(col => 1)
           elsif target_position > pos
-            scope.where(col.gt => pos, col.lte => target_position).inc(col => -1)
+            scope.where(col => { '$gt' => pos, '$lte' => target_position }).inc(col => -1)
           end
 
           if persisted?
@@ -67,12 +69,12 @@ module Mixins
       end
 
       def resolve_target_position(column, target_position)
-        target_position ||= :bottom
+        target_position ||= 'bottom'
 
         unless target_position.is_a? Numeric
           target_position = case target_position.to_s
-                            when 'top' then orderable_base(column)
-                            when 'bottom' then bottom_orderable_position(column)
+                            when 'top' then (top ||= orderable_base(column))
+                            when 'bottom' then (bottom ||= bottom_orderable_position(column))
                             when 'higher' then orderable_position(column).pred
                             when 'lower' then orderable_position(column).next
                             when /\A\d+\Z/ then target_position.to_i
@@ -80,8 +82,12 @@ module Mixins
                             end
         end
 
-        target_position = orderable_base(column) if target_position < orderable_base(column)
-        target_position = bottom_orderable_position(column) if target_position > bottom_orderable_position(column)
+        if target_position < (top ||= orderable_base(column))
+          target_position = top
+        elsif target_position > (bottom ||= bottom_orderable_position(column))
+          target_position = bottom
+        end
+
         target_position
       end
 
@@ -94,24 +100,28 @@ module Mixins
       end
 
       def with_orderable_transaction(&_block)
-        if use_transactions && !Thread.current[ORDERABLE_TRANSACTION_KEY]
-          retries = transaction_max_retries
-          begin
-            self.class.with_session do |session|
-              session.start_transaction(read: { mode: :primary },
-                                        read_concern: { level: :local },
-                                        write_concern: { w: 1 })
-              yield
-              session.commit_transaction
+        Mongoid::QueryCache.uncached do
+          if use_transactions && !Thread.current[ORDERABLE_TRANSACTION_KEY]
+            Thread.current[ORDERABLE_TRANSACTION_KEY] = true
+            retries = transaction_max_retries
+            begin
+              self.class.with_session do |session|
+                session.start_transaction(read: { mode: :primary },
+                                          read_concern: { level: :local },
+                                          write_concern: { w: 1 })
+                yield
+                session.commit_transaction
+              end
+            rescue Mongo::Error::OperationFailure => error
+              retries -= 1
+              retry if retries >= 0
+              raise error
+            ensure
+              Thread.current[ORDERABLE_TRANSACTION_KEY] = nil
             end
-          rescue Mongo::Error::OperationFailure => _e
-            retries -= 1
-            retry if retries >= 0
-          ensure
-            Thread.current[ORDERABLE_TRANSACTION_KEY] = nil
+          else
+            yield
           end
-        else
-          yield
         end
       end
     end

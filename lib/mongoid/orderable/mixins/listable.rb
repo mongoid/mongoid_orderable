@@ -4,11 +4,16 @@ module Mongoid
 module Orderable
 module Mixins
   module Listable
+
+    def in_list?(column = nil)
+      persisted? && !orderable_position(column).nil?
+    end
+
     # Returns items above the current document.
     # Items with a position lower than this document's position.
     def previous_items(column = nil)
       column ||= default_orderable_column
-      orderable_scope(column).where(orderable_column(column).lt => send(column))
+      orderable_scope(column).lt(orderable_column(column) => send(column))
     end
     alias prev_items previous_items
 
@@ -16,7 +21,7 @@ module Mixins
     # Items with a position greater than this document's position.
     def next_items(column = nil)
       column ||= default_orderable_column
-      orderable_scope(column).where(orderable_column(column).gt => send(column))
+      orderable_scope(column).gt(orderable_column(column) => send(column))
     end
 
     # Returns the previous item in the list
@@ -38,10 +43,6 @@ module Mixins
 
     def last?(column = nil)
       in_list?(column) && orderable_position(column) == bottom_orderable_position(column)
-    end
-
-    def in_list?(column = nil)
-      persisted? && !orderable_position(column).nil?
     end
   end
 end
