@@ -330,6 +330,36 @@ describe Mongoid::Orderable do
         expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
       end
 
+      it 'should correctly insert at the top' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!(move_to: :top)
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
+      it 'should correctly insert at the bottom' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
+      it 'should correctly insert at a random position' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!(move_to: (1..10).to_a.sample)
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
       it 'should correctly move items to a random position' do
         20.times.map do
           Thread.new do

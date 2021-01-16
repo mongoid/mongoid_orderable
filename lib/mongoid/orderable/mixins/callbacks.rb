@@ -38,14 +38,14 @@ module Mixins
       #         Document#save must be performed transactionally.
       # - false: Document#save does not need to be performed transactionally.
       def orderable_apply_one_position(field, target_position, &_block)
-        col = orderable_field(field)
+        f = orderable_field(field)
         scope = orderable_scope(field)
         scope_changed = orderable_scope_changed?(field)
 
         current = if scope_changed
                     nil
                   elsif persisted? && !embedded?
-                    scope.where(_id: _id).pluck(col).first
+                    scope.where(_id: _id).pluck(f).first
                   else
                     orderable_position(field)
                   end
@@ -61,24 +61,24 @@ module Mixins
         target = resolve_target_position(field, target_position, in_list)
 
         if !in_list
-          scope.gte(col => target).inc(col => 1)
+          scope.gte(f => target).inc(f => 1)
         elsif target < current
-          scope.where(col => { '$gte' => target, '$lt' => current }).inc(col => 1)
+          scope.where(f => { '$gte' => target, '$lt' => current }).inc(f => 1)
         elsif target > current
-          scope.where(col => { '$gt' => current, '$lte' => target }).inc(col => -1)
+          scope.where(f => { '$gt' => current, '$lte' => target }).inc(f => -1)
         end
 
-        set(col => target) if persisted?
+        set(f => target) if persisted?
         send("orderable_#{field}_position=", target)
 
         # Indicates whether Document#save must be performed transactionally
-        persisted? && scope_changed
+        scope_changed
       end
 
       def orderable_remove_one_position(field)
-        col = orderable_field(field)
+        f = orderable_field(field)
         current = orderable_position(field)
-        orderable_scope(field).gt(col => current).inc(col => -1)
+        orderable_scope(field).gt(f => current).inc(f => -1)
       end
 
       def resolve_target_position(field, target_position, in_list)

@@ -178,6 +178,34 @@ end
 To ensure the position is written correctly, you will need to set
 `cascade_callbacks: true` on the relation.
 
+### Transactions (Recommended)
+
+By default, Mongoid Orderable does not guarantee ordering consistency
+when doing multiple concurrent updates on documents. This means that
+instead of having positions `1, 2, 3, 4, 5`, you will likely end up
+with corrupted position data such as `1, 1, 4, 4, 6` when using this
+gem in real-world scenarios.
+
+To remedy this, this Mongoid Orderable can use MongoDB's native
+transaction functionality on database versions 4.0 and later. You may
+enable transactions on both the global and model configs:
+
+```ruby
+Mongoid::Orderable.configure do |config|
+  config.use_transactions = true       # default: false
+  config.transaction_max_retries = 10  # default: 10
+end
+
+class MyModel
+  orderable :position, use_transactions: false
+end
+```
+
+When two transactions are attempted at the same time, database-level
+failures may result and retries will be attempted. After
+`transaction_max_retries` has been exceeded, a
+`Mongoid::Orderable::Errors::TransactionFailed` error will be raised.
+
 ### Contributing
 
 Please fork the project on Github and raise a pull request including passing specs.
