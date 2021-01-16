@@ -191,7 +191,7 @@ describe Mongoid::Orderable do
 
       it 'simultaneous create and update' do
         newbie = SimpleOrderable.new
-        newbie.send(:add_to_list)
+        newbie.send(:orderable_apply_positions) { }
         expect(newbie.position).to eq(6)
         another = SimpleOrderable.create!
         expect(another.position).to eq(6)
@@ -203,7 +203,7 @@ describe Mongoid::Orderable do
 
       it 'parallel updates' do
         newbie = SimpleOrderable.new
-        newbie.send(:add_to_list)
+        newbie.send(:orderable_apply_positions) { }
         another = SimpleOrderable.create!
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
@@ -278,6 +278,63 @@ describe Mongoid::Orderable do
         expect(record2.previous_item).to eq(record1)
         expect(record1.previous_item).to eq(nil)
         expect(record5.next_item).to eq(nil)
+      end
+    end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
       end
     end
   end
@@ -412,6 +469,102 @@ describe Mongoid::Orderable do
         expect(record2.previous_item).to eq(record1)
         expect(record1.previous_item).to eq(nil)
         expect(record2.next_item).to eq(nil)
+      end
+    end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to a random scope', retry: 5 do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            record.update_attributes group_id: group_id
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.pluck(:position).sort
+        tally = result.tally
+        sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
+        expect(result.first).to eq(1)
+        expect(result.last).to be_in(2..5)
+        expect(sorted_tally.map(&:first).last).to eq tally.size
+        expect(sorted_tally.first.first).to eq 1
+        expect(sorted_tally.first.last).to be_in(1..3)
+      end
+
+      it 'should correctly move items to a random position and scope', retry: 5 do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            position = (1..5).to_a.sample
+            record.update_attributes group_id: group_id, move_to: position
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.pluck(:position).sort
+        tally = result.tally
+        sorted_tally = tally.sort_by {|i| [-i.last, i.first] }
+        expect(result.first).to eq(1)
+        expect(result.last).to be_in(2..5)
+        expect(sorted_tally.map(&:first).last).to eq tally.size
+        expect(sorted_tally.first.first).to eq 1
+        expect(sorted_tally.first.last).to be_in(1..3)
       end
     end
   end
