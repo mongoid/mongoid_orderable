@@ -12,7 +12,3 @@ when /\A7/
 else
   gem 'mongoid', version
 end
-
-group :test do
-  gem 'rubocop', '0.45.0'
-end
