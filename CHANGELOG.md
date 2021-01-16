@@ -24,11 +24,11 @@
 
 ### 4.1.0 (2014/3/19)
 
-* [#30](https://github.com/mongoid/mongoid_orderable/pull/30): Fix: reset a single column when `orderable_scope` changed instead of removing it from list - [@Bharat311](https://github.com/Bharat311).
+* [#30](https://github.com/mongoid/mongoid_orderable/pull/30): Fix: reset a single field when `orderable_scope` changed instead of removing it from list - [@Bharat311](https://github.com/Bharat311).
 * [#29](https://github.com/mongoid/mongoid_orderable/pull/29): Fix: incorrect position when orderable base is set - [@Bharat311](https://github.com/Bharat311).
 * [#28](https://github.com/mongoid/mongoid_orderable/pull/28): Inherited `orderable_configurations` - [@johnny-miyake](https://github.com/johnny-miyake).
 * [#27](https://github.com/mongoid/mongoid_orderable/pull/27): Allowed numeric string to specify a target position - [@johnny-miyake](https://github.com/johnny-miyake).
-* [#26](https://github.com/mongoid/mongoid_orderable/pull/26): Added support for multiple orderable columns - [@Bharat311](https://github.com/Bharat311).
+* [#26](https://github.com/mongoid/mongoid_orderable/pull/26): Added support for multiple orderable fields - [@Bharat311](https://github.com/Bharat311).
 * [#22](https://github.com/mongoid/mongoid_orderable/pull/22): Added lazy support for scopes with different foreign key names - [@dsci](https://github.com/dsci).
 * [#21](https://github.com/mongoid/mongoid_orderable/pull/21): Accounting for change in Mongoid's metadata API - [@pjkelly](https://github.com/pjkelly).
 * [#20](https://github.com/mongoid/mongoid_orderable/pull/20): Added next and previous item methods - [@mrjlynch](https://github.com/mrjlynch).

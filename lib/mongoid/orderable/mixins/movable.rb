@@ -5,18 +5,18 @@ module Orderable
 module Mixins
   module Movable
     def move_to!(target_position, options = {})
-      move_column_to target_position, options
+      move_field_to target_position, options
       save
     end
     alias insert_at! move_to!
 
     def move_to(target_position, options = {})
-      move_column_to target_position, options
+      move_field_to target_position, options
     end
     alias insert_at move_to
 
     def move_to=(target_position, options = {})
-      move_column_to target_position, options
+      move_field_to target_position, options
     end
     alias insert_at= move_to=
 
@@ -50,9 +50,9 @@ module Mixins
       @move_all || {}
     end
 
-    def move_column_to(position, options)
-      column = options[:column] || default_orderable_column
-      @move_all = move_all.merge(column => position)
+    def move_field_to(position, options)
+      field = options[:field] || default_orderable_field
+      @move_all = move_all.merge(field => position)
     end
   end
 end

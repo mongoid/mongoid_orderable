@@ -4,18 +4,20 @@ module Mongoid
 module Orderable
 module Configs
   class GlobalConfig
-    attr_accessor :column,
+    attr_accessor :field,
                   :index,
-                  :scope,
                   :base,
-                  :field_opts
+                  :field_opts,
+                  :use_transactions,
+                  :transaction_max_retries
 
     def initialize
-      self.column = :position
+      self.field = :position
       self.index = true
-      self.scope = nil
       self.base = 1
       self.field_opts = { type: Integer }
+      self.use_transactions = false
+      self.transaction_max_retries = 10
     end
   end
 end

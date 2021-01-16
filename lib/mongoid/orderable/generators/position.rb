@@ -4,20 +4,20 @@ module Mongoid
 module Orderable
 module Generators
   class Position < Base
-    def generate(column_name)
+    def generate(field_name)
       klass.class_eval <<~KLASS, __FILE__, __LINE__ + 1
-        def orderable_position(column = nil)
-          column ||= default_orderable_column
-          send "orderable_\#{column}_position"
+        def orderable_position(field = nil)
+          field ||= default_orderable_field
+          send "orderable_\#{field}_position"
         end
       KLASS
 
-      generate_method("orderable_#{column_name}_position") do
-        send column_name
+      generate_method("orderable_#{field_name}_position") do
+        send field_name
       end
 
-      generate_method("orderable_#{column_name}_position=") do |value|
-        send "#{column_name}=", value
+      generate_method("orderable_#{field_name}_position=") do |value|
+        send "#{field_name}=", value
       end
     end
   end
