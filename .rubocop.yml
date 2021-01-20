@@ -34,5 +34,8 @@ Style/Documentation:
 Style/DocumentDynamicEvalDefinition:
   Enabled: false
 
+Style/OptionalBooleanParameter:
+  Enabled: false
+
 Style/RaiseArgs:
   EnforcedStyle: compact

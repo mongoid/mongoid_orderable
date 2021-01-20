@@ -47,8 +47,8 @@ module Configs
 
     def set_field_options
       FIELD_OPTIONS.each do |key|
-        next unless options.key?(key)
-        @options[:field_opts][key] = options.delete(key)
+        next unless @options.key?(key)
+        @options[:field_opts][key] = @options.delete(key)
       end
     end
 
@@ -59,7 +59,7 @@ module Configs
       scope.map! do |value|
         case value
         when Symbol
-          relation = @orderable_class.relations[options[:scope].to_s]&.key&.to_sym
+          relation = @orderable_class.relations[@options[:scope].to_s]&.key&.to_sym
           relation || value
         when String
           value.to_sym
