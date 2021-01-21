@@ -29,7 +29,7 @@ module Orderable
     end
 
     def add_db_field
-      klass.field(config[:field], config[:field_opts])
+      klass.field(config[:field], { type: Integer }.reverse_merge(config[:field_opts]))
     end
 
     def add_db_index

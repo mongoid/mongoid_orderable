@@ -15,7 +15,7 @@ module Configs
       self.field = :position
       self.index = true
       self.base = 1
-      self.field_opts = { type: Integer }
+      self.field_opts = {}
       self.use_transactions = false
       self.transaction_max_retries = 10
     end
