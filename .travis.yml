@@ -21,12 +21,13 @@ before_install:
   - gem update bundler
 
 before_script:
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - 'echo "replication:" | sudo tee -a /etc/mongod.conf'
   - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
-  - sudo systemctl restart mongod
-  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - |
     mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  - sudo systemctl restart mongod
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - mongo -u root -p 12345 --eval 'rs.initiate()'
 
 after_script:
