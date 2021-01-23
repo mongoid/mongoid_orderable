@@ -112,8 +112,7 @@ module Orderable
              :persisted?,
              :embedded?,
              :collection_name,
-             to: :doc,
-             private: true
+             to: :doc
 
     def move_all
       doc.send(:move_all)
