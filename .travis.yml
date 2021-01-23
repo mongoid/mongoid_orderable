@@ -20,8 +20,10 @@ before_install:
 before_script:
   - "echo \"replication:\\n  replSetName: rs0\" | sudo tee -a /etc/mongod.conf"
   - "sudo service mongod restart"
+  - "sleep 15"
   - "mongo --eval 'rs.initiate({_id: \"rs0\", members: [{_id: 1, host: \"localhost:27017\"}]})'"
   - "mongo --eval 'rs.status()'"
+  - "sleep 15"
 
 matrix:
   fast_finish: true
