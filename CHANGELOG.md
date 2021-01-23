@@ -1,6 +1,14 @@
-### 5.2.1 (Next)
+### 6.0.1 (Next)
 
 * Your contribution here.
+
+### 6.0.0 (2021/01/23)
+
+* [#65](https://github.com/mongoid/mongoid_orderable/pull/65): Feature: Add transaction support with lock table - [@johnnyshields](https://github.com/johnnyshields).
+* [#62](https://github.com/mongoid/mongoid_orderable/pull/62): Feature: Allow scope parameter to be an Array - [@johnnyshields](https://github.com/johnnyshields).
+* [#62](https://github.com/mongoid/mongoid_orderable/pull/62): Refactor: rename "column" to "field" - [@johnnyshields](https://github.com/johnnyshields).
+* [#60](https://github.com/mongoid/mongoid_orderable/pull/60): Refactor: Drop support for Mongoid 6.x and lower - [@johnnyshields](https://github.com/johnnyshields).
+* [#60](https://github.com/mongoid/mongoid_orderable/pull/60): Refactor: Remove Mongoid Compatibility (no longer needed) - [@johnnyshields](https://github.com/johnnyshields).
 
 ### 5.2.0 (2018/05/01)
 

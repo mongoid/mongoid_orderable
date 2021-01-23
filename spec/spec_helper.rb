@@ -13,5 +13,8 @@ Mongoid::Config.belongs_to_required_by_default = false
 RSpec.configure do |config|
   config.before(:each) do
     Mongoid.purge!
+    Mongoid.models.each do |model|
+      model.create_indexes if model.name =~ /Mongoid::Orderable::Models/
+    end
   end
 end

@@ -17,12 +17,11 @@ env:
 before_install:
   - gem update bundler
 
-addons:
-  apt:
-    sources:
-      - mongodb-3.2-precise
-    packages:
-      - mongodb-org-server
+before_script:
+  - echo "replication:\n  replSetName: \"rs0\"" | sudo tee -a /etc/mongod.conf
+  - sudo service mongod restart
+  - mongo --eval 'rs.initiate({_id: "rs0", members: [{"_id":1, "host":"localhost:27017"}]})'
+  - mongo --eval 'rs.status()'
 
 matrix:
   fast_finish: true

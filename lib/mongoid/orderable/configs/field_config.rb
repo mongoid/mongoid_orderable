@@ -12,7 +12,8 @@ module Configs
                         index
                         default
                         use_transactions
-                        transaction_max_retries].freeze
+                        transaction_max_retries
+                        lock_collection].freeze
     ALIASES = { column: :field }.freeze
     FIELD_OPTIONS = %i[as].freeze
     VALID_OPTIONS = (CONFIG_OPTIONS | FIELD_OPTIONS).freeze
@@ -34,7 +35,8 @@ module Configs
         base: cfg.base,
         field_opts: cfg.field_opts.dup,
         use_transactions: cfg.use_transactions,
-        transaction_max_retries: cfg.transaction_max_retries }
+        transaction_max_retries: cfg.transaction_max_retries,
+        lock_collection: cfg.lock_collection }
     end
 
     protected

@@ -9,7 +9,8 @@ module Configs
                   :base,
                   :field_opts,
                   :use_transactions,
-                  :transaction_max_retries
+                  :transaction_max_retries,
+                  :lock_collection
 
     def initialize
       self.field = :position
@@ -18,6 +19,7 @@ module Configs
       self.field_opts = {}
       self.use_transactions = false
       self.transaction_max_retries = 10
+      self.lock_collection = :mongoid_orderable_locks
     end
   end
 end

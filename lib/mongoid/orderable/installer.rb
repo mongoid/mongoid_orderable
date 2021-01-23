@@ -56,6 +56,7 @@ module Orderable
       Generators::Movable.new(klass).generate(field_name)
       Generators::Listable.new(klass).generate(field_name)
       Generators::Helpers.new(klass).generate
+      Generators::LockCollection.new.generate(config[:lock_collection])
     end
   end
 end
