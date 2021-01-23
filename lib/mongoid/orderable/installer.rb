@@ -21,7 +21,7 @@ module Orderable
     protected
 
     def field_name
-      config[:field_opts][:as] || config[:field]
+      config[:field_options][:as] || config[:field]
     end
 
     def order_scope
@@ -29,7 +29,7 @@ module Orderable
     end
 
     def add_db_field
-      klass.field(config[:field], { type: Integer }.reverse_merge(config[:field_opts]))
+      klass.field(config[:field], { type: Integer }.reverse_merge(config[:field_options]))
     end
 
     def add_db_index

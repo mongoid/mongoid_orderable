@@ -31,9 +31,9 @@ module Configs
     def global_config
       cfg = Mongoid::Orderable.config
       { field: cfg.field,
+        as: cfg.as,
         index: cfg.index,
         base: cfg.base,
-        field_opts: cfg.field_opts.dup,
         use_transactions: cfg.use_transactions,
         transaction_max_retries: cfg.transaction_max_retries,
         lock_collection: cfg.lock_collection }
@@ -44,13 +44,14 @@ module Configs
     def assign_options(options)
       @options = global_config
       return unless options.is_a?(Hash)
-      @options.merge! options.symbolize_keys.transform_keys {|k| ALIASES[k] || k }.slice(*VALID_OPTIONS)
+      @options = @options.merge(options.symbolize_keys.transform_keys {|k| ALIASES[k] || k }).slice(*VALID_OPTIONS)
     end
 
     def set_field_options
+      @options[:field_options] = {}
       FIELD_OPTIONS.each do |key|
         next unless @options.key?(key)
-        @options[:field_opts][key] = @options.delete(key)
+        @options[:field_options][key] = @options.delete(key)
       end
     end
 

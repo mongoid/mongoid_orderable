@@ -7,6 +7,7 @@
 * [#65](https://github.com/mongoid/mongoid_orderable/pull/65): Feature: Add transaction support with lock table - [@johnnyshields](https://github.com/johnnyshields).
 * [#62](https://github.com/mongoid/mongoid_orderable/pull/62): Feature: Allow scope parameter to be an Array - [@johnnyshields](https://github.com/johnnyshields).
 * [#65](https://github.com/mongoid/mongoid_orderable/pull/65): Feature: Avoid calling position function if neither position nor scope is changing - [@johnnyshields](https://github.com/johnnyshields).
+* [#65](https://github.com/mongoid/mongoid_orderable/pull/65): Feature: Add global configurability - [@johnnyshields](https://github.com/johnnyshields).
 * [#65](https://github.com/mongoid/mongoid_orderable/pull/65): Fix: Do not run embedded destroy callbacks when the root object has been destroyed - [@johnnyshields](https://github.com/johnnyshields).
 * [#62](https://github.com/mongoid/mongoid_orderable/pull/62): Refactor: rename "column" to "field" - [@johnnyshields](https://github.com/johnnyshields).
 * [#60](https://github.com/mongoid/mongoid_orderable/pull/60): Refactor: Drop support for Mongoid 6.x and lower - [@johnnyshields](https://github.com/johnnyshields).
