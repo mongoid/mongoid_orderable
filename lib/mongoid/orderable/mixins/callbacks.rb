@@ -10,7 +10,7 @@ module Mixins
 
     included do
       around_save :orderable_update_positions
-      after_destroy :orderable_remove_positions
+      after_destroy :orderable_remove_positions, unless: -> { embedded? && _root.destroyed? }
 
       delegate :update_positions,
                :remove_positions,
