@@ -11,6 +11,7 @@ rvm:
   - 2.7.2
 
 env:
+  - MONGODB=4.4.3
   - MONGOID_VERSION=HEAD
   - MONGOID_VERSION=7
 
@@ -18,16 +19,27 @@ before_install:
   - gem update bundler
 
 before_script:
-  - sleep 15
-  - |
-    mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  - wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-${MONGODB}.tgz -O /tmp/mongodb.tgz
+  - tar xfz /tmp/mongodb.tgz
+  - export PATH=${PWD}/mongodb-linux-x86_64-${MONGODB}/bin:$PATH
+  - export MONGODB_DIR=${PWD}/mongodb-linux-x86_64-${MONGODB}
+  - mkdir $MONGODB_DIR/data
   - 'echo "replication:" | sudo tee -a /etc/mongod.conf'
   - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
-  - sudo systemctl restart mongod
-  - sleep 20
-  - mongo -u root -p 12345 --eval 'rs.initiate()'
+  - $MONGODB_DIR/bin/mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  - |
+    $MONGODB_DIR/bin/mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  - $MONGODB_DIR/bin/mongo -u root -p 12345 --eval 'rs.initiate()'
+
+  # When Travis uses MongoDB 4.4 by default, switch to this script:
+  # - 'echo "replication:" | sudo tee -a /etc/mongod.conf'
+  # - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
+  # - sudo systemctl restart mongod
+  # - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   # - |
-  #   mongo -u root -p 12345 --eval 'rs.initiate({_id: "rs0", members: [{_id: 1, host: "localhost:27017"}]})'
+  #   mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  # - mongo -u root -p 12345 --eval 'rs.initiate()'
 
 matrix:
   fast_finish: true
