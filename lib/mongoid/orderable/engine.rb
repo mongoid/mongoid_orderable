@@ -14,13 +14,17 @@ module Orderable
     # For new records, or if the orderable scope changes,
     # we must yield the save action inside the transaction.
     def update_positions(&_block)
+      yield and return unless orderable_keys.any? {|field| changed?(field) }
+
       any_scope_changed = false
       with_transaction do
         any_scope_changed = orderable_keys.map do |field|
           apply_one_position(field, move_all[field])
         end.any? || new_record?
+
         yield if any_scope_changed
       end
+
       yield unless any_scope_changed
     end
 
@@ -35,6 +39,8 @@ module Orderable
     #         Document#save must be performed transactionally.
     # - false: Document#save does not need to be performed transactionally.
     def apply_one_position(field, target_position)
+      return unless changed?(field)
+
       set_lock(field) if use_transactions && !embedded?
 
       f = orderable_field(field)
@@ -136,6 +142,13 @@ module Orderable
       target_position
     end
 
+    def changed?(field)
+      return true if new_record? || !doc.send(orderable_field(field)) || move_all[field]
+      ([orderable_field(field)] | orderable_scope(field).selector.keys).any? do |f|
+        doc.send("#{doc.fields[f]&.options&.[](:as) || f}_changed?")
+      end
+    end
+
     def set_lock(field, scope_changed = false)
       return unless use_transactions && !embedded?
       model_name = doc.class.orderable_configs[field][:lock_collection].to_s.singularize.classify
@@ -160,7 +173,7 @@ module Orderable
 
     def with_transaction(&_block)
       Mongoid::QueryCache.uncached do
-        if use_transactions && !Thread.current[ORDERABLE_TRANSACTION_KEY]
+        if use_transactions && !embedded? && !Thread.current[ORDERABLE_TRANSACTION_KEY]
           Thread.current[ORDERABLE_TRANSACTION_KEY] = true
           retries = transaction_max_retries
           begin

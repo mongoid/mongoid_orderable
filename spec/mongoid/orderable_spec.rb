@@ -127,7 +127,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      SimpleOrderable.all.map(&:position).sort
+      SimpleOrderable.pluck(:position).sort
     end
 
     it 'should have proper position field' do
@@ -702,7 +702,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      ZeroBasedOrderable.all.map(&:position).sort
+      ZeroBasedOrderable.pluck(:position).sort
     end
 
     it 'should have a orderable base of 0' do
@@ -906,7 +906,7 @@ describe Mongoid::Orderable do
     end
 
     context 'default orderable' do
-      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.pluck(:serial_no).sort }
 
       describe 'inserting' do
         let(:newbie) { MultipleFieldsOrderable.create! }
@@ -1021,7 +1021,7 @@ describe Mongoid::Orderable do
     end
 
     context 'serial_no orderable' do
-      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.pluck(:serial_no).sort }
 
       it 'should have proper serial_no field' do
         expect(MultipleFieldsOrderable.fields.key?('serial_no')).to be true
@@ -1170,7 +1170,7 @@ describe Mongoid::Orderable do
     end
 
     context 'position orderable' do
-      let(:positions) { MultipleFieldsOrderable.all.map(&:position).sort }
+      let(:positions) { MultipleFieldsOrderable.pluck(:position).sort }
 
       it 'should not have default position field' do
         expect(MultipleFieldsOrderable.fields).not_to have_key('position')
