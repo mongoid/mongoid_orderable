@@ -12,8 +12,6 @@ module Mixins
       self.class.orderable_configs.detect {|_c, conf| conf[:default] }.try(:first) || orderable_keys.first
     end
 
-    private
-
     def orderable_scope(field = nil)
       field ||= default_orderable_field
 
