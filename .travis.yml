@@ -11,9 +11,11 @@ rvm:
   - 2.7.2
 
 env:
-  - MONGODB=4.4.3
-  - MONGOID_VERSION=HEAD
-  - MONGOID_VERSION=7
+  global:
+    - MONGODB=4.4.3
+  jobs:
+    - MONGOID_VERSION=7
+    - MONGOID_VERSION=HEAD
 
 before_install:
   - gem update bundler
