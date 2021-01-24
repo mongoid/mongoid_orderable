@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Mongoid::Orderable do
   Mongoid::Orderable.configure do |c|
     c.use_transactions = true
-    c.transaction_max_retries = 40
+    c.transaction_max_retries = 100
     c.lock_collection = :foo_bar_locks
   end
 
