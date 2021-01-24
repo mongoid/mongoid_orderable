@@ -16,16 +16,13 @@ module Orderable
     def update_positions(&_block)
       yield and return unless orderable_keys.any? {|field| changed?(field) }
 
-      any_scope_changed = false
+      new_record = new_record?
       with_transaction do
-        any_scope_changed = orderable_keys.map do |field|
-          apply_one_position(field, move_all[field])
-        end.any? || new_record?
-
-        yield if any_scope_changed
+        orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
+        yield if new_record
       end
 
-      yield unless any_scope_changed
+      yield unless new_record
     end
 
     def remove_positions
@@ -34,10 +31,6 @@ module Orderable
       end
     end
 
-    # Returns boolean value as follows:
-    # - true: The document is persisted and its orderable scope was changed.
-    #         Document#save must be performed transactionally.
-    # - false: Document#save does not need to be performed transactionally.
     def apply_one_position(field, target_position)
       return unless changed?(field)
 
@@ -70,7 +63,7 @@ module Orderable
 
       # Return if there is no instruction to change the position
       in_list = persisted? && current
-      return false if in_list && !target_position
+      return if in_list && !target_position
 
       # Use $inc operator to shift the position of the other documents
       target = resolve_target_position(field, target_position, in_list)
@@ -83,12 +76,8 @@ module Orderable
       end
 
       # If persisted, update the field in the database atomically
-      doc.set(f => target) if persisted? && !embedded?
+      doc.set({ f => target }.merge(changed_scope_hash(field))) if use_transactions && persisted? && !embedded?
       doc.send("orderable_#{field}_position=", target)
-
-      # Return value indicates whether Document#save must be
-      # performed transactionally
-      scope_changed
     end
 
     def remove_one_position(field)
@@ -143,8 +132,22 @@ module Orderable
 
     def changed?(field)
       return true if new_record? || !doc.send(orderable_field(field)) || move_all[field]
-      ([orderable_field(field)] | orderable_scope(field).selector.keys).any? do |f|
-        doc.send("#{doc.fields[f]&.options&.[](:as) || f}_changed?")
+      changeable_keys(field).any? {|f| doc.send("#{f}_changed?") }
+    end
+
+    def changeable_keys(field)
+      [orderable_field(field)] | scope_keys(field)
+    end
+
+    def scope_keys(field)
+      orderable_scope(field).selector.keys.map do |f|
+        doc.fields[f]&.options&.[](:as) || f
+      end
+    end
+
+    def changed_scope_hash(field)
+      scope_keys(field).each_with_object({}) do |f, hash|
+        hash[f] = doc.send(f) if doc.send("#{f}_changed?")
       end
     end
 
