@@ -34,6 +34,9 @@ Style/Documentation:
 Style/DocumentDynamicEvalDefinition:
   Enabled: false
 
+Style/DoubleNegation:
+  Enabled: false
+
 Style/OptionalBooleanParameter:
   Enabled: false
 
