@@ -35,8 +35,7 @@ before_script:
     mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
   - pkill mongod
   - mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
-  - sleep 15
-  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  - sleep 20
   - mongo -u root -p 12345 --eval 'rs.initiate()'
 
   # When Travis uses MongoDB 4.4 by default, switch to this script:
