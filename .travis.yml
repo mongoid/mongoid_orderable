@@ -33,7 +33,7 @@ before_script:
   - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
   - |
     mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
-  - mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
+  - mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --replSet rs0 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
   - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
   - mongo -u root -p 12345 --eval 'rs.initiate()'
 
