@@ -11,6 +11,7 @@ Mongoid::Orderable is a ordered list implementation for your Mongoid 7+ projects
 * Uses MongoDB's `$inc` operator to batch-update position.
 * Supports scope for position index, including changing scopes.
 * Supports multiple position indexes on the same document.
+* (Optional) Uses [MongoDB transactions](https://docs.mongodb.com/manual/core/transactions/) to ensure order integrity during concurrent updates.
 
 ### Version Support
 
@@ -21,6 +22,8 @@ As of version 6.0.0, Mongoid::Orderable supports the following dependency versio
 * Rails 5.2+
 
 For older versions, please use Mongoid::Orderable 5.x and earlier.
+
+Transaction support requires MongoDB 4.2+ (4.4+ recommended.)
 
 ## Usage
 
@@ -51,7 +54,7 @@ class MyModel
   orderable scope: 'drawer', field: :pos
 
   # scope can also be a proc
-  orderable scope: lambda { |document| where(group_id: document.group_id) }
+  orderable scope: ->(doc) { where(group_id: doc.group_id) }
 
   # this one if you want specify indexes manually
   orderable index: false 
@@ -140,9 +143,9 @@ When a model defines multiple orderable fields, the original helpers are also av
 ```ruby
   @book1 = Book.create!
   @book2 = Book.create!
-  @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
+  @book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
   @book2.move_to! :top   # this will change the :position of the book to 0 (not serial_no)
-  @book2                 => #<Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
+  @book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
 ```
 
 To specify any other orderable field as default pass the **default: true** option with orderable.
@@ -178,12 +181,76 @@ end
 To ensure the position is written correctly, you will need to set
 `cascade_callbacks: true` on the relation.
 
+## Transaction Support
+
+By default, Mongoid Orderable does not guarantee ordering consistency
+when doing multiple concurrent updates on documents. This means that
+instead of having positions `1, 2, 3, 4, 5`, after running your system
+in production at scale your position data will become corrupted, e.g.
+`1, 1, 4, 4, 6`. To remedy this, this Mongoid Orderable can use
+[MongoDB transactions](https://docs.mongodb.com/manual/core/transactions/)
+
+### Prerequisites
+
+* MongoDB version 4.2+ (4.4+ recommended.)
+* Requires [MongoDB Replica Set](https://docs.mongodb.com/manual/tutorial/deploy-replica-set/) topology
+
+### Configuration
+
+You may enable transactions on both the global and model configs:
+
+```ruby
+Mongoid::Orderable.configure do |config|
+  config.use_transactions = true       # default: false
+  config.transaction_max_retries = 10  # default: 10
+end
+
+class MyModel
+  orderable :position, use_transactions: false
+end
+```
+
+When two transactions are attempted at the same time, database-level
+`WriteConflict` failures may result and retries will be attempted.
+After `transaction_max_retries` has been exceeded, a
+`Mongoid::Orderable::Errors::TransactionFailed` error will be raised.
+
+### Locks
+
+When using transactions, Mongoid Orderable creates a collection
+`mongoid_orderable_locks` which is used to store temporary lock objects.
+This collection accumulate documents overtime; it is safe to delete it periodically.
+
+You can change the lock collection name globally or per model:
+
+```ruby
+Mongoid::Orderable.configure do |config|
+  config.lock_collection = "my_locks"  # default: "mongoid_orderable_locks"
+end
+
+class MyModel
+  orderable :position, lock_collection: "my_model_locks"
+end
+```
+
+### MongoDB 4.2 Support
+
+In MongoDB 4.2, collections cannot be created within transactions.
+Therefore, you will need to manually run the following command once
+to initialize the lock collection:
+
+```ruby
+Mongoid::Orderable::Models::Lock.create!
+```
+
+This step is not necessary when using MongoDB 4.4+.
+
 ### Contributing
 
 Please fork the project on Github and raise a pull request including passing specs.
 
 ### Copyright & License
 
-Copyright (c) 2011 Arkadiy Zabazhanov & contributors.
+Copyright (c) 2011 Arkadiy Zabazhanov, Johnny Shields, and contributors.
 
 MIT license, see [LICENSE](LICENSE.txt) for details.

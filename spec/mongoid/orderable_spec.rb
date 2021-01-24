@@ -1,6 +1,12 @@
 require 'spec_helper'
 
 describe Mongoid::Orderable do
+  Mongoid::Orderable.configure do |c|
+    c.use_transactions = true
+    c.transaction_max_retries = 100
+    c.lock_collection = :foo_bar_locks
+  end
+
   class SimpleOrderable
     include Mongoid::Document
     include Mongoid::Orderable
@@ -121,7 +127,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      SimpleOrderable.all.map(&:position).sort
+      SimpleOrderable.pluck(:position).sort
     end
 
     it 'should have proper position field' do
@@ -191,7 +197,7 @@ describe Mongoid::Orderable do
 
       it 'simultaneous create and update' do
         newbie = SimpleOrderable.new
-        newbie.send(:add_to_list)
+        newbie.send(:orderable_update_positions) { }
         expect(newbie.position).to eq(6)
         another = SimpleOrderable.create!
         expect(another.position).to eq(6)
@@ -203,7 +209,7 @@ describe Mongoid::Orderable do
 
       it 'parallel updates' do
         newbie = SimpleOrderable.new
-        newbie.send(:add_to_list)
+        newbie.send(:orderable_update_positions) { }
         another = SimpleOrderable.create!
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
@@ -278,6 +284,127 @@ describe Mongoid::Orderable do
         expect(record2.previous_item).to eq(record1)
         expect(record1.previous_item).to eq(nil)
         expect(record5.next_item).to eq(nil)
+      end
+    end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      it 'should correctly insert at the top' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!(move_to: :top)
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
+      it 'should correctly insert at the bottom' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
+      it 'should correctly insert at a random position' do
+        20.times.map do
+          Thread.new do
+            SimpleOrderable.create!(move_to: (1..10).to_a.sample)
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq((1..25).to_a)
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = SimpleOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(SimpleOrderable.pluck(:position).sort).to eq([1, 2, 3, 4, 5])
+      end
+
+      context 'empty database' do
+        before { SimpleOrderable.delete_all }
+
+        it 'should correctly insert at the top' do
+          20.times.map do
+            Thread.new do
+              SimpleOrderable.create!(move_to: :top)
+            end
+          end.each(&:join)
+
+          expect(SimpleOrderable.pluck(:position).sort).to eq((1..20).to_a)
+        end
+
+        it 'should correctly insert at the bottom' do
+          20.times.map do
+            Thread.new do
+              SimpleOrderable.create!
+            end
+          end.each(&:join)
+
+          expect(SimpleOrderable.pluck(:position).sort).to eq((1..20).to_a)
+        end
+
+        it 'should correctly insert at a random position' do
+          20.times.map do
+            Thread.new do
+              SimpleOrderable.create!(move_to: (1..10).to_a.sample)
+            end
+          end.each(&:join)
+
+          expect(SimpleOrderable.pluck(:position).sort).to eq((1..20).to_a)
+        end
       end
     end
   end
@@ -414,6 +541,103 @@ describe Mongoid::Orderable do
         expect(record2.next_item).to eq(nil)
       end
     end
+
+    describe 'concurrency' do
+      it 'should correctly move items to top' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :top
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to bottom' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :bottom
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items higher' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :higher
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items lower' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: :lower
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      it 'should correctly move items to a random position' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            record.update_attributes move_to: (1..5).to_a.sample
+          end
+        end.each(&:join)
+
+        expect(ScopedOrderable.pluck(:position).sort).to eq([1, 1, 2, 2, 3])
+      end
+
+      # This spec fails randomly
+      it 'should correctly move items to a random scope', retry: 5 do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            record.update_attributes group_id: group_id
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.all.to_a.each_with_object({}) do |obj, hash|
+          hash[obj.group_id] ||= []
+          hash[obj.group_id] << obj.position
+        end
+
+        result.values.each do |ary|
+          expect(ary.sort).to eq((1..(ary.size)).to_a)
+        end
+      end
+
+      it 'should correctly move items to a random position and scope' do
+        20.times.map do
+          Thread.new do
+            record = ScopedOrderable.all.sample
+            group_id = ([1, 2, 3] - [record.group_id]).sample
+            position = (1..5).to_a.sample
+            record.update_attributes group_id: group_id, move_to: position
+          end
+        end.each(&:join)
+
+        result = ScopedOrderable.all.to_a.each_with_object({}) do |obj, hash|
+          hash[obj.group_id] ||= []
+          hash[obj.group_id] << obj.position
+        end
+
+        result.values.each do |ary|
+          expect(ary.sort).to eq((1..(ary.size)).to_a)
+        end
+      end
+    end
   end
 
   describe StringScopedOrderable do
@@ -479,7 +703,7 @@ describe Mongoid::Orderable do
     end
 
     def positions
-      ZeroBasedOrderable.all.map(&:position).sort
+      ZeroBasedOrderable.pluck(:position).sort
     end
 
     it 'should have a orderable base of 0' do
@@ -683,7 +907,7 @@ describe Mongoid::Orderable do
     end
 
     context 'default orderable' do
-      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.pluck(:serial_no).sort }
 
       describe 'inserting' do
         let(:newbie) { MultipleFieldsOrderable.create! }
@@ -798,7 +1022,7 @@ describe Mongoid::Orderable do
     end
 
     context 'serial_no orderable' do
-      let(:serial_nos) { MultipleFieldsOrderable.all.map(&:serial_no).sort }
+      let(:serial_nos) { MultipleFieldsOrderable.pluck(:serial_no).sort }
 
       it 'should have proper serial_no field' do
         expect(MultipleFieldsOrderable.fields.key?('serial_no')).to be true
@@ -947,7 +1171,7 @@ describe Mongoid::Orderable do
     end
 
     context 'position orderable' do
-      let(:positions) { MultipleFieldsOrderable.all.map(&:position).sort }
+      let(:positions) { MultipleFieldsOrderable.pluck(:position).sort }
 
       it 'should not have default position field' do
         expect(MultipleFieldsOrderable.fields).not_to have_key('position')

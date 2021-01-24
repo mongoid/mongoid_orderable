@@ -12,8 +12,6 @@ module Mixins
       self.class.orderable_configs.detect {|_c, conf| conf[:default] }.try(:first) || orderable_keys.first
     end
 
-    private
-
     def orderable_scope(field = nil)
       field ||= default_orderable_field
 
@@ -28,12 +26,12 @@ module Mixins
       !orderable_scope(field).where(_id: _id).exists?
     end
 
-    def orderable_bottom(field = nil)
+    def orderable_bottom(field = nil, in_list = true)
       field ||= default_orderable_field
       f = orderable_field(field)
       max = orderable_scope(field).ne(f => nil).max(f)
       return orderable_top(field) unless max
-      in_list?(field) ? max : max.next
+      in_list ? max : max.next
     end
   end
 end

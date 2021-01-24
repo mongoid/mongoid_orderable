@@ -2,7 +2,7 @@
 
 module Mongoid
   module Orderable
-    LOCK = Mutex.new
+    MUTEX = Mutex.new
 
     class << self
       def configure
@@ -10,7 +10,7 @@ module Mongoid
       end
 
       def config
-        @config || LOCK.synchronize { @config = ::Mongoid::Orderable::Configs::GlobalConfig.new }
+        @config || MUTEX.synchronize { @config = ::Mongoid::Orderable::Configs::GlobalConfig.new }
       end
     end
 

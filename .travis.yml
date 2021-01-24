@@ -11,18 +11,45 @@ rvm:
   - 2.7.2
 
 env:
-  - MONGOID_VERSION=HEAD
-  - MONGOID_VERSION=7
+  global:
+    - MONGODB=4.4.3
+  jobs:
+    - MONGOID_VERSION=7
+    - MONGOID_VERSION=HEAD
 
 before_install:
   - gem update bundler
 
-addons:
-  apt:
-    sources:
-      - mongodb-3.2-precise
-    packages:
-      - mongodb-org-server
+before_script:
+  - sudo systemctl stop mongod
+  - wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-${MONGODB}.tgz -O /tmp/mongodb.tgz
+  - tar xzf /tmp/mongodb.tgz
+  - export MONGODB_DIR=${PWD}/mongodb-linux-x86_64-ubuntu1604-${MONGODB}
+  - export PATH=$MONGODB_DIR/bin:$PATH
+  - mkdir $MONGODB_DIR/data
+  - mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
+  - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  - 'echo "replication:" | sudo tee -a /etc/mongod.conf'
+  - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
+  - |
+    mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  - pkill mongod
+  - mongod --dbpath $MONGODB_DIR/data --bind_ip 127.0.0.1 --config /etc/mongod.conf --logpath $MONGODB_DIR/mongod.log &> /dev/null &
+  - sleep 20
+  - mongo -u root -p 12345 --eval 'rs.initiate()'
+
+  # When Travis uses MongoDB 4.4 by default, switch to this script:
+  # - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  # - 'echo "replication:" | sudo tee -a /etc/mongod.conf'
+  # - 'echo "  replSetName: rs0" | sudo tee -a /etc/mongod.conf'
+  # - |
+  #   mongo admin --eval 'db.createUser({ user: "root", pwd: "12345", roles: [{ role: "root", db: "admin" }] })'
+  # - sudo systemctl restart mongod
+  # - until nc -z localhost 27017; do echo Waiting for MongoDB; sleep 1; done
+  # - mongo -u root -p 12345 --eval 'rs.initiate()'
+
+after_script:
+  - pkill mongod
 
 matrix:
   fast_finish: true
