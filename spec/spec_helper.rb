@@ -1,6 +1,7 @@
 require 'bundler'
 Bundler.require
 require 'rspec'
+require 'rspec/retry'
 
 Mongoid.configure do |config|
   config.connect_to 'mongoid_orderable_test'
