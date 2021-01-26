@@ -180,11 +180,13 @@ module Orderable
           retries = transaction_max_retries
           begin
             doc.class.with_session(causal_consistency: true) do |session|
-              session.start_transaction(read: { mode: :primary },
-                                        read_concern: { level: 'majority' },
-                                        write_concern: { w: 'majority' })
-              yield
-              session.commit_transaction
+              doc.class.with(read: { mode: :primary }) do
+                session.start_transaction(read: { mode: :primary },
+                                          read_concern: { level: 'majority' },
+                                          write_concern: { w: 'majority' })
+                yield
+                session.commit_transaction
+              end
             end
           rescue Mongo::Error::OperationFailure => e
             sleep(0.001)

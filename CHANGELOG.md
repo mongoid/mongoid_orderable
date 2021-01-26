@@ -1,6 +1,10 @@
-### 6.0.1 (Next)
+### 6.0.2 (Next)
 
 * Your contribution here.
+
+### 6.0.1 (2021/01/26)
+
+* [#69](https://github.com/mongoid/mongoid_orderable/pull/69): Fix: Transactions should force read from primary - [@johnnyshields](https://github.com/johnnyshields).
 
 ### 6.0.0 (2021/01/23)
 
