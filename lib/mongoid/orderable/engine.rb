@@ -16,10 +16,16 @@ module Orderable
     def update_positions(&_block)
       yield and return unless orderable_keys.any? {|field| changed?(field) }
 
-      new_record = new_record?
+      new_record = new_record? && !embedded?
+      if new_record
+        with_transaction do
+          orderable_keys.each {|field| doc.send("orderable_#{field}_position=", nil) }
+        end
+        yield
+      end
+
       with_transaction do
         orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
-        yield if new_record
       end
 
       yield unless new_record
@@ -179,7 +185,8 @@ module Orderable
           Thread.current[ORDERABLE_TRANSACTION_KEY] = true
           retries = transaction_max_retries
           begin
-            doc.class.with_session(causal_consistency: true) do |session|
+            doc.class.with_session(read: { mode: :primary },
+                                   causal_consistency: true) do |session|
               doc.class.with(read: { mode: :primary }) do
                 session.start_transaction(read: { mode: :primary },
                                           read_concern: { level: 'majority' },
