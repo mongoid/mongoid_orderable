@@ -197,7 +197,7 @@ describe Mongoid::Orderable do
 
       it 'simultaneous create and update' do
         newbie = SimpleOrderable.new
-        newbie.send(:orderable_update_positions) { }
+        newbie.send(:orderable_before_update) { }
         expect(newbie.position).to eq(6)
         another = SimpleOrderable.create!
         expect(another.position).to eq(6)
@@ -209,7 +209,7 @@ describe Mongoid::Orderable do
 
       it 'parallel updates' do
         newbie = SimpleOrderable.new
-        newbie.send(:orderable_update_positions) { }
+        newbie.send(:orderable_before_update) { }
         another = SimpleOrderable.create!
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])

@@ -2,38 +2,67 @@
 
 module Mongoid
 module Orderable
-  class Engine
-    ORDERABLE_TRANSACTION_KEY = :__mongoid_orderable_in_txn
-
-    attr_accessor :doc
+module Handlers
+  class Document
+    attr_reader :doc
 
     def initialize(doc)
       @doc = doc
     end
 
-    # For new records, or if the orderable scope changes,
-    # we must yield the save action inside the transaction.
-    def update_positions(&_block)
-      yield and return unless orderable_keys.any? {|field| changed?(field) }
-
-      new_record = new_record? && !embedded?
-      if new_record
-        with_transaction do
-          orderable_keys.each {|field| doc.send("orderable_#{field}_position=", nil) }
-        end
-        yield
-      end
-
-      with_transaction do
-        orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
-      end
-
-      yield unless new_record
+    def before_create
+      clear_all_positions
     end
 
-    def remove_positions
+    def after_create
+      apply_all_positions
+    end
+
+    def before_update
+      return unless orderable_keys.any? {|field| changed?(field) }
+      apply_all_positions
+    end
+
+    def after_destroy
       orderable_keys.each do |field|
         remove_one_position(field)
+      end
+    end
+
+    def remove_one_position(field)
+      f = orderable_field(field)
+      current = orderable_position(field)
+      set_lock(field) if use_transactions && !embedded?
+      orderable_scope(field).gt(f => current).inc(f => -1)
+    end
+
+    protected
+
+    delegate :orderable_keys,
+             :orderable_field,
+             :orderable_position,
+             :orderable_scope,
+             :orderable_scope_changed?,
+             :orderable_top,
+             :orderable_bottom,
+             :_id,
+             :new_record?,
+             :persisted?,
+             :embedded?,
+             :collection_name,
+             to: :doc
+
+    def with_transaction(&block)
+      Mongoid::Orderable::Handlers::Transactional.new(doc).with_transaction(&block)
+    end
+
+    def clear_all_positions
+      orderable_keys.each {|field| doc.send("orderable_#{field}_position=", nil) }
+    end
+
+    def apply_all_positions
+      with_transaction do
+        orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
       end
     end
 
@@ -86,29 +115,6 @@ module Orderable
       doc.send("orderable_#{field}_position=", target)
     end
 
-    def remove_one_position(field)
-      f = orderable_field(field)
-      current = orderable_position(field)
-      set_lock(field) if use_transactions && !embedded?
-      orderable_scope(field).gt(f => current).inc(f => -1)
-    end
-
-    protected
-
-    delegate :orderable_keys,
-             :orderable_field,
-             :orderable_position,
-             :orderable_scope,
-             :orderable_scope_changed?,
-             :orderable_top,
-             :orderable_bottom,
-             :_id,
-             :new_record?,
-             :persisted?,
-             :embedded?,
-             :collection_name,
-             to: :doc
-
     def move_all
       doc.send(:move_all)
     end
@@ -157,57 +163,28 @@ module Orderable
       end
     end
 
-    def set_lock(field, scope_changed = false)
+    def set_lock(field, generic = false)
       return unless use_transactions && !embedded?
       model_name = doc.class.orderable_configs[field][:lock_collection].to_s.singularize.classify
       model = Mongoid::Orderable::Models.const_get(model_name)
-      attrs = lock_scope(field, scope_changed)
+      attrs = lock_scope(field, generic)
       model.where(attrs).find_one_and_update(attrs, { upsert: true })
     end
 
-    def lock_scope(field, scope_changed = false)
+    def lock_scope(field, generic = false)
       sel = orderable_scope(field).selector
-      scope = ([collection_name] + (scope_changed ? sel.keys : sel.to_a.flatten)).map(&:to_s).join('|')
+      scope = ([collection_name] + (generic ? [field] : sel.to_a.flatten)).map(&:to_s).join('|')
       { scope: scope }
     end
 
     def use_transactions
-      orderable_keys.any? {|k| doc.class.orderable_configs[k][:use_transactions] }
+      !doc.embedded? && all_configs(:use_transactions).any?
     end
 
-    def transaction_max_retries
-      orderable_keys.map {|k| doc.class.orderable_configs[k][:transaction_max_retries] }.compact.max
-    end
-
-    def with_transaction(&_block)
-      Mongoid::QueryCache.uncached do
-        if use_transactions && !embedded? && !Thread.current[ORDERABLE_TRANSACTION_KEY]
-          Thread.current[ORDERABLE_TRANSACTION_KEY] = true
-          retries = transaction_max_retries
-          begin
-            doc.class.with_session(read: { mode: :primary },
-                                   causal_consistency: true) do |session|
-              doc.class.with(read: { mode: :primary }) do
-                session.start_transaction(read: { mode: :primary },
-                                          read_concern: { level: 'majority' },
-                                          write_concern: { w: 'majority' })
-                yield
-                session.commit_transaction
-              end
-            end
-          rescue Mongo::Error::OperationFailure => e
-            sleep(0.001)
-            retries -= 1
-            retry if retries >= 0
-            raise Mongoid::Orderable::Errors::TransactionFailed.new(e)
-          ensure
-            Thread.current[ORDERABLE_TRANSACTION_KEY] = nil
-          end
-        else
-          yield
-        end
-      end
+    def all_configs(key)
+      doc.orderable_keys.map {|k| doc.class.orderable_configs.dig(k, key) }
     end
   end
+end
 end
 end
