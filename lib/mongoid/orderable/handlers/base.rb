@@ -26,8 +26,8 @@ module Handlers
              :collection_name,
              to: :doc
 
-    def with_transaction(&block)
-      Mongoid::Orderable::Handlers::Transaction.new(doc).with_transaction(&block)
+    def use_transactions
+      false
     end
 
     def any_field_changed?
@@ -35,9 +35,7 @@ module Handlers
     end
 
     def apply_all_positions
-      with_transaction do
-        orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
-      end
+      orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
     end
 
     def apply_one_position(field, target_position)
@@ -162,14 +160,6 @@ module Handlers
       sel = orderable_scope(field).selector
       scope = ([collection_name] + (generic ? [field] : sel.to_a.flatten)).map(&:to_s).join('|')
       { scope: scope }
-    end
-
-    def use_transactions
-      !doc.embedded? && all_configs(:use_transactions).any?
-    end
-
-    def all_configs(key)
-      doc.orderable_keys.map {|k| doc.class.orderable_configs.dig(k, key) }
     end
   end
 end

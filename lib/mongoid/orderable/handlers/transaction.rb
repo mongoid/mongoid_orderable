@@ -17,7 +17,7 @@ module Handlers
 
     def with_transaction(&block)
       Mongoid::QueryCache.uncached do
-        if use_transactions && !Thread.current[THREAD_KEY]
+        if !Thread.current[THREAD_KEY]
           Thread.current[THREAD_KEY] = true
           retries = transaction_max_retries
           begin
@@ -37,14 +37,6 @@ module Handlers
     end
 
     protected
-
-    def use_transactions
-      !doc.embedded? && all_configs(:use_transactions).any?
-    end
-
-    def transaction_max_retries
-      all_configs(:transaction_max_retries).compact.max
-    end
 
     def do_transaction(&_block)
       doc.class.with_session(session_opts) do |session|
@@ -71,8 +63,8 @@ module Handlers
         write_concern: { w: 'majority' } }
     end
 
-    def all_configs(key)
-      doc.orderable_keys.map {|k| doc.class.orderable_configs.dig(k, key) }
+    def transaction_max_retries
+      doc.orderable_keys.map {|k| doc.class.orderable_configs.dig(k, :transaction_max_retries) }.compact.max
     end
   end
 end

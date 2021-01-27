@@ -24,11 +24,17 @@ module Mixins
       protected
 
       def orderable_handler
-        @orderable_engine ||= if embedded?
-                                Mongoid::Orderable::Handlers::Embedded.new(self)
-                              else
-                                Mongoid::Orderable::Handlers::Document.new(self)
-                              end
+        @orderable_handler ||= self.class.orderable_handler_class.new(self)
+      end
+
+      def self.orderable_handler_class
+        if embedded?
+          Mongoid::Orderable::Handlers::DocumentEmbedded
+        elsif orderable_configs.values.any? {|c| c[:use_transactions] }
+          Mongoid::Orderable::Handlers::DocumentTransactional
+        else
+          Mongoid::Orderable::Handlers::Document
+        end
       end
     end
   end
