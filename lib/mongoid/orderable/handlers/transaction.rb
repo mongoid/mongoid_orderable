@@ -3,7 +3,6 @@
 module Mongoid
 module Orderable
 module Handlers
-
   # Executes a block within the context of a MongoDB transaction.
   class Transaction
     THREAD_KEY = :__mongoid_orderable_in_txn
@@ -17,7 +16,9 @@ module Handlers
 
     def with_transaction(&block)
       Mongoid::QueryCache.uncached do
-        if !Thread.current[THREAD_KEY]
+        if Thread.current[THREAD_KEY]
+          yield
+        else
           Thread.current[THREAD_KEY] = true
           retries = transaction_max_retries
           begin
@@ -30,8 +31,6 @@ module Handlers
           ensure
             Thread.current[THREAD_KEY] = nil
           end
-        else
-          yield
         end
       end
     end

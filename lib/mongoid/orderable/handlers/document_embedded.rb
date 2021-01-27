@@ -4,7 +4,6 @@ module Mongoid
 module Orderable
 module Handlers
   class DocumentEmbedded < Document
-
     def after_destroy
       return if doc._root.destroyed?
       super

@@ -4,7 +4,6 @@ module Mongoid
 module Orderable
 module Handlers
   class DocumentTransactional < Document
-
     def before_create
       clear_all_positions
     end

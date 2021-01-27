@@ -4,7 +4,6 @@ module Mongoid
 module Orderable
 module Handlers
   class Document < Base
-
     def before_create
       apply_all_positions
     end
