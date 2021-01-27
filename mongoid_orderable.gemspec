@@ -11,6 +11,7 @@ Gem::Specification.new do |gem|
   gem.homepage    = 'https://github.com/mongoid/mongoid_orderable'
   gem.summary     = 'Mongoid orderable list implementation'
   gem.description = 'Enables Mongoid models to track their position in list'
+  gem.license     = 'MIT'
 
   gem.files         = Dir.glob('lib/**/*') + %w[CHANGELOG.md LICENSE.txt README.md Rakefile]
   gem.test_files    = Dir.glob('spec/**/*')
