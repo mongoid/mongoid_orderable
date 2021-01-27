@@ -9,18 +9,32 @@ module Mixins
     ORDERABLE_TRANSACTION_KEY = :__mongoid_orderable_in_txn
 
     included do
-      around_save :orderable_update_positions
-      after_destroy :orderable_remove_positions, unless: -> { embedded? && _root.destroyed? }
+      before_create :orderable_before_create
+      after_create :orderable_after_create, prepend: true
+      before_update :orderable_before_update
+      after_destroy :orderable_after_destroy, prepend: true
 
-      delegate :update_positions,
-               :remove_positions,
-               to: :orderable_engine,
+      delegate :before_create,
+               :after_create,
+               :before_update,
+               :after_destroy,
+               to: :orderable_handler,
                prefix: :orderable
 
       protected
 
-      def orderable_engine
-        @orderable_engine ||= Mongoid::Orderable::Engine.new(self)
+      def orderable_handler
+        @orderable_handler ||= self.class.orderable_handler_class.new(self)
+      end
+
+      def self.orderable_handler_class
+        if embedded?
+          Mongoid::Orderable::Handlers::DocumentEmbedded
+        elsif orderable_configs.values.any? {|c| c[:use_transactions] }
+          Mongoid::Orderable::Handlers::DocumentTransactional
+        else
+          Mongoid::Orderable::Handlers::Document
+        end
       end
     end
   end

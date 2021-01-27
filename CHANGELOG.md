@@ -1,6 +1,12 @@
-### 6.0.2 (Next)
+### 6.0.3 (Next)
 
 * Your contribution here.
+
+### 6.0.2 (2021/01/26)
+
+* [#70](https://github.com/mongoid/mongoid_orderable/pull/70): Fix: Transactions should not use around callbacks - [@johnnyshields](https://github.com/johnnyshields).
+* [#70](https://github.com/mongoid/mongoid_orderable/pull/70): Refactor: Partially reduce code complexity of handler classes - [@johnnyshields](https://github.com/johnnyshields).
+* [#70](https://github.com/mongoid/mongoid_orderable/pull/70): Tests: Run all tests both with and without transactions - [@johnnyshields](https://github.com/johnnyshields).
 
 ### 6.0.1 (2021/01/26)
 
