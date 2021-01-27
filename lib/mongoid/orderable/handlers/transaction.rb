@@ -5,7 +5,7 @@ module Orderable
 module Handlers
 
   # Executes a block within the context of a MongoDB transaction.
-  class Transactional
+  class Transaction
     THREAD_KEY = :__mongoid_orderable_in_txn
     RETRY_SLEEP = 0.001
 
