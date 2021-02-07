@@ -1,6 +1,7 @@
 ### 6.0.3 (Next)
 
 * Your contribution here.
+* [#71](https://github.com/mongoid/mongoid_orderable/pull/71): Feature: Add TTL index to lock collection - [@johnnyshields](https://github.com/johnnyshields).
 
 ### 6.0.2 (2021/01/26)
 

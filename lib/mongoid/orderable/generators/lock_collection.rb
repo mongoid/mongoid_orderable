@@ -12,12 +12,14 @@ module Generators
         module Models
           class #{model_name}
             include Mongoid::Document
+            include Mongoid::Timestamps::Updated::Short
 
             store_in collection: :#{collection_name}
 
             field :scope, type: String
 
             index({ scope: 1 }, { unique: 1 })
+            index({ updated_at: 1 }, { expire_after_seconds: 86400 })
           end
         end
       KLASS

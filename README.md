@@ -219,7 +219,7 @@ After `transaction_max_retries` has been exceeded, a
 
 When using transactions, Mongoid Orderable creates a collection
 `mongoid_orderable_locks` which is used to store temporary lock objects.
-This collection accumulate documents overtime; it is safe to delete it periodically.
+Lock collections use a TTL index which auto-deletes objects older than 1 day.
 
 You can change the lock collection name globally or per model:
 

@@ -153,7 +153,7 @@ module Handlers
       model_name = doc.class.orderable_configs[field][:lock_collection].to_s.singularize.classify
       model = Mongoid::Orderable::Models.const_get(model_name)
       attrs = lock_scope(field, generic)
-      model.where(attrs).find_one_and_update(attrs, { upsert: true })
+      model.where(attrs).find_one_and_update(attrs.merge(updated_at: Time.now), { upsert: true })
     end
 
     def lock_scope(field, generic = false)
