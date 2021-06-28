@@ -10,10 +10,15 @@ jobs:
       CI: true
       TESTOPTS: -v
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: true
       matrix:
-        ruby: [ 2.6, 2.7, head ]
+        ruby: [2.6, 2.7]
+        experimental: [false]
+        include:
+          - ruby: head
+            experimental: true
 
     steps:
       - name: repo checkout
