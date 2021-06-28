@@ -6,6 +6,7 @@
 
 * [#72](https://github.com/mongoid/mongoid_orderable/pull/72): Feature: Add :if and :unless conditions which disable callbacks.
 * [#71](https://github.com/mongoid/mongoid_orderable/pull/71): Fix: Add TTL index to locks table.
+* [#73](https://github.com/mongoid/mongoid_orderable/pull/73): Refactor: Replace Travis CI with Github Actions.
 
 ### 6.0.2 (2021/01/26)
 
