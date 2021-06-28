@@ -17,6 +17,14 @@ module Generators
           field ||= default_orderable_field
           #{self_class}.orderable_configs[field][:field]
         end
+
+        def orderable_if(field)
+          #{self_class}.orderable_configs[field][:if]
+        end
+
+        def orderable_unless(field)
+          #{self_class}.orderable_configs[field][:unless]
+        end
       KLASS
 
       generate_method(:orderable_inherited_class) do

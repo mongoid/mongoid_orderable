@@ -15,6 +15,8 @@ module Handlers
     delegate :orderable_keys,
              :orderable_field,
              :orderable_position,
+             :orderable_if,
+             :orderable_unless,
              :orderable_scope,
              :orderable_scope_changed?,
              :orderable_top,
@@ -39,7 +41,7 @@ module Handlers
     end
 
     def apply_one_position(field, target_position)
-      return unless changed?(field)
+      return unless allowed?(field) && changed?(field)
 
       set_lock(field) if use_transactions
 
@@ -94,6 +96,7 @@ module Handlers
     end
 
     def remove_one_position(field)
+      return unless allowed?(field)
       f = orderable_field(field)
       current = orderable_position(field)
       set_lock(field) if use_transactions
@@ -125,6 +128,25 @@ module Handlers
       end
 
       target_position
+    end
+
+    def allowed?(field)
+      cond_if = orderable_if(field)
+      cond_unless = orderable_unless(field)
+
+      (cond_if.nil? || resolve_condition(cond_if)) &&
+        (cond_unless.nil? || !resolve_condition(cond_unless))
+    end
+
+    def resolve_condition(condition)
+      case condition
+      when Proc
+        condition.arity.zero? ? doc.instance_exec(&condition) : condition.call(doc)
+      when Symbol
+        doc.send(condition)
+      else
+        condition || false
+      end
     end
 
     def changed?(field)

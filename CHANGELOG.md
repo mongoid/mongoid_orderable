@@ -1,7 +1,11 @@
-### 6.0.3 (Next)
+### 6.0.4 (Next)
 
 * Your contribution here.
-* [#71](https://github.com/mongoid/mongoid_orderable/pull/71): Feature: Add TTL index to lock collection - [@johnnyshields](https://github.com/johnnyshields).
+
+### 6.0.3 (2021/06/27)
+
+* [#72](https://github.com/mongoid/mongoid_orderable/pull/72): Feature: Add :if and :unless conditions which disable callbacks.
+* [#71](https://github.com/mongoid/mongoid_orderable/pull/71): Fix: Add TTL index to locks table.
 
 ### 6.0.2 (2021/01/26)
 

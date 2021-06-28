@@ -13,6 +13,18 @@ class SimpleOrderable
   orderable
 end
 
+class ConditionalOrderable
+  include Mongoid::Document
+  include Mongoid::Orderable
+
+  field :cond_a, type: Boolean
+  field :cond_b, type: Integer
+
+  orderable field: :pos_a, if: :cond_a, unless: ->(obj) { obj.cond_b&.<(2) }
+  orderable field: :pos_b, if: -> { cond_b&.<=(4) }
+  orderable field: :pos_c, unless: false
+end
+
 class ScopedGroup
   include Mongoid::Document
 
