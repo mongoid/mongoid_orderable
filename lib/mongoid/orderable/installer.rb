@@ -35,7 +35,7 @@ module Orderable
     def add_db_index
       spec = [[config[:field], 1]]
       config[:scope].each {|field| spec.unshift([field, 1]) } if config[:scope].is_a?(Array)
-      klass.index(Hash[spec])
+      klass.index(spec.to_h)
     end
 
     def save_config

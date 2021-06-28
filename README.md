@@ -138,7 +138,8 @@ book.previous_#{field}_item
 
 where `#{field}` is either `position` or `serial_no`.
 
-When a model defines multiple orderable fields, the original helpers are also available and work on the first orderable field.
+When a model defines multiple orderable fields, the original helpers are also available and work
+on the first orderable field.
 
 ```ruby
   @book1 = Book.create!
@@ -180,6 +181,24 @@ end
 
 To ensure the position is written correctly, you will need to set
 `cascade_callbacks: true` on the relation.
+
+### Disable Ordering
+
+You can disable position tracking for specific documents using the `:if` and `:unless` options.
+This is in advanced scenarios where you want to control position manually for certain documents.
+In general, the disable condition should match a specific scope.
+**Warning:** If used improperly, this will cause your documents to become out-of-order.
+
+```ruby
+class Book
+  include Mongoid::Document
+  include Mongoid::Orderable
+
+  field :track_position, type: Boolean
+  
+  orderable if: :track_position, unless: -> { created_at < Date.parse('2020-01-01') }
+end
+```
 
 ## Transaction Support
 

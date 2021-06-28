@@ -11,6 +11,8 @@ module Configs
                         base
                         index
                         default
+                        if
+                        unless
                         use_transactions
                         transaction_max_retries
                         lock_collection].freeze
