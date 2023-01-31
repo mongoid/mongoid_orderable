@@ -48,7 +48,7 @@ module Orderable
       klass.send :include, Mixins::Callbacks
       klass.send :include, Mixins::Movable
       klass.send :include, Mixins::Listable
-      klass.send :prepend, Mixins::Changeable
+      klass.send :prepend, Mixins::Cascadeable if klass.embedded?
     end
 
     def generate_all_helpers
