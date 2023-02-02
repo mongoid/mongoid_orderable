@@ -19,7 +19,7 @@ Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
 Layout/IndentationWidth:
-  IgnoredPatterns:
+  AllowedPatterns:
     - '^\s*module'
 
 Layout/LineLength:

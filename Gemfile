@@ -2,6 +2,10 @@
 
 source 'https://rubygems.org'
 
+gem 'rake'
+gem 'rspec', '>= 3.0.0'
+gem 'rspec-retry'
+gem 'rubocop', '>= 1.8.1'
 gemspec
 
 case version = ENV['MONGOID_VERSION'] || '7'

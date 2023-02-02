@@ -14,12 +14,8 @@ Gem::Specification.new do |gem|
   gem.license     = 'MIT'
 
   gem.files         = Dir.glob('lib/**/*') + %w[CHANGELOG.md LICENSE.txt README.md Rakefile]
-  gem.test_files    = Dir.glob('spec/**/*')
   gem.require_path  = 'lib'
 
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec', '>= 3.0.0'
-  gem.add_development_dependency 'rspec-retry'
-  gem.add_development_dependency 'rubocop', '>= 1.8.1'
   gem.add_runtime_dependency 'mongoid', '>= 7.0.0'
+  gem.metadata['rubygems_mfa_required'] = 'true'
 end
