@@ -2,7 +2,7 @@
 
 * Your contribution here.
 
-### 6.0.4 (Next)
+### 6.0.4 (2023/02/01)
 
 * [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Setting #move_to should mark an orderable object as changed so that callbacks are triggered.
 
