@@ -17,6 +17,7 @@ module Mixins
       delegate :before_create,
                :after_create,
                :before_update,
+               :after_update,
                :after_destroy,
                to: :orderable_handler,
                prefix: :orderable

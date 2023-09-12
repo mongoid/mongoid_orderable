@@ -1,6 +1,8 @@
 ### 6.0.5 (Next)
 
-* Your contribution here.
+* [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Preserve position when creating new records.
+* [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: .
+
 
 ### 6.0.4 (2023/02/01)
 
