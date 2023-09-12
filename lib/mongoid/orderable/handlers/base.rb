@@ -74,9 +74,12 @@ module Handlers
       in_list = persisted? && current
       return if in_list && !target_position
 
+      # Get the target position for new record
+      target_position = doc.send(field.to_s) if new_record_with_orderable_field?(field)
+
       # Use $inc operator to shift the position of the other documents
       target = resolve_target_position(field, target_position, in_list)
-      if !in_list
+      if !in_list || new_record_with_orderable_field?(field)
         scope.gte(f => target).inc(f => 1)
       elsif target < current
         scope.where(f => { '$gte' => target, '$lt' => current }).inc(f => 1)
@@ -182,6 +185,10 @@ module Handlers
       sel = orderable_scope(field).selector
       scope = ([collection_name] + (generic ? [field] : sel.to_a.flatten)).map(&:to_s).join('|')
       { scope: scope }
+    end
+
+    def new_record_with_orderable_field?(field)
+      new_record? && doc.send(field.to_s)
     end
   end
 end
