@@ -103,7 +103,7 @@ module Handlers
       end
 
       # If persisted, update the field in the database atomically
-      doc.set({ f => target }.merge(changed_scope_hash(field))) if use_transactions
+      doc.set({ f => target }.merge(changed_scope_hash(field))) if use_transactions && persisted?
       doc.send("orderable_#{field}_position=", target)
     end
 
