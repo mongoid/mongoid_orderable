@@ -12,6 +12,7 @@ module Mixins
       before_create :orderable_before_create
       after_create :orderable_after_create, prepend: true
       before_update :orderable_before_update
+      after_update :orderable_after_update, prepend: true
       after_destroy :orderable_after_destroy, prepend: true
 
       delegate :before_create,
