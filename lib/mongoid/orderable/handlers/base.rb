@@ -32,7 +32,7 @@ module Handlers
              to: :doc
 
     def new_record?
-      @new_record
+      use_transactions ? @new_record : doc.new_record?
     end
 
     def use_transactions
