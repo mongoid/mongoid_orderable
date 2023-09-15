@@ -26,14 +26,11 @@ module Handlers
              :orderable_top,
              :orderable_bottom,
              :_id,
+             :new_record?,
              :persisted?,
              :embedded?,
              :collection_name,
              to: :doc
-
-    def new_record?
-      @new_record
-    end
 
     def use_transactions
       false
