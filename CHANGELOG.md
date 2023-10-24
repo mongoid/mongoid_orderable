@@ -1,6 +1,6 @@
 ### 6.0.5 (Next)
 
-* Your contribution here.
+* [#84](https://github.com/mongoid/mongoid_orderable/pull/84): Feature: Use Mongo::QueryCache if available.
 
 ### 6.0.4 (2023/02/01)
 
