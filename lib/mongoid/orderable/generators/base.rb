@@ -10,7 +10,7 @@ module Generators
       @klass = klass
     end
 
-    protected
+    private
 
     def generate_method(name, &block)
       klass.send(:define_method, name, &block)

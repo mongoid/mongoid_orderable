@@ -6,6 +6,7 @@
 
 * [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Preserve position when creating new records.
 * [#84](https://github.com/mongoid/mongoid_orderable/pull/84): Feature: Use Mongo::QueryCache if available.
+* [#85](https://github.com/mongoid/mongoid_orderable/pull/85): Refactor: Replace all usages of "protected" with "private".
 
 ### 6.0.4 (2023/02/01)
 

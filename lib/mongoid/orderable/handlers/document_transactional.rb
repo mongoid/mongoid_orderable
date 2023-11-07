@@ -13,7 +13,7 @@ module Handlers
       super
     end
 
-    protected
+    private
 
     def apply_all_positions
       with_transaction { super }

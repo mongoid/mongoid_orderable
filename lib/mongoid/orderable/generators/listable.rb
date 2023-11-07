@@ -9,7 +9,7 @@ module Generators
       generate_aliased_helpers(field_name)
     end
 
-    protected
+    private
 
     def generate_list_helpers(field_name)
       generate_method("next_#{field_name}_item") do

@@ -41,7 +41,7 @@ module Configs
         lock_collection: cfg.lock_collection }
     end
 
-    protected
+    private
 
     def assign_options(options)
       @options = global_config

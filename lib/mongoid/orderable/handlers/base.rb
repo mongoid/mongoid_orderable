@@ -11,7 +11,7 @@ module Handlers
       reset_new_record
     end
 
-    protected
+    private
 
     delegate :orderable_keys,
              :orderable_field,

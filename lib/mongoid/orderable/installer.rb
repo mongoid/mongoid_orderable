@@ -18,7 +18,7 @@ module Orderable
       generate_all_helpers
     end
 
-    protected
+    private
 
     def field_name
       config[:field_options][:as] || config[:field]
