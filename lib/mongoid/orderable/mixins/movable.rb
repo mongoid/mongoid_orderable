@@ -47,12 +47,16 @@ module Mixins
     protected
 
     def move_all
-      @move_all || {}
+      @move_all ||= {}
     end
 
     def move_field_to(position, options)
       field = options[:field] || default_orderable_field
-      @move_all = move_all.merge(field => position)
+      move_all[field] = position
+    end
+
+    def clear_move_all!
+      @move_all = {}
     end
   end
 end

@@ -1,5 +1,10 @@
-### 6.0.5 (Next)
+### 6.0.6 (Next)
 
+* Your change here.
+
+### 6.0.5 (2023/11/08)
+
+* [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Preserve position when creating new records.
 * [#84](https://github.com/mongoid/mongoid_orderable/pull/84): Feature: Use Mongo::QueryCache if available.
 
 ### 6.0.4 (2023/02/01)
