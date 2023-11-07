@@ -85,9 +85,9 @@ describe SimpleOrderable do
         expect(another.position).to eq(6)
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
-        # expect(newbie.position).to eq(6)
-        # expect(another.position).to eq(6) # not reloaded
+        expect(newbie.position).to eq(6)
         expect(newbie.reload.position).to eq(6)
+        expect(another.position).to eq(6)
         expect(another.reload.position).to eq(7)
       end
 
@@ -97,33 +97,33 @@ describe SimpleOrderable do
         another = SimpleOrderable.create!
         newbie.save!
         expect(positions).to eq([1, 2, 3, 4, 5, 6, 7])
-        # expect(newbie.position).to eq(6)
-        # expect(another.position).to eq(6) # not reloaded
+        expect(newbie.position).to eq(6)
         expect(newbie.reload.position).to eq(6)
+        expect(another.position).to eq(6)
         expect(another.reload.position).to eq(7)
       end
 
       it 'with correct specific position as a number' do
         record = SimpleOrderable.create!(position: 3)
-        # expect(record.position).to eq(3)
+        expect(record.position).to eq(3)
         expect(record.reload.position).to eq(3)
       end
 
       it 'with incorrect specific position as a number' do
         record = SimpleOrderable.create!(position: -4)
-        # expect(record.position).to eq(1) # not reloaded
+        expect(record.position).to eq(1)
         expect(record.reload.position).to eq(1)
       end
 
       it 'with correct specific position as a string' do
         record = SimpleOrderable.create!(position: '4')
-        # expect(record.position).to eq(4)
+        expect(record.position).to eq(4)
         expect(record.reload.position).to eq(4)
       end
 
       it 'with incorrect specific position as a string' do
         record = SimpleOrderable.create!(position: '-4')
-        # expect(record.position).to eq(1)
+        expect(record.position).to eq(1)
         expect(record.reload.position).to eq(1)
       end
 
@@ -131,8 +131,6 @@ describe SimpleOrderable do
         records = SimpleOrderable.all
         expect(records.pluck(:position)).to eq([1, 2, 3, 4, 5])
         SimpleOrderable.create!(position: 3)
-        # expect(records.pluck(:position)).to eq([1, 2, 3, 4, 5, 6]) # not reloaded
-        records.each(&:reload)
         expect(records.pluck(:position)).to eq([1, 2, 4, 5, 6, 3])
       end
     end

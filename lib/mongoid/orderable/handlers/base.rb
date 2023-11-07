@@ -8,10 +8,7 @@ module Handlers
 
     def initialize(doc)
       @doc = doc
-
-      # Required for transactions, which perform some actions
-      # in the after_create callback.
-      @new_record = doc.new_record?
+      reset_new_record
     end
 
     protected
@@ -125,8 +122,15 @@ module Handlers
       doc.send(:move_all)
     end
 
-    def clear_move_all!
+    def reset
+      reset_new_record
       doc.send(:clear_move_all!)
+    end
+
+    # Required for transactions, which perform some actions
+    # in the after_create callback.
+    def reset_new_record
+      @new_record = doc.new_record?
     end
 
     def resolve_target_position(field, target_position, in_list)

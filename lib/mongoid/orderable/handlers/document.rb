@@ -10,7 +10,7 @@ module Handlers
     end
 
     def after_create
-      clear_move_all!
+      reset
     end
 
     def before_update
@@ -19,12 +19,12 @@ module Handlers
     end
 
     def after_update
-      clear_move_all!
+      reset
     end
 
     def after_destroy
       remove_all_positions
-      clear_move_all!
+      reset
     end
   end
 end

@@ -14,30 +14,27 @@ describe MultipleFieldsOrderable do
       describe 'inserting' do
         let(:newbie) { MultipleFieldsOrderable.create! }
 
-        before do
-          @position = newbie.position
-          @record = MultipleFieldsOrderable.find(newbie.id)
-        end
+        before { @position = newbie.position }
 
         it 'top' do
-          @record.move_to! :top
+          newbie.move_to! :top
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(1)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(1)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'bottom' do
-          @record.move_to! :bottom
+          newbie.move_to! :bottom
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(6)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(6)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'middle' do
-          @record.move_to! 4
+          newbie.move_to! 4
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(4)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(4)
+          expect(newbie.position).to eq(@position)
         end
       end
 
@@ -166,30 +163,27 @@ describe MultipleFieldsOrderable do
       describe 'inserting' do
         let(:newbie) { MultipleFieldsOrderable.create! }
 
-        before do
-          @position = newbie.position
-          @record = MultipleFieldsOrderable.find(newbie.id)
-        end
+        before { @position = newbie.position }
 
         it 'top' do
-          @record.move_serial_no_to! :top
+          newbie.move_serial_no_to! :top
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(1)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(1)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'bottom' do
-          @record.move_serial_no_to! :bottom
+          newbie.move_serial_no_to! :bottom
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(6)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(6)
+          expect(newbie.position).to eq(@position)
         end
 
         it 'middle' do
-          @record.move_serial_no_to! 4
+          newbie.move_serial_no_to! 4
           expect(serial_nos).to eq([1, 2, 3, 4, 5, 6])
-          expect(@record.serial_no).to eq(4)
-          expect(@record.position).to eq(@position)
+          expect(newbie.serial_no).to eq(4)
+          expect(newbie.position).to eq(@position)
         end
       end
 
@@ -322,30 +316,27 @@ describe MultipleFieldsOrderable do
       describe 'inserting' do
         let(:newbie) { MultipleFieldsOrderable.create! }
 
-        before do
-          @serial_no = newbie.serial_no
-          @record = MultipleFieldsOrderable.find(newbie.id)
-        end
+        before { @serial_no = newbie.serial_no }
 
         it 'top' do
-          @record.move_position_to! :top
+          newbie.move_position_to! :top
           expect(positions).to eq([0, 1, 2, 3, 4, 5])
-          expect(@record.position).to eq(0)
-          expect(@record.serial_no).to eq(@serial_no)
+          expect(newbie.position).to eq(0)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
 
         it 'bottom' do
-          @record.move_position_to! :bottom
+          newbie.move_position_to! :bottom
           expect(positions).to eq([0, 1, 2, 3, 4, 5])
-          expect(@record.position).to eq(5)
-          expect(@record.serial_no).to eq(@serial_no)
+          expect(newbie.position).to eq(5)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
 
         it 'middle' do
-          @record.move_position_to! 4
+          newbie.move_position_to! 4
           expect(positions).to eq([0, 1, 2, 3, 4, 5])
-          expect(@record.position).to eq(4)
-          expect(@record.serial_no).to eq(@serial_no)
+          expect(newbie.position).to eq(4)
+          expect(newbie.serial_no).to eq(@serial_no)
         end
       end
 
@@ -437,8 +428,8 @@ describe MultipleFieldsOrderable do
     context 'group_count orderable' do
       before :each do
         MultipleFieldsOrderable.delete_all
-        2.times { MultipleFieldsOrderable.create! group_id: 1 }
-        3.times { MultipleFieldsOrderable.create! group_id: 2 }
+        2.times { MultipleFieldsOrderable.create!(group_id: 1) }
+        3.times { MultipleFieldsOrderable.create!(group_id: 2) }
       end
 
       let(:all_groups) { MultipleFieldsOrderable.order_by([:group_id, :asc], [:groups, :asc]).map(&:groups) }
@@ -466,24 +457,47 @@ describe MultipleFieldsOrderable do
 
       describe 'inserting' do
         it 'top' do
-          newbie = MultipleFieldsOrderable.create! group_id: 1
-          record = MultipleFieldsOrderable.find(newbie.id)
+          newbie = MultipleFieldsOrderable.create!(group_id: 1)
+          newbie.move_groups_to! :top
+          expect(all_groups).to eq([1, 2, 3, 1, 2, 3])
+          expect(newbie.groups).to eq(1)
+        end
+
+        it 'bottom' do
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
+          newbie.move_groups_to! :bottom
+          expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
+          expect(newbie.groups).to eq(4)
+        end
+
+        it 'middle' do
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
+          newbie.move_groups_to! 2
+          expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
+          expect(newbie.groups).to eq(2)
+        end
+      end
+
+      describe 'moving existing document' do
+        it 'top' do
+          newbie = MultipleFieldsOrderable.create!(group_id: 1)
+          record = MultipleFieldsOrderable.find(newbie._id)
           record.move_groups_to! :top
           expect(all_groups).to eq([1, 2, 3, 1, 2, 3])
           expect(record.groups).to eq(1)
         end
 
         it 'bottom' do
-          newbie = MultipleFieldsOrderable.create! group_id: 2
-          record = MultipleFieldsOrderable.find(newbie.id)
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
+          record = MultipleFieldsOrderable.find(newbie._id)
           record.move_groups_to! :bottom
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(record.groups).to eq(4)
         end
 
         it 'middle' do
-          newbie = MultipleFieldsOrderable.create! group_id: 2
-          record = MultipleFieldsOrderable.find(newbie.id)
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
+          record = MultipleFieldsOrderable.find(newbie._id)
           record.move_groups_to! 2
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(record.groups).to eq(2)
