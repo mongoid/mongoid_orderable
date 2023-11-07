@@ -428,8 +428,8 @@ describe MultipleFieldsOrderable do
     context 'group_count orderable' do
       before :each do
         MultipleFieldsOrderable.delete_all
-        2.times { MultipleFieldsOrderable.create! group_id: 1 }
-        3.times { MultipleFieldsOrderable.create! group_id: 2 }
+        2.times { MultipleFieldsOrderable.create!(group_id: 1) }
+        3.times { MultipleFieldsOrderable.create!(group_id: 2) }
       end
 
       let(:all_groups) { MultipleFieldsOrderable.order_by([:group_id, :asc], [:groups, :asc]).map(&:groups) }
@@ -457,21 +457,21 @@ describe MultipleFieldsOrderable do
 
       describe 'inserting' do
         it 'top' do
-          newbie = MultipleFieldsOrderable.create! group_id: 1
+          newbie = MultipleFieldsOrderable.create!(group_id: 1)
           newbie.move_groups_to! :top
           expect(all_groups).to eq([1, 2, 3, 1, 2, 3])
           expect(newbie.groups).to eq(1)
         end
 
         it 'bottom' do
-          newbie = MultipleFieldsOrderable.create! group_id: 2
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
           newbie.move_groups_to! :bottom
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(newbie.groups).to eq(4)
         end
 
         it 'middle' do
-          newbie = MultipleFieldsOrderable.create! group_id: 2
+          newbie = MultipleFieldsOrderable.create!(group_id: 2)
           newbie.move_groups_to! 2
           expect(all_groups).to eq([1, 2, 1, 2, 3, 4])
           expect(newbie.groups).to eq(2)

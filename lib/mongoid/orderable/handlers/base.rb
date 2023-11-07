@@ -8,6 +8,7 @@ module Handlers
 
     def initialize(doc)
       @doc = doc
+      reset_new_record
     end
 
     protected
@@ -22,11 +23,14 @@ module Handlers
              :orderable_top,
              :orderable_bottom,
              :_id,
-             :new_record?,
              :persisted?,
              :embedded?,
              :collection_name,
              to: :doc
+
+    def new_record?
+      use_transactions ? @new_record : doc.new_record?
+    end
 
     def use_transactions
       false
@@ -36,8 +40,18 @@ module Handlers
       orderable_keys.any? {|field| changed?(field) }
     end
 
+    def set_new_record_positions
+      return unless new_record?
+
+      orderable_keys.each do |field|
+        next unless (position = doc.send(field))
+
+        move_all[field] ||= position
+      end
+    end
+
     def apply_all_positions
-      orderable_keys.map {|field| apply_one_position(field, move_all[field]) }
+      orderable_keys.each {|field| apply_one_position(field, move_all[field]) }
     end
 
     def apply_one_position(field, target_position)
@@ -56,7 +70,7 @@ module Handlers
       end
 
       # Get the current position as exists in the database
-      current = if !persisted? || scope_changed
+      current = if new_record? || scope_changed
                   nil
                 elsif persisted? && !embedded?
                   scope.where(_id: _id).pluck(f).first
@@ -74,8 +88,9 @@ module Handlers
       in_list = persisted? && current
       return if in_list && !target_position
 
-      # Use $inc operator to shift the position of the other documents
       target = resolve_target_position(field, target_position, in_list)
+
+      # Use $inc operator to shift the position of the other documents
       if !in_list
         scope.gte(f => target).inc(f => 1)
       elsif target < current
@@ -107,10 +122,21 @@ module Handlers
       doc.send(:move_all)
     end
 
+    def reset
+      reset_new_record
+      doc.send(:clear_move_all!)
+    end
+
+    # Required for transactions, which perform some actions
+    # in the after_create callback.
+    def reset_new_record
+      @new_record = doc.new_record?
+    end
+
     def resolve_target_position(field, target_position, in_list)
       target_position ||= 'bottom'
 
-      unless target_position.is_a? Numeric
+      unless target_position.is_a?(Numeric)
         target_position = case target_position.to_s
                           when 'top' then (min ||= orderable_top(field))
                           when 'bottom' then (max ||= orderable_bottom(field, in_list))
