@@ -23,7 +23,7 @@ module Mixins
                to: :orderable_handler,
                prefix: :orderable
 
-      protected
+      private
 
       def orderable_handler
         @orderable_handler ||= self.class.orderable_handler_class.new(self)

@@ -10,7 +10,7 @@ module Generators
       generate_shorthand_helpers(field_name)
     end
 
-    protected
+    private
 
     def generate_move_to_helpers(field_name)
       generate_method("move_#{field_name}_to") do |target_position|

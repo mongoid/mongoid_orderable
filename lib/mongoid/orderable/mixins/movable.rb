@@ -44,7 +44,7 @@ module Mixins
       KLASS
     end
 
-    protected
+    private
 
     def move_all
       @move_all ||= {}

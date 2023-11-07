@@ -11,7 +11,7 @@ module Generators
       end
     end
 
-    protected
+    private
 
     def criteria(order_scope)
       case order_scope

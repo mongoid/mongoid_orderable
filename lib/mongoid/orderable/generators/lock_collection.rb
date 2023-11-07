@@ -25,7 +25,7 @@ module Generators
       KLASS
     end
 
-    protected
+    private
 
     def model_exists?(model_name)
       base = ::Mongoid::Orderable::Models

@@ -35,7 +35,7 @@ module Handlers
       end
     end
 
-    protected
+    private
 
     def do_transaction(&_block)
       doc.class.with_session(session_opts) do |session|
