@@ -1,6 +1,15 @@
-### 6.0.4 (Next)
+### 6.0.6 (Next)
 
-* Your contribution here.
+* Your change here.
+
+### 6.0.5 (2023/11/08)
+
+* [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Preserve position when creating new records.
+* [#84](https://github.com/mongoid/mongoid_orderable/pull/84): Feature: Use Mongo::QueryCache if available.
+
+### 6.0.4 (2023/02/01)
+
+* [#75](https://github.com/mongoid/mongoid_orderable/pull/75): Fix: Setting #move_to should mark an orderable object as changed so that callbacks are triggered.
 
 ### 6.0.3 (2021/06/27)
 

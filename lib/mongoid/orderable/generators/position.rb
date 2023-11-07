@@ -8,16 +8,16 @@ module Generators
       klass.class_eval <<~KLASS, __FILE__, __LINE__ + 1
         def orderable_position(field = nil)
           field ||= default_orderable_field
-          send "orderable_\#{field}_position"
+          send("orderable_\#{field}_position")
         end
       KLASS
 
       generate_method("orderable_#{field_name}_position") do
-        send field_name
+        send(field_name)
       end
 
       generate_method("orderable_#{field_name}_position=") do |value|
-        send "#{field_name}=", value
+        send("#{field_name}=", value)
       end
     end
   end

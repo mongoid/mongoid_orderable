@@ -53,7 +53,7 @@ end
 class EmbedsOrderable
   include Mongoid::Document
 
-  embeds_many :embedded_orderables
+  embeds_many :embedded_orderables, cascade_callbacks: true
 end
 
 class EmbeddedOrderable

@@ -15,7 +15,7 @@ module Handlers
     end
 
     def with_transaction(&block)
-      Mongoid::QueryCache.uncached do
+      query_cache.uncached do
         if Thread.current[THREAD_KEY]
           yield
         else
@@ -64,6 +64,10 @@ module Handlers
 
     def transaction_max_retries
       doc.orderable_keys.map {|k| doc.class.orderable_configs.dig(k, :transaction_max_retries) }.compact.max
+    end
+
+    def query_cache
+      defined?(Mongo::QueryCache) ? Mongo::QueryCache : Mongoid::QueryCache
     end
   end
 end

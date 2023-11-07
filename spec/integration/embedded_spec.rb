@@ -18,8 +18,37 @@ describe EmbeddedOrderable do
     it 'sets proper position while creation' do
       expect(positions).to eq([[1, 2], [1, 2, 3]])
     end
-
+    
     context '#move_to' do
+
+      it 'move_to! moves an item returned by a query to position' do
+        parent = EmbedsOrderable.first
+        child1 = parent.embedded_orderables.where(position: 1).first
+        child2 = parent.embedded_orderables.where(position: 2).first
+        child1.move_to!(2)
+        expect(child1.reload.position).to eq(2)
+        expect(child2.reload.position).to eq(1)
+      end
+
+      it 'move_to moves an item returned by a query to position when saving the parent' do
+        parent = EmbedsOrderable.first
+        child1 = parent.embedded_orderables.where(position: 1).first
+        child2 = parent.embedded_orderables.where(position: 2).first
+        child1.move_to(2)
+        parent.save!
+        expect(child1.reload.position).to eq(2)
+        expect(child2.reload.position).to eq(1)
+      end
+
+      it 'move_to= moves an item returned by a query to position when saving the parent' do
+        parent = EmbedsOrderable.first
+        child1 = parent.embedded_orderables.where(position: 1).first
+        child2 = parent.embedded_orderables.where(position: 2).first
+        child1.move_to = 2
+        parent.save!
+        expect(child1.reload.position).to eq(2)
+        expect(child2.reload.position).to eq(1)
+      end
 
       it 'moves an embedded item to top position' do
         parent = EmbedsOrderable.first
