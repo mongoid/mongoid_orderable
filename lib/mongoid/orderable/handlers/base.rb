@@ -16,6 +16,7 @@ module Handlers
     delegate :orderable_keys,
              :orderable_field,
              :orderable_position,
+             :orderable_position_was,
              :orderable_if,
              :orderable_unless,
              :orderable_scope,
@@ -37,12 +38,10 @@ module Handlers
     end
 
     def any_field_changed?
-      orderable_keys.any? {|field| changed?(field) }
+      orderable_keys.any? {|field| changed?(field) } || move_all.any?
     end
 
-    def set_new_record_positions
-      return unless new_record?
-
+    def set_target_positions
       orderable_keys.each do |field|
         next unless (position = doc.send(field))
 
@@ -74,6 +73,8 @@ module Handlers
                   nil
                 elsif persisted? && !embedded?
                   scope.where(_id: _id).pluck(f).first
+                elsif persisted? && embedded?
+                  orderable_position_was(field)
                 else
                   orderable_position(field)
                 end
@@ -86,16 +87,23 @@ module Handlers
 
       # Return if there is no instruction to change the position
       in_list = persisted? && current
+      puts 'uuu'
+      puts persisted?.inspect
+      puts current.inspect
+      puts target_position.inspect
       return if in_list && !target_position
 
       target = resolve_target_position(field, target_position, in_list)
 
       # Use $inc operator to shift the position of the other documents
       if !in_list
+        puts '111'
         scope.gte(f => target).inc(f => 1)
       elsif target < current
+        puts '222'
         scope.where(f => { '$gte' => target, '$lt' => current }).inc(f => 1)
       elsif target > current
+        puts '333'
         scope.where(f => { '$gt' => current, '$lte' => target }).inc(f => -1)
       end
 
