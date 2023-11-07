@@ -10,10 +10,19 @@ module Generators
           field ||= default_orderable_field
           send("orderable_\#{field}_position")
         end
+
+        def orderable_position_was(field = nil)
+          field ||= default_orderable_field
+          send("orderable_\#{field}_position_was")
+        end
       KLASS
 
       generate_method("orderable_#{field_name}_position") do
         send(field_name)
+      end
+
+      generate_method("orderable_#{field_name}_position_was") do
+        send("#{field_name}_was")
       end
 
       generate_method("orderable_#{field_name}_position=") do |value|

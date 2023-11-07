@@ -5,7 +5,7 @@ module Orderable
 module Handlers
   class DocumentTransactional < Document
     def before_create
-      set_new_record_positions
+      set_target_positions
     end
 
     def after_create

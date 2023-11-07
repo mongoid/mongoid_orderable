@@ -5,7 +5,7 @@ module Orderable
 module Handlers
   class Document < Base
     def before_create
-      set_new_record_positions
+      set_target_positions
       apply_all_positions
     end
 
@@ -15,6 +15,7 @@ module Handlers
 
     def before_update
       return unless any_field_changed?
+      set_target_positions
       apply_all_positions
     end
 
