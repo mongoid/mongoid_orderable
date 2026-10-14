@@ -1,7 +1,10 @@
 [![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
-[![Test](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml/badge.svg)](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml)
+[![Test](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml?query=branch%3Amaster)
+[![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid_orderable/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid_orderable?branch=master)
 
 # Mongoid Orderable
+
+The Ruby 4.0 CI job measures all library files with SimpleCov and submits `coverage/.resultset.json` through the official Coveralls action using GitHub's automatic token. Other matrix jobs do not upload duplicate reports. Run `COVERAGE=true bundle install` and `COVERAGE=true bundle exec rake spec` to measure coverage locally. An accepted upstream default-branch build is required for the badge; this workflow alone does not activate the external service.
 
 Mongoid::Orderable is a ordered list implementation for your Mongoid 7+ projects.
 
