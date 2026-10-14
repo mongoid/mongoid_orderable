@@ -4,7 +4,7 @@ require 'rspec'
 require 'rspec/retry'
 
 Mongoid.configure do |config|
-  config.connect_to 'mongoid_orderable_test'
+  config.load_configuration(clients: { default: { database: 'mongoid_orderable_test', hosts: [ENV.fetch('MONGODB_HOST', 'localhost:27017')] } })
 end
 
 Mongoid.logger.level = Logger::INFO
