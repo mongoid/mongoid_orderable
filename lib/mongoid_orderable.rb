@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'logger'
 require 'active_support'
 
 I18n.enforce_available_locales = false if I18n.respond_to?(:enforce_available_locales)

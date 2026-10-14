@@ -1,5 +1,5 @@
 [![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
-[![Build Status](https://travis-ci.org/mongoid/mongoid_orderable.svg?branch=master)](https://travis-ci.org/mongoid/mongoid_orderable)
+[![Test](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml/badge.svg)](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml)
 
 # Mongoid Orderable
 
@@ -24,6 +24,8 @@ As of version 6.0.0, Mongoid::Orderable supports the following dependency versio
 For older versions, please use Mongoid::Orderable 5.x and earlier.
 
 Transaction support requires MongoDB 4.2+ (4.4+ recommended.)
+
+CI tests representative compatible combinations through Ruby 4.0, Mongoid 9, and MongoDB Server 8.0, retaining Ruby 2.6 / Mongoid 7 / MongoDB 4.4 coverage. See [the test matrix](.github/workflows/test.yml); this is not a Cartesian product of supported versions. Every CI test job uses an isolated single-node replica set, so transaction and non-transaction tests both run. Set `MONGOID_VERSION` to select a Mongoid major version and `MONGODB_HOST` to override the default `localhost:27017` when running tests.
 
 ## Usage
 

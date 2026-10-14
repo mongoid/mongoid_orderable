@@ -5,14 +5,17 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'rspec', '>= 3.0.0'
 gem 'rspec-retry'
-gem 'rubocop', '>= 1.8.1'
+gem 'rubocop', '~> 1.50.0'
 gemspec
 
-case version = ENV['MONGOID_VERSION'] || '7'
+gem 'bigdecimal' if RUBY_VERSION >= '3.4'
+gem 'logger' if RUBY_VERSION >= '3.4'
+
+case version = ENV['MONGOID_VERSION'] || '9'
 when 'HEAD'
   gem 'mongoid', github: 'mongodb/mongoid'
-when /\A7/
-  gem 'mongoid', '~> 7.0'
+when /\A\d+\z/
+  gem 'mongoid', "~> #{version}.0"
 else
   gem 'mongoid', version
 end
