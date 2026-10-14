@@ -6,6 +6,7 @@ gem 'rake'
 gem 'rspec', '>= 3.0.0'
 gem 'rspec-retry'
 gem 'rubocop', '~> 1.50.0'
+gem 'simplecov', '~> 0.22', require: false if ENV['COVERAGE'] == 'true'
 gemspec
 
 gem 'bigdecimal' if RUBY_VERSION >= '3.4'

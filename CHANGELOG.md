@@ -1,6 +1,7 @@
 ### 6.0.6 (Next)
 
 * Your change here.
+* [#91](https://github.com/mongoid/mongoid_orderable/pull/91): Add real SimpleCov coverage with one representative Coveralls reporting job and upstream-default-branch CI and coverage badges.
 * [#90](https://github.com/mongoid/mongoid_orderable/pull/90): Modernize the GitHub Actions matrix through Ruby 4.0, Mongoid 9, and MongoDB Server 8.0 using container services and replica sets for transaction coverage.
 
 ### 6.0.5 (2023/11/08)
