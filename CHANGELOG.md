@@ -1,3 +1,7 @@
+### 6.0.7 (Next)
+
+* Your change here.
+
 ### 6.0.6 (2026/10/14)
 
 * [#90](https://github.com/mongoid/mongoid_orderable/pull/90): Explicitly load Logger for modern ActiveSupport compatibility.
