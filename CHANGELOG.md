@@ -1,6 +1,6 @@
-### 6.0.6 (Next)
+### 6.0.6 (2026/10/14)
 
-* Your change here.
+* [#90](https://github.com/mongoid/mongoid_orderable/pull/90): Explicitly load Logger for modern ActiveSupport compatibility.
 * [#91](https://github.com/mongoid/mongoid_orderable/pull/91): Add real SimpleCov coverage with one representative Coveralls reporting job and upstream-default-branch CI and coverage badges.
 * [#90](https://github.com/mongoid/mongoid_orderable/pull/90): Modernize the GitHub Actions matrix through Ruby 4.0, Mongoid 9, and MongoDB Server 8.0 using container services and replica sets for transaction coverage.
 
