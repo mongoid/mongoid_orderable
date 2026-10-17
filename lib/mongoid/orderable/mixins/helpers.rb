@@ -29,7 +29,13 @@ module Mixins
     def orderable_bottom(field = nil, in_list = true)
       field ||= default_orderable_field
       f = orderable_field(field)
-      max = orderable_scope(field).ne(f => nil).max(f)
+      scope = orderable_scope(field)
+      scope = scope.ne(_id: _id) if embedded?
+      max = scope.ne(f => nil).max(f)
+      if embedded? && in_list && persisted?
+        previous_position = send("#{f}_was")
+        max = [max, previous_position].compact.max
+      end
       return orderable_top(field) unless max
       in_list ? max : max.next
     end

@@ -30,6 +30,8 @@ Transaction support requires MongoDB 4.2+ (4.4+ recommended.)
 
 ## Usage
 
+See [UPGRADING](UPGRADING.md) for migration notes, including embedded position assignment changes in 6.0.7.
+
 ### Getting Started
 
 ```ruby
@@ -184,6 +186,22 @@ end
 
 To ensure the position is written correctly, you will need to set
 `cascade_callbacks: true` on the relation.
+
+Assigning an embedded document's position reorders its siblings when either the child or its parent is saved:
+
+```ruby
+survey = Survey.create!
+3.times { survey.questions.create! }
+question = survey.questions.last
+
+question.position = 1
+survey.save! # question.save! also works
+survey.reload.questions.map(&:position) # => [2, 3, 1]
+```
+
+Positions below the top or above the bottom are clamped to the list bounds. Assigning `nil` moves an existing child to the bottom. New children with a position are inserted at that position, shifting later siblings. Existing `move_to`, `move_to!`, and their helper methods remain supported; an explicit movement request takes precedence over a direct position assignment.
+
+This changes the previous behavior where assigning an existing embedded child's position could leave duplicate positions instead of shifting its siblings. See [UPGRADING](UPGRADING.md).
 
 ### Disable Ordering
 
