@@ -1,5 +1,6 @@
 ### 6.0.7 (Next)
 
+* [#93](https://github.com/mongoid/mongoid_orderable/pull/93): Cover generated ordering helpers, embedded deletion, nested transactions, retry failures, scope errors and standalone version loading - [@dblock](https://github.com/dblock).
 * Your change here.
 * [#92](https://github.com/mongoid/mongoid_orderable/pull/92): Fix direct position assignment for embedded documents while retaining the movement API, based on regression tests by [@johnnyshields](https://github.com/johnnyshields) - [@dblock](https://github.com/dblock).
 
