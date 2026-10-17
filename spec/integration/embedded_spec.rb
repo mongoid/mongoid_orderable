@@ -187,6 +187,213 @@ describe EmbeddedOrderable do
         expect(child2.reload.position).to eq(1)
       end
     end
+
+    context '#save! on parent' do
+      let!(:parent) { EmbedsOrderable.last }
+      let!(:child1) { parent.embedded_orderables.first }
+      let!(:child2) { parent.embedded_orderables.second }
+      let!(:child3) { parent.embedded_orderables.third }
+
+      it 'sets existing item to top' do
+        child3.position = 1
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 1]
+      end
+
+      it 'sets existing item above top' do
+        child3.position = 0
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 1]
+      end
+
+      it 'sets existing item to middle' do
+        child3.position = 2
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 2]
+      end
+
+      it 'sets existing item to bottom' do
+        child1.position = 3
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [3, 1, 2]
+      end
+
+      it 'sets existing item below bottom' do
+        child1.position = 4
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [3, 1, 2]
+      end
+
+      it 'sets existing item with nil position' do
+        child2.position = nil
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 2]
+      end
+
+      it 'saves new item with position set to top' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 1
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 4, 1]
+      end
+
+      it 'saves new item with position set above top' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 0
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 4, 1]
+      end
+
+      it 'saves new item with position set to middle' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 2
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 4, 2]
+      end
+
+      it 'saves new item with position set to bottom' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 4
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+
+      it 'saves new item with position set below bottom' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 5
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+
+      it 'saves new item with nil position' do
+        parent.embedded_orderables.build
+        parent.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+    end
+
+    context '#save! on child' do
+      let!(:parent) { EmbedsOrderable.last }
+      let!(:child1) { parent.embedded_orderables.first }
+      let!(:child2) { parent.embedded_orderables.second }
+      let!(:child3) { parent.embedded_orderables.third }
+
+      it 'sets existing item to top' do
+        child3.position = 1
+        child3.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 1]
+      end
+
+      it 'sets existing item above top' do
+        child3.position = 0
+        child3.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 1]
+      end
+
+      it 'sets existing item to middle' do
+        child3.position = 2
+        child3.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 2]
+      end
+
+      it 'sets existing item to bottom' do
+        child1.position = 3
+        child1.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [3, 1, 2]
+      end
+
+      it 'sets existing item below bottom' do
+        child1.position = 4
+        child1.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [3, 1, 2]
+      end
+
+      it 'sets existing item with nil position' do
+        child2.position = nil
+        child2.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 2]
+      end
+
+      it 'saves new item with position set to top' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 1
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 4, 1]
+      end
+
+      it 'saves new item with position set above top' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 0
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [2, 3, 4, 1]
+      end
+
+      it 'saves new item with position set to middle' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 2
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 3, 4, 2]
+      end
+
+      it 'saves new item with position set to bottom' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 4
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+
+      it 'saves new item with position set below bottom' do
+        child4 = parent.embedded_orderables.build
+        child4.position = 5
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+
+      it 'saves new item with nil position' do
+        child4 = parent.embedded_orderables.build
+        child4.save!
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq [1, 2, 3, 4]
+      end
+    end
+  end
+
+  [:parent, :child].each do |save_target|
+    context "direct assignment saved through #{save_target}" do
+      let!(:parent) { EmbedsOrderable.create! }
+
+      def save_position(child, target)
+        target == :parent ? parent.save! : child.save!
+      end
+
+      it 'handles a single child and repeated changes on the same instance' do
+        child = parent.embedded_orderables.create!
+        child.position = 10
+        save_position(child, save_target)
+        expect(child.position).to eq(1)
+        child.position = nil
+        save_position(child, save_target)
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq([1])
+      end
+
+      it 'honors an explicit movement request over the assigned position' do
+        3.times { parent.embedded_orderables.create! }
+        child = parent.embedded_orderables.last
+        child.position = 2
+        child.move_to(:top)
+        save_position(child, save_target)
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq([2, 3, 1])
+      end
+
+      it 'supports subsequent moves without reloading the child' do
+        3.times { parent.embedded_orderables.create! }
+        child = parent.embedded_orderables.last
+        child.position = 1
+        save_position(child, save_target)
+        child.position = 2
+        save_position(child, save_target)
+        expect(parent.reload.embedded_orderables.map(&:position)).to eq([1, 3, 2])
+      end
+    end
   end
 
   context 'with transactions' do

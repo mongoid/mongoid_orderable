@@ -60,6 +60,7 @@ module Handlers
       set_lock(field) if use_transactions
 
       f = orderable_field(field)
+      target_position ||= orderable_position(field) || :bottom if embedded? && doc.send("#{f}_changed?")
       scope = orderable_scope(field)
       scope_changed = orderable_scope_changed?(field)
 
@@ -74,6 +75,8 @@ module Handlers
                   nil
                 elsif persisted? && !embedded?
                   scope.where(_id: _id).pluck(f).first
+                elsif persisted? && embedded?
+                  doc.send("#{f}_was")
                 else
                   orderable_position(field)
                 end
