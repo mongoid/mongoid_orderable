@@ -1,7 +1,6 @@
-### 6.0.7 (Next)
+### 6.0.7 (2026/10/18)
 
 * [#92](https://github.com/mongoid/mongoid_orderable/pull/92): Fix direct position assignment for embedded documents while retaining the movement API, based on regression tests by [@johnnyshields](https://github.com/johnnyshields) - [@dblock](https://github.com/dblock).
-* Your contribution here.
 
 ### 6.0.6 (2026/10/14)
 
