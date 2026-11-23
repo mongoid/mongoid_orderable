@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.push File.expand_path('lib', __dir__)
-require 'mongoid/orderable/version'
+require_relative 'lib/mongoid/orderable/version'
 
 Gem::Specification.new do |gem|
   gem.name        = 'mongoid_orderable'
