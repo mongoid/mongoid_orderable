@@ -25,6 +25,6 @@ gh release create "v$version" --repo mongoid/mongoid_orderable \
 
 Verify the exact version at `https://rubygems.org/gems/mongoid_orderable/versions/VERSION` and inspect `gh release view "v$version" --repo mongoid/mongoid_orderable` to confirm a published, non-draft release. If interrupted, resume only the missing publication step.
 
-## Next development version
+## Next Development Version
 
 Increment the patch version in `lib/mongoid/orderable/version.rb`, add a new dated-as-`Next` changelog section with a contribution placeholder, and commit and push the changes to `master`.
