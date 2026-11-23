@@ -1,5 +1,6 @@
 ActiveSupport
 Arkadiy
+Bundler
 CHANGELOG
 changelog
 CLI
@@ -14,6 +15,7 @@ gte
 initializer
 joeyAghion
 johnnyshields
+JRuby
 linter
 lt
 lte
@@ -35,6 +37,7 @@ Rakefile
 rb
 README
 README's
+RSpec
 RuboCop
 rubocop
 RubyGems
