@@ -16,6 +16,6 @@ Gem::Specification.new do |gem|
   gem.files         = Dir.glob('lib/**/*') + %w[CHANGELOG.md LICENSE.txt README.md Rakefile]
   gem.require_path  = 'lib'
 
-  gem.add_runtime_dependency 'mongoid', '>= 7.0.0'
+  gem.add_dependency 'mongoid', '>= 7.0.0'
   gem.metadata['rubygems_mfa_required'] = 'true'
 end

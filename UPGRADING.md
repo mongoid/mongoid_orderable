@@ -2,7 +2,7 @@
 
 ## 6.0.7
 
-### Assigning embedded document positions
+### Assigning Embedded Document Positions
 
 Assigning `child.position` and saving the child or its parent now reorders the embedded siblings, rather than writing a literal position that can leave duplicates. The relation must use `cascade_callbacks: true` when saving through the parent.
 

@@ -1,14 +1,10 @@
-[![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable)
-[![Test](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml?query=branch%3Amaster)
-[![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid_orderable/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid_orderable?branch=master)
-
 # Mongoid Orderable
 
-The Ruby 4.0 CI job measures all library files with SimpleCov and submits `coverage/.resultset.json` through the official Coveralls action using GitHub's automatic token. Other matrix jobs do not upload duplicate reports. Run `COVERAGE=true bundle install` and `COVERAGE=true bundle exec rake spec` to measure coverage locally. An accepted upstream default-branch build is required for the badge; this workflow alone does not activate the external service.
+[![Gem Version](https://badge.fury.io/rb/mongoid_orderable.svg)](https://badge.fury.io/rb/mongoid_orderable) [![Test](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/mongoid/mongoid_orderable/actions/workflows/test.yml?query=branch%3Amaster) [![Coverage Status](https://coveralls.io/repos/github/mongoid/mongoid_orderable/badge.svg?branch=master)](https://coveralls.io/github/mongoid/mongoid_orderable?branch=master)
 
-Mongoid::Orderable is a ordered list implementation for your Mongoid 7+ projects.
+Mongoid::Orderable is an ordered list implementation for your Mongoid 7+ projects.
 
-### Core Features
+## Core Features
 
 * Sets a position index field on your documents which allows you to sort them in order.
 * Uses MongoDB's `$inc` operator to batch-update position.
@@ -28,6 +24,14 @@ For older versions, please use Mongoid::Orderable 5.x and earlier.
 
 Transaction support requires MongoDB 4.2+ (4.4+ recommended.)
 
+## Installation
+
+Add the gem to your Gemfile and run `bundle install`.
+
+```ruby
+gem 'mongoid_orderable'
+```
+
 ## Usage
 
 See [UPGRADING](UPGRADING.md) for migration notes, including embedded position assignment changes in 6.0.7.
@@ -38,8 +42,7 @@ See [UPGRADING](UPGRADING.md) for migration notes, including embedded position a
 gem 'mongoid_orderable'
 ```
 
-Include `Mongoid::Orderable` into your model and call `orderable` method.
-Embedded objects are automatically scoped to their parent.
+Include `Mongoid::Orderable` into your model and call `orderable` method. Embedded objects are automatically scoped to their parent.
 
 ```ruby
 class MyModel
@@ -47,8 +50,8 @@ class MyModel
   include Mongoid::Orderable
 
   belongs_to :group
-  belongs_to :drawer, class_name: "Office::Drawer",
-             foreign_key: "legacy_drawer_key_id"
+  belongs_to :drawer, class_name: 'Office::Drawer',
+                      foreign_key: 'legacy_drawer_key_id'
 
   orderable
 
@@ -62,15 +65,14 @@ class MyModel
   orderable scope: ->(doc) { where(group_id: doc.group_id) }
 
   # this one if you want specify indexes manually
-  orderable index: false 
+  orderable index: false
 
   # count position from zero as the top-most value (1 is the default value)
   orderable base: 0
 end
 ```
 
-You can also set default config values in an initializer, which will be
-applied when calling the `orderable` macro in a model.
+You can also set default config values in an initializer, which will be applied when calling the `orderable` macro in a model.
 
 ```ruby
 # configs/initializers/mongoid_orderable.rb
@@ -121,43 +123,41 @@ class Book
 end
 ```
 
-The above defines two different orderable_fields on Book - *position* and *serial_no*.
-The following helpers are generated in this case:
+The above defines two different orderable_fields on Book - *position* and *serial_no*. The following helpers are generated in this case:
 
 ```ruby
-book.move_#{field}_to
-book.move_#{field}_to=
-book.move_#{field}_to!
+book.move_ #{field}_to
+book.move_ #{field}_to=
+book.move_ #{field}_to!
 
-book.move_#{field}_to_top
-book.move_#{field}_to_bottom
-book.move_#{field}_higher
-book.move_#{field}_lower
+book.move_ #{field}_to_top
+book.move_ #{field}_to_bottom
+book.move_ #{field}_higher
+book.move_ #{field}_lower
 
-book.next_#{field}_items
-book.previous_#{field}_items
+book.next_ #{field}_items
+book.previous_ #{field}_items
 
-book.next_#{field}_item
-book.previous_#{field}_item
+book.next_ #{field}_item
+book.previous_ #{field}_item
 ```
 
 where `#{field}` is either `position` or `serial_no`.
 
-When a model defines multiple orderable fields, the original helpers are also available and work
-on the first orderable field.
+When a model defines multiple orderable fields, the original helpers are also available and work on the first orderable field.
 
 ```ruby
-  @book1 = Book.create!
-  @book2 = Book.create!
-  @book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
-  @book2.move_to! :top   # this will change the :position of the book to 0 (not serial_no)
-  @book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
+@book1 = Book.create!
+@book2 = Book.create!
+@book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 1>
+@book2.move_to! :top   # this will change the :position of the book to 0 (not serial_no)
+@book2                 # => <Book _id: 53a16a2ba1bde4f746000001, serial_no: 1, position: 0>
 ```
 
 To specify any other orderable field as default pass the **default: true** option with orderable.
 
 ```ruby
-  orderable field: sno, as: :serial_no, default: true
+orderable field: sno, as: :serial_no, default: true
 ```
 
 ### Embedded Documents
@@ -173,8 +173,7 @@ class Question
 end
 ```
 
-If you bulk import embedded documents without specifying their position,
-no field `position` will be written.
+If you bulk import embedded documents without specifying their position, no field `position` will be written.
 
 ```ruby
 class Survey
@@ -184,8 +183,7 @@ class Survey
 end
 ```
 
-To ensure the position is written correctly, you will need to set
-`cascade_callbacks: true` on the relation.
+To ensure the position is written correctly, you will need to set `cascade_callbacks: true` on the relation.
 
 Assigning an embedded document's position reorders its siblings when either the child or its parent is saved:
 
@@ -205,10 +203,7 @@ This changes the previous behavior where assigning an existing embedded child's 
 
 ### Disable Ordering
 
-You can disable position tracking for specific documents using the `:if` and `:unless` options.
-This is in advanced scenarios where you want to control position manually for certain documents.
-In general, the disable condition should match a specific scope.
-**Warning:** If used improperly, this will cause your documents to become out-of-order.
+You can disable position tracking for specific documents using the `:if` and `:unless` options. This is in advanced scenarios where you want to control position manually for certain documents. In general, the disable condition should match a specific scope. **Warning:** If used improperly, this will cause your documents to become out-of-order.
 
 ```ruby
 class Book
@@ -216,19 +211,14 @@ class Book
   include Mongoid::Orderable
 
   field :track_position, type: Boolean
-  
+
   orderable if: :track_position, unless: -> { created_at < Date.parse('2020-01-01') }
 end
 ```
 
 ## Transaction Support
 
-By default, Mongoid Orderable does not guarantee ordering consistency
-when doing multiple concurrent updates on documents. This means that
-instead of having positions `1, 2, 3, 4, 5`, after running your system
-in production at scale your position data will become corrupted, e.g.
-`1, 1, 4, 4, 6`. To remedy this, this Mongoid Orderable can use
-[MongoDB transactions](https://docs.mongodb.com/manual/core/transactions/)
+By default, Mongoid Orderable does not guarantee ordering consistency when doing multiple concurrent updates on documents. This means that instead of having positions `1, 2, 3, 4, 5`, after running your system in production at scale your position data will become corrupted, e.g. `1, 1, 4, 4, 6`. To remedy this, this Mongoid Orderable can use [MongoDB transactions](https://docs.mongodb.com/manual/core/transactions/)
 
 ### Prerequisites
 
@@ -250,34 +240,27 @@ class MyModel
 end
 ```
 
-When two transactions are attempted at the same time, database-level
-`WriteConflict` failures may result and retries will be attempted.
-After `transaction_max_retries` has been exceeded, a
-`Mongoid::Orderable::Errors::TransactionFailed` error will be raised.
+When two transactions are attempted at the same time, database-level `WriteConflict` failures may result and retries will be attempted. After `transaction_max_retries` has been exceeded, a `Mongoid::Orderable::Errors::TransactionFailed` error will be raised.
 
 ### Locks
 
-When using transactions, Mongoid Orderable creates a collection
-`mongoid_orderable_locks` which is used to store temporary lock objects.
-Lock collections use a TTL index which auto-deletes objects older than 1 day.
+When using transactions, Mongoid Orderable creates a collection `mongoid_orderable_locks` which is used to store temporary lock objects. Lock collections use a TTL index which auto-deletes objects older than 1 day.
 
 You can change the lock collection name globally or per model:
 
 ```ruby
 Mongoid::Orderable.configure do |config|
-  config.lock_collection = "my_locks"  # default: "mongoid_orderable_locks"
+  config.lock_collection = 'my_locks' # default: "mongoid_orderable_locks"
 end
 
 class MyModel
-  orderable :position, lock_collection: "my_model_locks"
+  orderable :position, lock_collection: 'my_model_locks'
 end
 ```
 
 ### MongoDB 4.2 Support
 
-In MongoDB 4.2, collections cannot be created within transactions.
-Therefore, you will need to manually run the following command once
-to initialize the lock collection:
+In MongoDB 4.2, collections cannot be created within transactions. Therefore, you will need to manually run the following command once to initialize the lock collection:
 
 ```ruby
 Mongoid::Orderable::Models::Lock.create!
@@ -285,12 +268,12 @@ Mongoid::Orderable::Models::Lock.create!
 
 This step is not necessary when using MongoDB 4.4+.
 
-### Contributing
+## Contributing
 
-Please fork the project on Github and raise a pull request including passing specs.
+See [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md), [UPGRADING.md](UPGRADING.md), and [RELEASING.md](RELEASING.md).
 
-### Copyright & License
+## Copyright & License
 
 Copyright (c) 2011 Arkadiy Zabazhanov, Johnny Shields, and contributors.
 
-MIT license, see [LICENSE](LICENSE.txt) for details.
+MIT license, see [LICENSE.txt](LICENSE.txt) for details.
