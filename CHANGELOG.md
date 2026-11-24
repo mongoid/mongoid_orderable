@@ -1,3 +1,7 @@
+### 6.0.9 (Next)
+
+* Your contribution here.
+
 ### 6.0.8 (2026/11/24)
 
 * [#94](https://github.com/mongoid/mongoid_orderable/pull/94): Lint Markdown, YAML, and spelling with rubocop-md, rubocop-prose, rubocop-spellcheck, and rubocop-yaml in a separate Lint workflow, and clean up documentation - [@dblock](https://github.com/dblock).
